@@ -1,0 +1,144 @@
+{
+  "summary": {
+    "total_tests": 19,
+    "passed_tests": 19,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "timestamp": "2025-12-01T06:24:32.753013"
+  },
+  "test_results": [
+    {
+      "test_name": "Login as driver",
+      "success": true,
+      "details": "Successfully logged in as driver@test.com",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:30.453903"
+    },
+    {
+      "test_name": "Login as partner",
+      "success": true,
+      "details": "Successfully logged in as partner@test.com",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:30.725835"
+    },
+    {
+      "test_name": "Login as admin",
+      "success": true,
+      "details": "Successfully logged in as admin@test.com",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:30.987889"
+    },
+    {
+      "test_name": "User Registration",
+      "success": true,
+      "details": "Created new user: test_driver_062430@test.com",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.253387"
+    },
+    {
+      "test_name": "Get All Parking Spots",
+      "success": true,
+      "details": "Retrieved 4 parking spots",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.295839"
+    },
+    {
+      "test_name": "Search Spots by City",
+      "success": true,
+      "details": "Found 1 spots in Dallas",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.335557"
+    },
+    {
+      "test_name": "Get Specific Spot",
+      "success": true,
+      "details": "Retrieved spot details for spot-001",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.412975"
+    },
+    {
+      "test_name": "Create Parking Spot",
+      "success": true,
+      "details": "Created spot: Test Spot 062431 (ID: bc61a942-45d4-41ef-a0f5-8ff101813e08)",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.452702"
+    },
+    {
+      "test_name": "Get Partner Spots",
+      "success": true,
+      "details": "Partner has 6 spots",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.495892"
+    },
+    {
+      "test_name": "Create Booking",
+      "success": true,
+      "details": "Created booking: 192c7868-31df-497a-8ec0-6aa38bba83ff for spot spot-001",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.602015"
+    },
+    {
+      "test_name": "Get Driver Bookings",
+      "success": true,
+      "details": "Driver has 1 bookings",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.639175"
+    },
+    {
+      "test_name": "Get Spot Bookings",
+      "success": true,
+      "details": "Spot has 1 bookings",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:31.680913"
+    },
+    {
+      "test_name": "Create Checkout Session",
+      "success": true,
+      "details": "Created Stripe checkout session: cs_test_a1SyvhcJh2oBpt1EjI1QKFoFlxii9Y2cjaRB2XrlGpfh8HE1XGxvz8E4Nq",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:32.315581"
+    },
+    {
+      "test_name": "Get Payment Status",
+      "success": true,
+      "details": "Payment status: unpaid",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:32.547811"
+    },
+    {
+      "test_name": "Get Dashboard Stats",
+      "success": true,
+      "details": "Stats - Spots: 6, Bookings: 1, Revenue: $0.00",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:32.584674"
+    },
+    {
+      "test_name": "Get All Users",
+      "success": true,
+      "details": "Total users in system: 4",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:32.624039"
+    },
+    {
+      "test_name": "Invalid Login Handling",
+      "success": true,
+      "details": "Correctly rejected invalid credentials",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:32.669918"
+    },
+    {
+      "test_name": "Non-existent Spot Handling",
+      "success": true,
+      "details": "Correctly returned 404 for non-existent spot",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:32.713492"
+    },
+    {
+      "test_name": "Unauthorized Spot Creation",
+      "success": true,
+      "details": "Correctly rejected unauthorized spot creation",
+      "response_data": null,
+      "timestamp": "2025-12-01T06:24:32.752819"
+    }
+  ]
+}
