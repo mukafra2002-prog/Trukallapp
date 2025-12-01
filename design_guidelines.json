@@ -1,0 +1,186 @@
+{
+  "identity": {
+    "persona": "E1: The Anti-AI Designer",
+    "philosophy": "Fusion over Imitation. Emotion First. Content is King.",
+    "anti_patterns": [
+      "Purple/Teal gradients for CTAs",
+      "Inter font for headings",
+      "Symmetry everywhere",
+      "Low contrast gray text"
+    ]
+  },
+  "project_context": {
+    "app_name": "NightHaul",
+    "app_type": "mobile_web_app",
+    "target_audience": "Professional Truck Drivers",
+    "emotional_tone": "Reliable, Industrial, Safe, Direct",
+    "theme_strategy": "Dark Mode Default (The Night Shift)",
+    "core_needs": [
+      "High visibility in low light",
+      "Large touch targets (fat finger friendly)",
+      "Instant information (no digging)",
+      "Offline resilience"
+    ]
+  },
+  "design_system": {
+    "typography": {
+      "headings": {
+        "family": "Chivo, sans-serif",
+        "usage": "Headings, Hero Text, Big Numbers",
+        "weights": ["900", "700"],
+        "letter_spacing": "-0.02em"
+      },
+      "body": {
+        "family": "Manrope, sans-serif",
+        "usage": "Paragraphs, UI Labels, Inputs",
+        "weights": ["400", "600"]
+      },
+      "mono": {
+        "family": "JetBrains Mono, monospace",
+        "usage": "Fuel Prices, Coordinates, Time, License Plates",
+        "weights": ["500"]
+      },
+      "scale": {
+        "h1": "text-4xl md:text-6xl font-black tracking-tighter",
+        "h2": "text-3xl md:text-4xl font-bold tracking-tight",
+        "h3": "text-2xl font-bold",
+        "body_lg": "text-lg leading-relaxed",
+        "body_base": "text-base leading-relaxed",
+        "caption": "text-sm font-medium uppercase tracking-wider text-muted-foreground"
+      }
+    },
+    "colors": {
+      "palette_name": "Asphalt & Amber",
+      "background": {
+        "default": "#09090B",
+        "paper": "#18181B",
+        "subtle": "#27272A"
+      },
+      "primary": {
+        "main": "#F59E0B",
+        "hover": "#D97706",
+        "foreground": "#000000",
+        "description": "Safety Amber - High visibility, associated with caution and road signs."
+      },
+      "secondary": {
+        "main": "#10B981",
+        "foreground": "#000000",
+        "description": "Signal Green - Used for 'Available', 'Safe', 'Go'."
+      },
+      "destructive": {
+        "main": "#EF4444",
+        "foreground": "#FFFFFF",
+        "description": "Stop Red - Used for 'Full', 'Danger', 'Offline'."
+      },
+      "text": {
+        "primary": "#FAFAFA",
+        "secondary": "#A1A1AA",
+        "muted": "#52525B"
+      },
+      "border": {
+        "default": "#27272A",
+        "active": "#F59E0B"
+      }
+    },
+    "spacing": {
+      "base_unit": "4px",
+      "container_padding": "p-4 md:p-8",
+      "section_gap": "gap-8 md:gap-12",
+      "touch_target": "min-h-[56px]"
+    },
+    "radius": {
+      "default": "rounded-lg",
+      "button": "rounded-md",
+      "card": "rounded-xl"
+    },
+    "shadows": {
+      "card": "shadow-[0_0_0_1px_rgba(255,255,255,0.1)]",
+      "glow": "shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground h-14 px-8 text-lg font-bold uppercase tracking-wide hover:bg-primary/90 transition-all active:scale-95 shadow-glow",
+      "secondary": "bg-secondary text-secondary-foreground h-14 px-6 font-bold hover:bg-secondary/90",
+      "outline": "border-2 border-primary text-primary h-14 px-6 font-bold hover:bg-primary/10",
+      "ghost": "hover:bg-white/10 text-white h-12 px-4"
+    },
+    "cards": {
+      "default": "bg-card border border-white/10 rounded-xl p-6 shadow-card hover:border-primary/50 transition-colors",
+      "interactive": "cursor-pointer active:scale-[0.98] transition-transform"
+    },
+    "inputs": {
+      "default": "bg-black/50 border-white/20 h-14 text-lg focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-white/30 rounded-md"
+    },
+    "navigation": {
+      "mobile_bar": "fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10 h-20 flex items-center justify-around z-50",
+      "desktop_sidebar": "fixed left-0 top-0 bottom-0 w-64 bg-card border-r border-white/10 p-6"
+    }
+  },
+  "layouts": {
+    "mobile_home": "flex flex-col gap-4 p-4 pb-24",
+    "desktop_dashboard": "grid grid-cols-12 gap-6 p-8",
+    "grid_strategy": {
+      "mode": "Mode B: The Control Room",
+      "description": "Dense, data-heavy, high correlation. Every pixel utilized."
+    }
+  },
+  "visual_enhancers": {
+    "textures": "Use subtle noise overlay (opacity 0.03) on backgrounds to reduce digital flatness.",
+    "glassmorphism": "Use 'Industrial Glass' - high blur (backdrop-blur-xl), low opacity white border (border-white/10), dark tint (bg-black/80).",
+    "motion": {
+      "hover": "transition-all duration-200 ease-out",
+      "page_transition": "animate-in fade-in slide-in-from-bottom-4 duration-500"
+    }
+  },
+  "assets": {
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 2px, large sizes (24px+)"
+    },
+    "images": {
+      "hero_bg": {
+        "url": "https://images.unsplash.com/photo-1621568668558-61a39d6a8f90?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwzfHx0cnVjayUyMHN0b3AlMjBuaWdodCUyMHBhcmtpbmd8ZW58MHx8fHwxNzY0NTY5NDY1fDA&ixlib=rb-4.1.0&q=85",
+        "alt": "Black pickup truck at night parking",
+        "usage": "Login screen background, Hero section"
+      },
+      "parking_lot": {
+        "url": "https://images.unsplash.com/photo-1720759043544-4d43459f3388?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHw0fHx0cnVjayUyMHN0b3AlMjBuaWdodCUyMHBhcmtpbmd8ZW58MHx8fHwxNzY0NTY5NDY1fDA&ixlib=rb-4.1.0&q=85",
+        "alt": "Truck parking lot",
+        "usage": "Parking spot listings"
+      },
+      "diner": {
+        "url": "https://images.unsplash.com/photo-1735031099103-cbeffe674ec5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHx0cnVjayUyMGRyaXZlciUyMGRpbmVyJTIwZm9vZHxlbnwwfHx8fDE3NjQ1Njk0NjZ8MA&ixlib=rb-4.1.0&q=85",
+        "alt": "Neon Route 95 Diner sign",
+        "usage": "Amenities section, Food finder"
+      },
+      "fuel": {
+        "url": "https://images.unsplash.com/photo-1763323306652-d76c65cf7b5c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHw0fHxnYXMlMjBzdGF0aW9uJTIwZnVlbCUyMHB1bXAlMjBuaWdodHxlbnwwfHx8fDE3NjQ1Njk0Njl8MA&ixlib=rb-4.1.0&q=85",
+        "alt": "Illuminated gas station",
+        "usage": "Fuel price tracker"
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "CRITICAL: Implement Dark Mode by default. Add 'dark' class to the html or body tag immediately.",
+    "Use 'Chivo' font for all headings. Import it from Google Fonts.",
+    "Use 'Manrope' for body text. Import it from Google Fonts.",
+    "Use 'JetBrains Mono' for all data points (prices, coordinates, time).",
+    "Ensure all touch targets (buttons, inputs, list items) are at least 56px height.",
+    "Do not use gradients for backgrounds. Use solid dark colors with subtle noise if possible.",
+    "Use the provided image URLs for the respective sections.",
+    "For the Map view, use a dark themed map style (e.g., CartoDB Dark Matter or similar free alternative).",
+    "Add 'data-testid' to all interactive elements.",
+    "Use 'sonner' for notifications (e.g., 'Spot Booked', 'Login Failed').",
+    "Follow the 'Control Room' grid layout for the Admin Dashboard.",
+    "Keep the Driver Interface extremely simple: One primary action per screen."
+  ],
+  "universal_guidelines": [
+    "Avoid generic 'AI slop' aesthetics.",
+    "No purple/teal gradients.",
+    "No centered layouts for text-heavy sections.",
+    "Use 2-3x more spacing than typical.",
+    "Every interaction needs a micro-animation.",
+    "Never use AI emoji characters."
+  ]
+}
