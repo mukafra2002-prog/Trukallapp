@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
-import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell } from "lucide-react";
+import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell, TrendingUp } from "lucide-react";
 
 const mapContainerStyle = {
   width: '100%',
