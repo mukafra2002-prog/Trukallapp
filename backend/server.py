@@ -231,6 +231,130 @@ class DashboardStats(BaseModel):
     total_revenue: float
     active_spots: int
 
+# NEW MODELS FOR CRITICAL FEATURES
+
+class SpotReview(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    spot_id: str
+    spot_name: str
+    driver_email: str
+    driver_name: str
+    rating: int  # 1-5 stars
+    cleanliness_rating: int  # 1-5
+    safety_rating: int  # 1-5
+    amenities_rating: int  # 1-5
+    comment: str
+    verified_booking: bool = False  # Verified they actually booked
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SpotReviewCreate(BaseModel):
+    spot_id: str
+    rating: int
+    cleanliness_rating: int
+    safety_rating: int
+    amenities_rating: int
+    comment: str
+
+class ConvoyPost(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    driver_name: str
+    origin_city: str
+    origin_state: str
+    destination_city: str
+    destination_state: str
+    departure_date: datetime
+    message: str
+    looking_for_convoy: bool = True
+    max_drivers: int = 5
+    current_drivers: int = 1
+    status: str = "open"  # "open", "full", "departed"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ConvoyPostCreate(BaseModel):
+    origin_city: str
+    origin_state: str
+    destination_city: str
+    destination_state: str
+    departure_date: datetime
+    message: str
+    max_drivers: int = 5
+
+class DriverChat(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    location_name: str  # e.g., "Dallas Highway 45"
+    driver_email: str
+    driver_name: str
+    message: str
+    message_type: str = "chat"  # "chat", "warning", "tip"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DriverChatCreate(BaseModel):
+    location_name: str
+    message: str
+    message_type: str = "chat"
+
+class TripCalculation(BaseModel):
+    load_id: str
+    load_rate: float
+    distance: int
+    estimated_fuel_cost: float
+    toll_cost: float
+    parking_cost: float
+    total_expenses: float
+    net_profit: float
+    profit_per_mile: float
+    is_profitable: bool
+
+class DetentionClaim(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    driver_name: str
+    broker_name: str
+    load_id: Optional[str] = None
+    detention_hours: float
+    hourly_rate: float
+    total_amount: float
+    location: str
+    start_time: datetime
+    end_time: datetime
+    proof_photos: List[str] = []
+    status: str = "pending"  # "pending", "submitted", "paid", "disputed"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DetentionClaimCreate(BaseModel):
+    broker_name: str
+    load_id: Optional[str] = None
+    detention_hours: float
+    hourly_rate: float
+    location: str
+    start_time: datetime
+    end_time: datetime
+
+class DOTCompliance(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    cdl_expiry: datetime
+    medical_card_expiry: datetime
+    hazmat_expiry: Optional[datetime] = None
+    twic_card_expiry: Optional[datetime] = None
+    csa_score: int = 0
+    last_inspection_date: Optional[datetime] = None
+    violations: List[dict] = []
+    alerts_enabled: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DOTComplianceCreate(BaseModel):
+    cdl_expiry: datetime
+    medical_card_expiry: datetime
+    hazmat_expiry: Optional[datetime] = None
+    twic_card_expiry: Optional[datetime] = None
+
 # ============== AUTH HELPERS ==============
 
 def hash_password(password: str) -> str:
