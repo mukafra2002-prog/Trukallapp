@@ -186,6 +186,39 @@ export default function DriverDashboard() {
     }
   };
 
+  const getChainDisplayName = (chainId) => {
+    const names = {
+      'pilot_flying_j': 'Pilot Flying J',
+      'loves': "Love's Travel Stops",
+      'ta_petro': 'TA/Petro',
+      'speedway': 'Speedway',
+      'walmart': 'Walmart',
+      'lowes': "Lowe's",
+      'home_depot': 'Home Depot',
+      'cracker_barrel': 'Cracker Barrel',
+      'cabelas': "Cabela's",
+      'bass_pro': 'Bass Pro Shops',
+      'rest_area': 'Rest Area',
+      'truck_stop': 'Independent Truck Stop'
+    };
+    return names[chainId] || chainId;
+  };
+
+  const getChainColor = (chainId) => {
+    const colors = {
+      'pilot_flying_j': 'bg-red-500',
+      'loves': 'bg-yellow-500',
+      'ta_petro': 'bg-blue-600',
+      'speedway': 'bg-orange-500',
+      'walmart': 'bg-blue-500',
+      'lowes': 'bg-blue-700',
+      'cracker_barrel': 'bg-amber-600',
+      'cabelas': 'bg-green-700',
+      'rest_area': 'bg-green-500'
+    };
+    return colors[chainId] || 'bg-gray-500';
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
