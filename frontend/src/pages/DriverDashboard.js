@@ -205,11 +205,20 @@ export default function DriverDashboard() {
                           <CardTitle className="text-lg">{spot.name}</CardTitle>
                           <CardDescription>{spot.city}, {spot.state}</CardDescription>
                         </div>
-                        {spot.available_spaces > 0 ? (
-                          <Badge className="status-available">Available</Badge>
-                        ) : (
-                          <Badge className="status-full">Full</Badge>
-                        )}
+                        <div className="flex flex-col gap-1">
+                          {spot.available_spaces > 0 ? (
+                            <Badge className="status-available">Available</Badge>
+                          ) : (
+                            <Badge className="status-full">Full</Badge>
+                          )}
+                          {/* Predictive Badge */}
+                          {spot.available_spaces > 0 && spot.available_spaces <= spot.total_spaces * 0.5 && (
+                            <Badge className="bg-secondary/20 text-secondary text-xs" data-testid="trend-filling">
+                              <TrendingUp className="w-3 h-3 mr-1" />
+                              Filling
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -224,6 +233,15 @@ export default function DriverDashboard() {
                             {spot.is_free ? "FREE" : `$${spot.price_per_night}/night`}
                           </span>
                         </div>
+                        {/* Predicted availability for next few hours */}
+                        {spot.available_spaces > 0 && spot.available_spaces < 10 && (
+                          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-md p-2">
+                            <p className="text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
+                              <AlertTriangle className="w-3 h-3" />
+                              <span>Likely to fill in 2-3 hours</span>
+                            </p>
+                          </div>
+                        )}
                         <div className="flex items-center gap-1 flex-wrap">
                           {spot.amenities.slice(0, 4).map((amenity) => (
                             <div key={amenity} className="amenity-badge bg-accent" title={amenity}>
