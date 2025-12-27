@@ -51,6 +51,9 @@ export default function DriverDashboard() {
   useEffect(() => {
     fetchSpots();
     fetchBookings();
+    fetchShowerCredits();
+    fetchRetailChains();
+    fetchRetailParking();
     
     // Calculate reward points based on bookings
     // 100 points per booking
