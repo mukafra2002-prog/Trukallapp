@@ -87,6 +87,9 @@ export default function DriverDashboard() {
     try {
       const response = await axios.get(`${API}/bookings/driver/${user.email}`);
       setBookings(response.data);
+      
+      // Calculate reward points based on actual bookings
+      setRewardPoints(response.data.length * 100);
     } catch (error) {
       console.error("Failed to load bookings", error);
     }
