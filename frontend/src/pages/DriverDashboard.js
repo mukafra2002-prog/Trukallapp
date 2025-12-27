@@ -859,15 +859,39 @@ export default function DriverDashboard() {
           className={`flex flex-col items-center gap-1 ${activeTab === 'map' ? 'text-primary' : 'text-muted-foreground'}`}
           data-testid="mobile-nav-map"
         >
-          <MapPin className="w-6 h-6" />
+          <MapPin className="w-5 h-5" />
           <span className="text-xs">Find</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("showers")}
+          className={`flex flex-col items-center gap-1 ${activeTab === 'showers' ? 'text-primary' : 'text-muted-foreground'}`}
+          data-testid="mobile-nav-showers"
+        >
+          <ShowerHead className="w-5 h-5" />
+          <span className="text-xs">Showers</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("brokers")}
+          className={`flex flex-col items-center gap-1 ${activeTab === 'brokers' ? 'text-primary' : 'text-muted-foreground'}`}
+          data-testid="mobile-nav-brokers"
+        >
+          <Building2 className="w-5 h-5" />
+          <span className="text-xs">Brokers</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("retail")}
+          className={`flex flex-col items-center gap-1 ${activeTab === 'retail' ? 'text-primary' : 'text-muted-foreground'}`}
+          data-testid="mobile-nav-retail"
+        >
+          <Store className="w-5 h-5" />
+          <span className="text-xs">Retail</span>
         </button>
         <button
           onClick={() => setActiveTab("bookings")}
           className={`flex flex-col items-center gap-1 ${activeTab === 'bookings' ? 'text-primary' : 'text-muted-foreground'}`}
           data-testid="mobile-nav-bookings"
         >
-          <History className="w-6 h-6" />
+          <History className="w-5 h-5" />
           <span className="text-xs">Bookings</span>
         </button>
       </div>
