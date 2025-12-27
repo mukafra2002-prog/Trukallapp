@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 
 class NightHaulAPITester:
-    def __init__(self, base_url="https://trucker-helper-1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://trucker-dash-3.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
