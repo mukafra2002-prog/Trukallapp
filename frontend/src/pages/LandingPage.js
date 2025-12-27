@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
-import { Truck, Shield, MapPin, DollarSign, Clock, Fuel } from "lucide-react";
+import { Truck, Shield, MapPin, DollarSign, Clock, Fuel, Bell, TrendingUp, Award } from "lucide-react";
 
 export default function LandingPage() {
   const { login } = useContext(AuthContext);
@@ -64,11 +64,11 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-3 mb-6">
               <Truck className="w-16 h-16 text-primary" />
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white">
-                NightHaul
+                TrukAll
               </h1>
             </div>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Safe Parking for Truck Drivers • Available 24/7 • No More Stress
+              Complete Truck Driver Solution • Safe Parking • Real-Time Alerts • Rewards
             </p>
           </div>
 
@@ -77,30 +77,30 @@ export default function LandingPage() {
             <Card className="glassmorphism border-white/10 card-hover" data-testid="feature-realtime">
               <CardHeader>
                 <MapPin className="w-10 h-10 text-primary mb-2" />
-                <CardTitle className="text-xl">Real-Time Availability</CardTitle>
+                <CardTitle className="text-xl">Smart Parking Finder</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">See which lots are full before you drive there</p>
+                <p className="text-muted-foreground">Real-time + predictive parking with hidden spot discovery</p>
               </CardContent>
             </Card>
 
-            <Card className="glassmorphism border-white/10 card-hover" data-testid="feature-secure">
+            <Card className="glassmorphism border-white/10 card-hover" data-testid="feature-alerts">
               <CardHeader>
-                <Shield className="w-10 h-10 text-secondary mb-2" />
-                <CardTitle className="text-xl">Secure Parking</CardTitle>
+                <Bell className="w-10 h-10 text-primary mb-2" />
+                <CardTitle className="text-xl">Safety Alerts</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Security rated spots with camera surveillance</p>
+                <p className="text-muted-foreground">Wake-up alerts, fatigue monitoring, unsafe zone warnings</p>
               </CardContent>
             </Card>
 
-            <Card className="glassmorphism border-white/10 card-hover" data-testid="feature-amenities">
+            <Card className="glassmorphism border-white/10 card-hover" data-testid="feature-rewards">
               <CardHeader>
-                <Fuel className="w-10 h-10 text-primary mb-2" />
-                <CardTitle className="text-xl">Full Amenities</CardTitle>
+                <Award className="w-10 h-10 text-secondary mb-2" />
+                <CardTitle className="text-xl">Community Rewards</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Showers, restrooms, food, fuel prices updated daily</p>
+                <p className="text-muted-foreground">Earn points, get rewards, join the driver community</p>
               </CardContent>
             </Card>
           </div>
@@ -109,7 +109,7 @@ export default function LandingPage() {
           <Card className="glassmorphism border-white/10 max-w-md mx-auto" data-testid="auth-card">
             <CardHeader>
               <CardTitle className="text-2xl text-center">Get Started</CardTitle>
-              <CardDescription className="text-center">Find safe parking tonight</CardDescription>
+              <CardDescription className="text-center">Join thousands of drivers solving daily problems</CardDescription>
             </CardHeader>
             <CardContent>
               <Tabs value={isLogin ? "login" : "signup"} onValueChange={(v) => setIsLogin(v === "login")}>
@@ -224,6 +224,25 @@ export default function LandingPage() {
               </Tabs>
             </CardContent>
           </Card>
+
+          {/* Trust Indicators */}
+          <div className="mt-12 text-center">
+            <p className="text-sm text-muted-foreground mb-4">Solving 10 critical truck driver problems</p>
+            <div className="flex items-center justify-center gap-6 flex-wrap">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-secondary" />
+                <span className="text-sm font-medium">Predictive Parking</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Bell className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium">Safety Alerts</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Award className="w-5 h-5 text-secondary" />
+                <span className="text-sm font-medium">Rewards System</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
