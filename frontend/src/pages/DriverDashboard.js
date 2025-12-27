@@ -537,6 +537,319 @@ export default function DriverDashboard() {
             </Card>
           </div>
         )}
+
+        {/* Shower Credits Tab */}
+        {activeTab === "showers" && (
+          <div className="space-y-6">
+            {/* Summary Card */}
+            <Card className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShowerHead className="w-6 h-6 text-blue-500" />
+                  Your Shower Credits
+                </CardTitle>
+                <CardDescription>Track your rewards across all truck stop chains</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-3xl font-bold text-blue-500">{showerTotals.total_available_showers}</p>
+                    <p className="text-sm text-muted-foreground">Available Showers</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold text-cyan-500">{showerTotals.total_points.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">Total Points</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold text-purple-500">{showerTotals.chains_tracked}</p>
+                    <p className="text-sm text-muted-foreground">Chains Tracked</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Individual Chain Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {showerCredits.length === 0 ? (
+                <Card className="col-span-full">
+                  <CardContent className="py-8 text-center">
+                    <ShowerHead className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground">No shower credits tracked yet</p>
+                    <p className="text-sm text-muted-foreground mt-2">Add your rewards numbers to track your credits</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                showerCredits.map((credit) => (
+                  <Card key={credit.id} className="overflow-hidden" data-testid={`shower-credit-${credit.chain}`}>
+                    <div className={`h-2 ${getChainColor(credit.chain)}`}></div>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">{getChainDisplayName(credit.chain)}</CardTitle>
+                      {credit.rewards_number && (
+                        <CardDescription className="font-mono text-xs">{credit.rewards_number}</CardDescription>
+                      )}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Available Showers</p>
+                          <p className="text-2xl font-bold">{credit.available_showers}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">Points</p>
+                          <p className="text-xl font-bold text-blue-500">{credit.points_balance.toLocaleString()}</p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-3">
+                        Last updated: {new Date(credit.last_updated).toLocaleDateString()}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Broker Ratings Tab */}
+        {activeTab === "brokers" && (
+          <div className="space-y-6">
+            {/* Search Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building2 className="w-6 h-6" />
+                  Broker Ratings & Fraud Detection
+                </CardTitle>
+                <CardDescription>Check broker reputation before accepting loads</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-3">
+                  <Input
+                    type="text"
+                    placeholder="Enter broker name or MC number..."
+                    value={brokerSearch}
+                    onChange={(e) => setBrokerSearch(e.target.value)}
+                    className="flex-1"
+                    data-testid="broker-search-input"
+                  />
+                  <Button onClick={() => fetchBrokerRatings(brokerSearch)} className="btn-primary" data-testid="broker-search-btn">
+                    <Search className="w-4 h-4 mr-2" />
+                    Search
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Broker Summary */}
+            {brokerSummary && (
+              <Card className={`border-2 ${brokerSummary.fraud_reports > 0 ? 'border-red-500/50 bg-red-500/5' : 'border-green-500/50 bg-green-500/5'}`}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-xl">{brokerSummary.broker_name}</CardTitle>
+                      {brokerSummary.mc_number && (
+                        <CardDescription className="font-mono">{brokerSummary.mc_number}</CardDescription>
+                      )}
+                    </div>
+                    {brokerSummary.fraud_reports > 0 && (
+                      <Badge className="bg-red-500 text-white">
+                        <AlertOctagon className="w-3 h-3 mr-1" />
+                        {brokerSummary.fraud_reports} Fraud Report{brokerSummary.fraud_reports > 1 ? 's' : ''}
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                        <span className="text-2xl font-bold">{brokerSummary.average_rating.toFixed(1)}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Overall Rating</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <DollarSign className="w-5 h-5 text-green-500" />
+                        <span className="text-2xl font-bold">{brokerSummary.average_payment_rating.toFixed(1)}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Payment Rating</p>
+                    </div>
+                    <div className="text-center">
+                      <span className="text-2xl font-bold">{brokerSummary.average_payment_days.toFixed(0)}</span>
+                      <p className="text-xs text-muted-foreground">Avg Days to Pay</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <ThumbsUp className="w-5 h-5 text-blue-500" />
+                        <span className="text-2xl font-bold">{brokerSummary.would_work_again_percentage.toFixed(0)}%</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Would Work Again</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-4 text-center">
+                    Based on {brokerSummary.total_reviews} reviews ({brokerSummary.verified_reviews} verified)
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Individual Reviews */}
+            {brokerRatings.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="font-semibold">Recent Reviews</h3>
+                {brokerRatings.map((rating) => (
+                  <Card key={rating.id} className={rating.fraud_reported ? 'border-red-500/30' : ''}>
+                    <CardContent className="pt-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <p className="font-semibold">{rating.driver_name}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(rating.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {rating.verified_load && (
+                            <Badge variant="outline" className="text-xs">Verified Load</Badge>
+                          )}
+                          {rating.fraud_reported && (
+                            <Badge className="bg-red-500 text-white text-xs">
+                              Fraud: {rating.fraud_type?.replace('_', ' ')}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`w-4 h-4 ${i < rating.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`} />
+                          ))}
+                        </div>
+                        {rating.would_work_again ? (
+                          <span className="text-xs text-green-500 flex items-center gap-1">
+                            <ThumbsUp className="w-3 h-3" /> Would work again
+                          </span>
+                        ) : (
+                          <span className="text-xs text-red-500 flex items-center gap-1">
+                            <ThumbsDown className="w-3 h-3" /> Would not work again
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm">{rating.comment}</p>
+                      {rating.payment_days && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Paid in {rating.payment_days} days
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Retail Parking Tab */}
+        {activeTab === "retail" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Store className="w-6 h-6" />
+                  Free Overnight Parking
+                </CardTitle>
+                <CardDescription>Find overnight parking at Walmart, Cracker Barrel, and more</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-2 flex-wrap">
+                  <Button
+                    variant={selectedChain === "" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setSelectedChain("");
+                      fetchRetailParking("");
+                    }}
+                  >
+                    All
+                  </Button>
+                  {retailChains.filter(c => c.overnight_friendly).map((chain) => (
+                    <Button
+                      key={chain.id}
+                      variant={selectedChain === chain.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        setSelectedChain(chain.id);
+                        fetchRetailParking(chain.id);
+                      }}
+                    >
+                      {chain.name}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {retailParking.length === 0 ? (
+                <Card className="col-span-full">
+                  <CardContent className="py-8 text-center">
+                    <Store className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground">No retail parking locations found</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                retailParking.map((location) => (
+                  <Card key={location.id} className="overflow-hidden" data-testid={`retail-${location.id}`}>
+                    <div className={`h-2 ${getChainColor(location.chain)}`}></div>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-lg">{location.name}</CardTitle>
+                          <CardDescription>{location.city}, {location.state}</CardDescription>
+                        </div>
+                        {location.community_verified && (
+                          <Badge className="bg-green-500/20 text-green-600 text-xs">Verified</Badge>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-3">{location.address}</p>
+                      
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                          <span className="font-bold">{location.average_rating.toFixed(1)}</span>
+                          <span className="text-xs text-muted-foreground">({location.total_reviews} reviews)</span>
+                        </div>
+                        {location.truck_parking_spaces && (
+                          <Badge variant="outline">{location.truck_parking_spaces} spots</Badge>
+                        )}
+                      </div>
+
+                      {location.restrictions.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {location.restrictions.map((restriction, i) => (
+                            <Badge key={i} variant="outline" className="text-xs bg-yellow-500/10 text-yellow-600">
+                              {restriction.replace(/_/g, ' ')}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+
+                      {location.amenities.length > 0 && (
+                        <div className="flex gap-2">
+                          {location.amenities.map((amenity, i) => (
+                            <span key={i} className="text-xs text-muted-foreground">
+                              {getAmenityIcon(amenity)} {amenity}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Mobile Navigation */}
