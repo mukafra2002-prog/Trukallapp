@@ -44,6 +44,7 @@ class User(BaseModel):
     name: str
     role: str  # "driver", "partner", "admin"
     phone: Optional[str] = None
+    reward_points: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserCreate(BaseModel):
