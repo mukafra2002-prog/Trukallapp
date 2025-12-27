@@ -97,6 +97,9 @@ async def seed_database():
             "status": "active",
             "rating": 4.5,
             "total_reviews": 125,
+            "weather_alert": "clear",
+            "weigh_station_nearby": True,
+            "weigh_station_status": "open",
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat()
         },
