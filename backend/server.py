@@ -1411,6 +1411,321 @@ async def create_compliance_record(compliance_data: DOTComplianceCreate, driver_
     
     return compliance
 
+# ============== BROKER RATINGS & FRAUD DETECTION ==============
+
+@api_router.get("/brokers/ratings/{broker_name}")
+async def get_broker_ratings(broker_name: str):
+    ratings = await db.broker_ratings.find(
+        {"broker_name": {"$regex": broker_name, "$options": "i"}},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    for rating in ratings:
+        if isinstance(rating.get('created_at'), str):
+            rating['created_at'] = datetime.fromisoformat(rating['created_at'])
+    
+    return ratings
+
+@api_router.get("/brokers/summary/{broker_name}", response_model=BrokerSummary)
+async def get_broker_summary(broker_name: str):
+    ratings = await db.broker_ratings.find(
+        {"broker_name": {"$regex": broker_name, "$options": "i"}}
+    ).to_list(10000)
+    
+    if not ratings:
+        raise HTTPException(status_code=404, detail="No ratings found for this broker")
+    
+    total = len(ratings)
+    avg_rating = sum(r['rating'] for r in ratings) / total
+    avg_payment = sum(r['payment_rating'] for r in ratings) / total
+    
+    payment_days_list = [r['payment_days'] for r in ratings if r.get('payment_days')]
+    avg_payment_days = sum(payment_days_list) / len(payment_days_list) if payment_days_list else 0
+    
+    fraud_count = sum(1 for r in ratings if r.get('fraud_reported'))
+    would_work = sum(1 for r in ratings if r.get('would_work_again'))
+    verified = sum(1 for r in ratings if r.get('verified_load'))
+    
+    return BrokerSummary(
+        broker_name=ratings[0]['broker_name'],
+        mc_number=ratings[0].get('mc_number'),
+        total_reviews=total,
+        average_rating=round(avg_rating, 2),
+        average_payment_rating=round(avg_payment, 2),
+        average_payment_days=round(avg_payment_days, 1),
+        fraud_reports=fraud_count,
+        would_work_again_percentage=round((would_work / total) * 100, 1),
+        verified_reviews=verified
+    )
+
+@api_router.post("/brokers/rate")
+async def rate_broker(rating_data: BrokerRatingCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    rating = BrokerRating(
+        driver_email=user['email'],
+        driver_name=user['name'],
+        **rating_data.model_dump()
+    )
+    
+    rating_doc = rating.model_dump()
+    rating_doc['created_at'] = rating_doc['created_at'].isoformat()
+    
+    await db.broker_ratings.insert_one(rating_doc)
+    
+    # Award points for rating brokers
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": 50}}
+    )
+    
+    # Alert community if fraud reported
+    if rating.fraud_reported:
+        logger.warning(f"FRAUD ALERT: {rating.broker_name} reported by {user['name']} - Type: {rating.fraud_type}")
+    
+    return rating
+
+@api_router.get("/brokers/fraud-alerts")
+async def get_fraud_alerts(limit: int = 50):
+    alerts = await db.broker_ratings.find(
+        {"fraud_reported": True},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    for alert in alerts:
+        if isinstance(alert.get('created_at'), str):
+            alert['created_at'] = datetime.fromisoformat(alert['created_at'])
+    
+    return alerts
+
+# ============== SHOWER CREDITS TRACKER ==============
+
+@api_router.get("/shower-credits/{driver_email}")
+async def get_shower_credits(driver_email: str):
+    credits = await db.shower_credits.find(
+        {"driver_email": driver_email},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    for credit in credits:
+        if isinstance(credit.get('last_updated'), str):
+            credit['last_updated'] = datetime.fromisoformat(credit['last_updated'])
+        if isinstance(credit.get('created_at'), str):
+            credit['created_at'] = datetime.fromisoformat(credit['created_at'])
+    
+    return credits
+
+@api_router.post("/shower-credits")
+async def add_shower_credit(credit_data: ShowerCreditCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if already exists
+    existing = await db.shower_credits.find_one({
+        "driver_email": driver_email,
+        "chain": credit_data.chain
+    })
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="Already tracking this chain. Use update endpoint.")
+    
+    credit = ShowerCredit(
+        driver_email=user['email'],
+        **credit_data.model_dump()
+    )
+    
+    credit_doc = credit.model_dump()
+    credit_doc['last_updated'] = credit_doc['last_updated'].isoformat()
+    credit_doc['created_at'] = credit_doc['created_at'].isoformat()
+    
+    await db.shower_credits.insert_one(credit_doc)
+    return credit
+
+@api_router.put("/shower-credits/{chain}")
+async def update_shower_credit(chain: str, update_data: ShowerCreditUpdate, driver_email: str):
+    updates = {}
+    if update_data.available_showers is not None:
+        updates['available_showers'] = update_data.available_showers
+    if update_data.points_balance is not None:
+        updates['points_balance'] = update_data.points_balance
+    
+    updates['last_updated'] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.shower_credits.update_one(
+        {"driver_email": driver_email, "chain": chain},
+        {"$set": updates}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Shower credit not found")
+    
+    return {"message": "Updated successfully"}
+
+@api_router.get("/shower-credits/{driver_email}/total")
+async def get_shower_totals(driver_email: str):
+    credits = await db.shower_credits.find({"driver_email": driver_email}).to_list(1000)
+    
+    total_showers = sum(c['available_showers'] for c in credits)
+    total_points = sum(c['points_balance'] for c in credits)
+    
+    return {
+        "total_available_showers": total_showers,
+        "total_points": total_points,
+        "chains_tracked": len(credits)
+    }
+
+# ============== RETAIL OVERNIGHT PARKING ==============
+
+@api_router.get("/retail-parking")
+async def get_retail_parking(
+    city: Optional[str] = None,
+    state: Optional[str] = None,
+    chain: Optional[str] = None
+):
+    query = {"allows_overnight": True}
+    if city:
+        query['city'] = {"$regex": city, "$options": "i"}
+    if state:
+        query['state'] = {"$regex": state, "$options": "i"}
+    if chain:
+        query['chain'] = chain
+    
+    locations = await db.retail_parking.find(query, {"_id": 0}).to_list(1000)
+    
+    for loc in locations:
+        if isinstance(loc.get('last_verified'), str):
+            loc['last_verified'] = datetime.fromisoformat(loc['last_verified'])
+        if isinstance(loc.get('created_at'), str):
+            loc['created_at'] = datetime.fromisoformat(loc['created_at'])
+    
+    return locations
+
+@api_router.post("/retail-parking")
+async def add_retail_parking(parking_data: RetailParkingCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    parking = RetailParking(**parking_data.model_dump())
+    
+    parking_doc = parking.model_dump()
+    parking_doc['last_verified'] = parking_doc['last_verified'].isoformat()
+    parking_doc['created_at'] = parking_doc['created_at'].isoformat()
+    
+    await db.retail_parking.insert_one(parking_doc)
+    
+    # Award points for adding locations
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": 75}}
+    )
+    
+    return parking
+
+@api_router.get("/retail-parking/chains")
+async def get_retail_chains():
+    return {
+        "chains": [
+            {"id": "walmart", "name": "Walmart", "overnight_friendly": True},
+            {"id": "lowes", "name": "Lowe's", "overnight_friendly": True},
+            {"id": "home_depot", "name": "Home Depot", "overnight_friendly": False},
+            {"id": "cracker_barrel", "name": "Cracker Barrel", "overnight_friendly": True},
+            {"id": "cabelas", "name": "Cabela's", "overnight_friendly": True},
+            {"id": "bass_pro", "name": "Bass Pro Shops", "overnight_friendly": True},
+            {"id": "rest_area", "name": "Rest Area", "overnight_friendly": True},
+            {"id": "truck_stop", "name": "Independent Truck Stop", "overnight_friendly": True}
+        ]
+    }
+
+# ============== TRUCK ROUTE PLANNER ==============
+
+@api_router.post("/routes/plan")
+async def plan_truck_route(route_request: TruckRouteRequest, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate distance (simplified - in production use Google Maps API)
+    import math
+    
+    lat1, lon1 = math.radians(route_request.origin_lat), math.radians(route_request.origin_lng)
+    lat2, lon2 = math.radians(route_request.destination_lat), math.radians(route_request.destination_lng)
+    
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    c = 2 * math.asin(math.sqrt(a))
+    distance_miles = 3959 * c  # Earth radius in miles
+    
+    # Estimate drive time (50 mph average)
+    drive_time_hours = distance_miles / 50
+    
+    # Calculate costs
+    mpg = 6.0
+    fuel_price = 3.89
+    fuel_cost = (distance_miles / mpg) * fuel_price
+    
+    toll_cost = distance_miles * 0.10 if not route_request.avoid_tolls else 0
+    
+    # Check for restrictions
+    warnings = []
+    if route_request.truck_height_ft > 13.5:
+        warnings.append("Height restriction: Some bridges may have 13'6\" clearance")
+    if route_request.truck_weight_lbs > 80000:
+        warnings.append("Overweight: Special permits required")
+    if route_request.hazmat:
+        warnings.append("Hazmat: Tunnel and city restrictions apply")
+    
+    # Find parking stops if requested
+    waypoints = []
+    if route_request.include_parking_stops:
+        # Get parking along route (simplified)
+        spots = await db.parking_spots.find(
+            {"available_spaces": {"$gt": 0}},
+            {"_id": 0}
+        ).limit(3).to_list(3)
+        
+        waypoints = [{
+            "type": "parking",
+            "name": spot['name'],
+            "lat": spot['latitude'],
+            "lng": spot['longitude']
+        } for spot in spots]
+    
+    route = TruckRoute(
+        driver_email=user['email'],
+        **route_request.model_dump(),
+        total_distance_miles=round(distance_miles, 1),
+        estimated_drive_time_hours=round(drive_time_hours, 1),
+        estimated_fuel_cost=round(fuel_cost, 2),
+        estimated_toll_cost=round(toll_cost, 2),
+        warnings=warnings,
+        waypoints=waypoints
+    )
+    
+    route_doc = route.model_dump()
+    route_doc['created_at'] = route_doc['created_at'].isoformat()
+    
+    await db.truck_routes.insert_one(route_doc)
+    
+    return route
+
+@api_router.get("/routes/{driver_email}")
+async def get_saved_routes(driver_email: str):
+    routes = await db.truck_routes.find(
+        {"driver_email": driver_email},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    for route in routes:
+        if isinstance(route.get('created_at'), str):
+            route['created_at'] = datetime.fromisoformat(route['created_at'])
+    
+    return routes
+
 # ============== ADMIN ROUTES ==============
 
 @api_router.get("/admin/stats", response_model=DashboardStats)
