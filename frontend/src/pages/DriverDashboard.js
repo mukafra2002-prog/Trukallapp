@@ -41,7 +41,36 @@ export default function DriverDashboard() {
   useEffect(() => {
     fetchSpots();
     fetchBookings();
-  }, []);
+    
+    // Calculate reward points based on bookings
+    // 100 points per booking
+    const calculatePoints = () => {
+      const points = bookings.length * 100;
+      setRewardPoints(points);
+    };
+    
+    if (bookings.length > 0) {
+      calculatePoints();
+    }
+    
+    // Simulate fatigue monitoring based on time
+    const monitorFatigue = () => {
+      const hour = new Date().getHours();
+      // Between 10 PM and 6 AM, increase fatigue warnings
+      if (hour >= 22 || hour <= 6) {
+        setFatigueLevel('warning');
+        setShowFatigueAlert(true);
+      } else {
+        setFatigueLevel('good');
+        setShowFatigueAlert(false);
+      }
+    };
+    
+    monitorFatigue();
+    const fatigueInterval = setInterval(monitorFatigue, 60000); // Check every minute
+    
+    return () => clearInterval(fatigueInterval);
+  }, [bookings]);
 
   const fetchSpots = async () => {
     try {
