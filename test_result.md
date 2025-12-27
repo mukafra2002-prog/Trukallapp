@@ -150,11 +150,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "GET /api/brokers/ratings/{name} and /api/brokers/summary/{name} working"
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: All broker ratings endpoints working perfectly. GET /api/brokers/ratings/ABC returns 1 rating. GET /api/brokers/summary/ABC returns correct 5.0 rating for ABC Logistics. Search for 'Quick Freight' correctly shows fraud alert with 1 fraud report. All fraud detection functionality working as expected."
 
   - task: "Retail Parking API"
     implemented: true
