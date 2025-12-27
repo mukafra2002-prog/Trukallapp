@@ -887,6 +887,394 @@ async def reset_hos(driver_email: str):
     
     return {"message": "HOS reset successful. Awarded 50 points for rest compliance."}
 
+# ============== HOS (HOURS OF SERVICE) ==============
+
+@api_router.get("/hos/{driver_email}")
+async def get_hos_status(driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate hours since last reset
+    last_reset = datetime.fromisoformat(user['hos_last_reset'])
+    hours_since_reset = (datetime.now(timezone.utc) - last_reset).total_seconds() / 3600
+    
+    hours_remaining = max(0, user['hos_hours_remaining'] - hours_since_reset)
+    
+    return {
+        "hours_remaining": round(hours_remaining, 1),
+        "last_reset": user['hos_last_reset'],
+        "status": "good" if hours_remaining > 2 else "warning" if hours_remaining > 0 else "violation"
+    }
+
+@api_router.post("/hos/{driver_email}/reset")
+async def reset_hos(driver_email: str):
+    result = await db.users.update_one(
+        {"email": driver_email},
+        {
+            "$set": {
+                "hos_hours_remaining": 11.0,
+                "hos_last_reset": datetime.now(timezone.utc).isoformat()
+            }
+        }
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Award 50 points for completing a rest period
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": 50}}
+    )
+    
+    return {"message": "HOS reset successful. Awarded 50 points for rest compliance."}
+
+# ============== SPOT REVIEWS ==============
+
+@api_router.get("/reviews/spot/{spot_id}")
+async def get_spot_reviews(spot_id: str):
+    reviews = await db.spot_reviews.find({"spot_id": spot_id}, {"_id": 0}).to_list(1000)
+    
+    for review in reviews:
+        if isinstance(review.get('created_at'), str):
+            review['created_at'] = datetime.fromisoformat(review['created_at'])
+    
+    return reviews
+
+@api_router.post("/reviews")
+async def create_review(review_data: SpotReviewCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    spot = await db.parking_spots.find_one({"id": review_data.spot_id})
+    if not spot:
+        raise HTTPException(status_code=404, detail="Parking spot not found")
+    
+    # Check if driver actually booked this spot
+    booking = await db.bookings.find_one({
+        "driver_email": driver_email,
+        "spot_id": review_data.spot_id,
+        "booking_status": "completed"
+    })
+    
+    review = SpotReview(
+        **review_data.model_dump(),
+        driver_email=user['email'],
+        driver_name=user['name'],
+        spot_name=spot['name'],
+        verified_booking=booking is not None
+    )
+    
+    review_doc = review.model_dump()
+    review_doc['created_at'] = review_doc['created_at'].isoformat()
+    
+    await db.spot_reviews.insert_one(review_doc)
+    
+    # Update spot average rating
+    all_reviews = await db.spot_reviews.find({"spot_id": review_data.spot_id}).to_list(1000)
+    avg_rating = sum(r['rating'] for r in all_reviews) / len(all_reviews)
+    
+    await db.parking_spots.update_one(
+        {"id": review_data.spot_id},
+        {"$set": {"rating": round(avg_rating, 1), "total_reviews": len(all_reviews)}}
+    )
+    
+    # Award 25 points for leaving a review
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": 25}}
+    )
+    
+    logger.info(f"Review created for {spot['name']} by {user['name']}")
+    return review
+
+@api_router.get("/reviews/summary/{spot_id}")
+async def get_review_summary(spot_id: str):
+    reviews = await db.spot_reviews.find({"spot_id": spot_id}).to_list(1000)
+    
+    if not reviews:
+        return {
+            "total_reviews": 0,
+            "average_rating": 0,
+            "cleanliness_avg": 0,
+            "safety_avg": 0,
+            "amenities_avg": 0
+        }
+    
+    return {
+        "total_reviews": len(reviews),
+        "average_rating": round(sum(r['rating'] for r in reviews) / len(reviews), 1),
+        "cleanliness_avg": round(sum(r['cleanliness_rating'] for r in reviews) / len(reviews), 1),
+        "safety_avg": round(sum(r['safety_rating'] for r in reviews) / len(reviews), 1),
+        "amenities_avg": round(sum(r['amenities_rating'] for r in reviews) / len(reviews), 1)
+    }
+
+# ============== CONVOY FINDER ==============
+
+@api_router.get("/convoy/posts")
+async def get_convoy_posts(
+    origin_state: Optional[str] = None,
+    destination_state: Optional[str] = None
+):
+    query = {"status": "open"}
+    if origin_state:
+        query['origin_state'] = {"$regex": origin_state, "$options": "i"}
+    if destination_state:
+        query['destination_state'] = {"$regex": destination_state, "$options": "i"}
+    
+    posts = await db.convoy_posts.find(query, {"_id": 0}).to_list(1000)
+    
+    for post in posts:
+        if isinstance(post.get('departure_date'), str):
+            post['departure_date'] = datetime.fromisoformat(post['departure_date'])
+        if isinstance(post.get('created_at'), str):
+            post['created_at'] = datetime.fromisoformat(post['created_at'])
+    
+    return posts
+
+@api_router.post("/convoy/posts")
+async def create_convoy_post(post_data: ConvoyPostCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    post = ConvoyPost(
+        driver_email=user['email'],
+        driver_name=user['name'],
+        **post_data.model_dump()
+    )
+    
+    post_doc = post.model_dump()
+    post_doc['departure_date'] = post_doc['departure_date'].isoformat()
+    post_doc['created_at'] = post_doc['created_at'].isoformat()
+    
+    await db.convoy_posts.insert_one(post_doc)
+    logger.info(f"Convoy post created: {post.origin_city} to {post.destination_city}")
+    return post
+
+@api_router.post("/convoy/posts/{post_id}/join")
+async def join_convoy(post_id: str, driver_email: str):
+    post = await db.convoy_posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Convoy post not found")
+    
+    if post['current_drivers'] >= post['max_drivers']:
+        raise HTTPException(status_code=400, detail="Convoy is full")
+    
+    result = await db.convoy_posts.update_one(
+        {"id": post_id},
+        {"$inc": {"current_drivers": 1}}
+    )
+    
+    # Check if now full
+    updated = await db.convoy_posts.find_one({"id": post_id})
+    if updated['current_drivers'] >= updated['max_drivers']:
+        await db.convoy_posts.update_one(
+            {"id": post_id},
+            {"$set": {"status": "full"}}
+        )
+    
+    return {"message": "Joined convoy successfully"}
+
+# ============== DRIVER CHAT ==============
+
+@api_router.get("/chat/{location_name}")
+async def get_chat_messages(location_name: str, limit: int = 50):
+    messages = await db.driver_chat.find(
+        {"location_name": location_name},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    for msg in messages:
+        if isinstance(msg.get('created_at'), str):
+            msg['created_at'] = datetime.fromisoformat(msg['created_at'])
+    
+    return messages[::-1]  # Reverse to show oldest first
+
+@api_router.post("/chat")
+async def post_chat_message(chat_data: DriverChatCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    chat = DriverChat(
+        driver_email=user['email'],
+        driver_name=user['name'],
+        **chat_data.model_dump()
+    )
+    
+    chat_doc = chat.model_dump()
+    chat_doc['created_at'] = chat_doc['created_at'].isoformat()
+    
+    await db.driver_chat.insert_one(chat_doc)
+    return chat
+
+# ============== TRIP PROFIT CALCULATOR ==============
+
+@api_router.post("/calculator/trip-profit")
+async def calculate_trip_profit(
+    load_id: str,
+    driver_email: str,
+    custom_fuel_price: Optional[float] = None,
+    custom_toll_cost: Optional[float] = None,
+    custom_parking_cost: Optional[float] = None
+):
+    load = await db.loads.find_one({"id": load_id})
+    if not load:
+        raise HTTPException(status_code=404, detail="Load not found")
+    
+    # Calculate fuel cost (avg 6 MPG for trucks)
+    mpg = 6.0
+    fuel_price_per_gallon = custom_fuel_price or 3.89
+    fuel_gallons = load['distance'] / mpg
+    estimated_fuel_cost = fuel_gallons * fuel_price_per_gallon
+    
+    # Estimate tolls (varies by route, assume $0.50/mile for toll roads)
+    toll_cost = custom_toll_cost or (load['distance'] * 0.10)
+    
+    # Estimate parking (1-2 nights depending on distance)
+    nights = max(1, load['distance'] // 500)
+    parking_cost = custom_parking_cost or (nights * 25)
+    
+    total_expenses = estimated_fuel_cost + toll_cost + parking_cost
+    net_profit = load['rate'] - total_expenses
+    profit_per_mile = net_profit / load['distance']
+    
+    calculation = TripCalculation(
+        load_id=load_id,
+        load_rate=load['rate'],
+        distance=load['distance'],
+        estimated_fuel_cost=round(estimated_fuel_cost, 2),
+        toll_cost=round(toll_cost, 2),
+        parking_cost=round(parking_cost, 2),
+        total_expenses=round(total_expenses, 2),
+        net_profit=round(net_profit, 2),
+        profit_per_mile=round(profit_per_mile, 2),
+        is_profitable=net_profit > 0
+    )
+    
+    return calculation
+
+# ============== DETENTION CLAIMS ==============
+
+@api_router.get("/detention/{driver_email}")
+async def get_detention_claims(driver_email: str):
+    claims = await db.detention_claims.find(
+        {"driver_email": driver_email},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    for claim in claims:
+        if isinstance(claim.get('start_time'), str):
+            claim['start_time'] = datetime.fromisoformat(claim['start_time'])
+        if isinstance(claim.get('end_time'), str):
+            claim['end_time'] = datetime.fromisoformat(claim['end_time'])
+        if isinstance(claim.get('created_at'), str):
+            claim['created_at'] = datetime.fromisoformat(claim['created_at'])
+    
+    return claims
+
+@api_router.post("/detention")
+async def create_detention_claim(claim_data: DetentionClaimCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    total_amount = claim_data.detention_hours * claim_data.hourly_rate
+    
+    claim = DetentionClaim(
+        driver_email=user['email'],
+        driver_name=user['name'],
+        total_amount=total_amount,
+        **claim_data.model_dump()
+    )
+    
+    claim_doc = claim.model_dump()
+    claim_doc['start_time'] = claim_doc['start_time'].isoformat()
+    claim_doc['end_time'] = claim_doc['end_time'].isoformat()
+    claim_doc['created_at'] = claim_doc['created_at'].isoformat()
+    
+    await db.detention_claims.insert_one(claim_doc)
+    logger.info(f"Detention claim created: ${total_amount} from {claim_data.broker_name}")
+    return claim
+
+@api_router.get("/detention/{driver_email}/total")
+async def get_detention_total(driver_email: str):
+    claims = await db.detention_claims.find({"driver_email": driver_email}).to_list(10000)
+    
+    total_pending = sum(c['total_amount'] for c in claims if c['status'] == 'pending')
+    total_paid = sum(c['total_amount'] for c in claims if c['status'] == 'paid')
+    
+    return {
+        "total_pending": round(total_pending, 2),
+        "total_paid": round(total_paid, 2),
+        "total_claims": len(claims)
+    }
+
+# ============== DOT COMPLIANCE ==============
+
+@api_router.get("/compliance/{driver_email}")
+async def get_compliance_status(driver_email: str):
+    compliance = await db.dot_compliance.find_one({"driver_email": driver_email}, {"_id": 0})
+    
+    if not compliance:
+        return {"message": "No compliance data found"}
+    
+    if isinstance(compliance.get('cdl_expiry'), str):
+        compliance['cdl_expiry'] = datetime.fromisoformat(compliance['cdl_expiry'])
+    if isinstance(compliance.get('medical_card_expiry'), str):
+        compliance['medical_card_expiry'] = datetime.fromisoformat(compliance['medical_card_expiry'])
+    if compliance.get('hazmat_expiry') and isinstance(compliance['hazmat_expiry'], str):
+        compliance['hazmat_expiry'] = datetime.fromisoformat(compliance['hazmat_expiry'])
+    if compliance.get('created_at') and isinstance(compliance['created_at'], str):
+        compliance['created_at'] = datetime.fromisoformat(compliance['created_at'])
+    
+    # Calculate days until expiration
+    now = datetime.now(timezone.utc)
+    cdl_days = (compliance['cdl_expiry'] - now).days
+    medical_days = (compliance['medical_card_expiry'] - now).days
+    
+    alerts = []
+    if cdl_days < 30:
+        alerts.append({"type": "cdl", "message": f"CDL expires in {cdl_days} days", "severity": "high" if cdl_days < 14 else "medium"})
+    if medical_days < 30:
+        alerts.append({"type": "medical", "message": f"Medical card expires in {medical_days} days", "severity": "high" if medical_days < 14 else "medium"})
+    
+    compliance['alerts'] = alerts
+    
+    return compliance
+
+@api_router.post("/compliance")
+async def create_compliance_record(compliance_data: DOTComplianceCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    compliance = DOTCompliance(
+        driver_email=user['email'],
+        **compliance_data.model_dump()
+    )
+    
+    compliance_doc = compliance.model_dump()
+    compliance_doc['cdl_expiry'] = compliance_doc['cdl_expiry'].isoformat()
+    compliance_doc['medical_card_expiry'] = compliance_doc['medical_card_expiry'].isoformat()
+    if compliance_doc.get('hazmat_expiry'):
+        compliance_doc['hazmat_expiry'] = compliance_doc['hazmat_expiry'].isoformat()
+    if compliance_doc.get('twic_card_expiry'):
+        compliance_doc['twic_card_expiry'] = compliance_doc['twic_card_expiry'].isoformat()
+    compliance_doc['created_at'] = compliance_doc['created_at'].isoformat()
+    
+    # Upsert (update if exists, insert if not)
+    await db.dot_compliance.update_one(
+        {"driver_email": driver_email},
+        {"$set": compliance_doc},
+        upsert=True
+    )
+    
+    return compliance
+
 # ============== ADMIN ROUTES ==============
 
 @api_router.get("/admin/stats", response_model=DashboardStats)
