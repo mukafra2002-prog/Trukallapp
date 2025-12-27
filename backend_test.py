@@ -703,7 +703,7 @@ class NightHaulAPITester:
 
     def run_all_tests(self):
         """Run all test suites"""
-        print("🚛 Starting NightHaul API Testing...")
+        print("🚛 Starting TrukAll API Testing...")
         print(f"Backend URL: {self.base_url}")
         print("=" * 60)
         
@@ -712,6 +712,10 @@ class NightHaulAPITester:
             self.test_parking_spots_endpoints()
             self.test_booking_endpoints()
             self.test_payment_endpoints()
+            self.test_shower_credits_endpoints()
+            self.test_broker_ratings_endpoints()
+            self.test_retail_parking_endpoints()
+            self.test_loads_endpoints()
             self.test_admin_endpoints()
             self.test_error_handling()
             
