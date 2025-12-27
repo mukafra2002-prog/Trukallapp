@@ -23,7 +23,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app
-app = FastAPI(title="TruckPark - Safe Parking for Truck Drivers")
+app = FastAPI(title="TrukAll - Complete Truck Driver Solution")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -45,6 +45,8 @@ class User(BaseModel):
     role: str  # "driver", "partner", "admin"
     phone: Optional[str] = None
     reward_points: int = 0
+    hos_hours_remaining: float = 11.0  # Hours of Service remaining
+    hos_last_reset: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserCreate(BaseModel):
@@ -70,17 +72,20 @@ class ParkingSpot(BaseModel):
     total_spaces: int
     available_spaces: int
     price_per_night: float
-    amenities: List[str]  # ["shower", "restroom", "food", "fuel", "security", "wifi"]
+    amenities: List[str]
     is_free: bool = False
-    security_level: str  # "low", "medium", "high"
+    security_level: str
     partner_id: str
     description: Optional[str] = None
     images: List[str] = []
     fuel_price_diesel: Optional[float] = None
     fuel_price_unleaded: Optional[float] = None
-    status: str = "active"  # "active", "inactive", "pending"
+    status: str = "active"
     rating: float = 0.0
     total_reviews: int = 0
+    weather_alert: Optional[str] = None  # "clear", "storm", "snow", "rain"
+    weigh_station_nearby: bool = False
+    weigh_station_status: Optional[str] = None  # "open", "closed", "bypass"
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -112,8 +117,8 @@ class Booking(BaseModel):
     check_in_date: datetime
     check_out_date: datetime
     total_price: float
-    payment_status: str  # "pending", "paid", "failed", "refunded"
-    booking_status: str  # "confirmed", "cancelled", "completed"
+    payment_status: str
+    booking_status: str
     session_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -131,6 +136,92 @@ class PaymentTransaction(BaseModel):
     session_id: str
     payment_status: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Load(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    origin_city: str
+    origin_state: str
+    destination_city: str
+    destination_state: str
+    pickup_date: datetime
+    delivery_date: datetime
+    weight: int  # pounds
+    distance: int  # miles
+    rate: float  # dollars
+    equipment_type: str  # "flatbed", "dry_van", "reefer", "stepdeck"
+    contact_name: str
+    contact_phone: str
+    status: str = "available"  # "available", "booked", "completed"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class LoadCreate(BaseModel):
+    origin_city: str
+    origin_state: str
+    destination_city: str
+    destination_state: str
+    pickup_date: datetime
+    delivery_date: datetime
+    weight: int
+    distance: int
+    rate: float
+    equipment_type: str
+    contact_name: str
+    contact_phone: str
+
+class Expense(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    category: str  # "fuel", "tolls", "parking", "food", "maintenance", "other"
+    amount: float
+    description: str
+    location: Optional[str] = None
+    date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ExpenseCreate(BaseModel):
+    category: str
+    amount: float
+    description: str
+    location: Optional[str] = None
+
+class MaintenanceReminder(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    truck_id: Optional[str] = None
+    maintenance_type: str  # "oil_change", "tire_rotation", "brake_inspection", "annual_inspection"
+    current_mileage: int
+    due_mileage: int
+    is_completed: bool = False
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MaintenanceReminderCreate(BaseModel):
+    maintenance_type: str
+    current_mileage: int
+    due_mileage: int
+    notes: Optional[str] = None
+
+class EmergencySOS(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    driver_name: str
+    driver_phone: str
+    latitude: float
+    longitude: float
+    emergency_type: str  # "breakdown", "accident", "medical", "other"
+    description: str
+    status: str = "active"  # "active", "responding", "resolved"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class EmergencySOSCreate(BaseModel):
+    latitude: float
+    longitude: float
+    emergency_type: str
+    description: str
 
 class DashboardStats(BaseModel):
     total_spots: int
@@ -156,12 +247,10 @@ async def get_current_user(email: str) -> User:
 
 @api_router.post("/auth/register", response_model=User)
 async def register(user_data: UserCreate):
-    # Check if user exists
     existing = await db.users.find_one({"email": user_data.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Create user
     user = User(
         email=user_data.email,
         name=user_data.name,
@@ -172,6 +261,7 @@ async def register(user_data: UserCreate):
     user_doc = user.model_dump()
     user_doc['password_hash'] = hash_password(user_data.password)
     user_doc['created_at'] = user_doc['created_at'].isoformat()
+    user_doc['hos_last_reset'] = user_doc['hos_last_reset'].isoformat()
     
     await db.users.insert_one(user_doc)
     logger.info(f"User registered: {user.email} as {user.role}")
@@ -295,12 +385,10 @@ async def get_partner_spots(partner_email: str):
 
 @api_router.post("/bookings", response_model=Booking)
 async def create_booking(booking_data: BookingCreate, driver_email: str):
-    # Get driver
     user = await db.users.find_one({"email": driver_email})
     if not user or user['role'] != "driver":
         raise HTTPException(status_code=403, detail="Only drivers can create bookings")
     
-    # Get parking spot
     spot = await db.parking_spots.find_one({"id": booking_data.spot_id}, {"_id": 0})
     if not spot:
         raise HTTPException(status_code=404, detail="Parking spot not found")
@@ -308,13 +396,11 @@ async def create_booking(booking_data: BookingCreate, driver_email: str):
     if spot['available_spaces'] <= 0:
         raise HTTPException(status_code=400, detail="No available spaces")
     
-    # Calculate total price
     days = (booking_data.check_out_date - booking_data.check_in_date).days
     if days <= 0:
         days = 1
     total_price = spot['price_per_night'] * days if not spot['is_free'] else 0.0
     
-    # Create booking
     booking = Booking(
         driver_id=user['id'],
         driver_name=user['name'],
@@ -336,7 +422,6 @@ async def create_booking(booking_data: BookingCreate, driver_email: str):
     
     await db.bookings.insert_one(booking_doc)
     
-    # Update available spaces
     await db.parking_spots.update_one(
         {"id": spot['id']},
         {"$inc": {"available_spaces": -1}}
@@ -383,7 +468,6 @@ async def get_spot_bookings(spot_id: str):
 
 @api_router.post("/payments/create-checkout")
 async def create_checkout_session(booking_id: str, request: Request):
-    # Get booking
     booking = await db.bookings.find_one({"id": booking_id}, {"_id": 0})
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -391,15 +475,12 @@ async def create_checkout_session(booking_id: str, request: Request):
     if booking['total_price'] <= 0:
         return {"message": "No payment required for free parking"}
     
-    # Get origin from request
     origin = str(request.base_url).rstrip('/')
     
-    # Initialize Stripe
     stripe_key = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
     webhook_url = f"{origin}/api/webhook/stripe"
     stripe_checkout = StripeCheckout(api_key=stripe_key, webhook_url=webhook_url)
     
-    # Create checkout session
     checkout_request = CheckoutSessionRequest(
         amount=booking['total_price'],
         currency="usd",
@@ -414,13 +495,11 @@ async def create_checkout_session(booking_id: str, request: Request):
     
     session = await stripe_checkout.create_checkout_session(checkout_request)
     
-    # Update booking with session_id
     await db.bookings.update_one(
         {"id": booking_id},
         {"$set": {"session_id": session.session_id}}
     )
     
-    # Create payment transaction
     transaction = PaymentTransaction(
         booking_id=booking_id,
         amount=booking['total_price'],
@@ -437,12 +516,11 @@ async def create_checkout_session(booking_id: str, request: Request):
 @api_router.get("/payments/status/{session_id}")
 async def get_payment_status(session_id: str):
     stripe_key = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
-    webhook_url = ""  # Not needed for status check
+    webhook_url = ""
     stripe_checkout = StripeCheckout(api_key=stripe_key, webhook_url=webhook_url)
     
     status = await stripe_checkout.get_checkout_status(session_id)
     
-    # Update booking and transaction if paid
     if status.payment_status == "paid":
         transaction = await db.payment_transactions.find_one({"session_id": session_id})
         if transaction and transaction['payment_status'] != "paid":
@@ -465,7 +543,7 @@ async def stripe_webhook(request: Request):
         signature = request.headers.get("Stripe-Signature", "")
         
         stripe_key = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
-        webhook_url = ""  # Not needed
+        webhook_url = ""
         stripe_checkout = StripeCheckout(api_key=stripe_key, webhook_url=webhook_url)
         
         event = await stripe_checkout.handle_webhook(body, signature)
@@ -476,6 +554,212 @@ async def stripe_webhook(request: Request):
     except Exception as e:
         logger.error(f"Webhook error: {str(e)}")
         return {"status": "error", "message": str(e)}
+
+# ============== LOAD BOARD ROUTES ==============
+
+@api_router.get("/loads", response_model=List[Load])
+async def get_loads(
+    origin_state: Optional[str] = None,
+    destination_state: Optional[str] = None,
+    equipment_type: Optional[str] = None
+):
+    query = {"status": "available"}
+    if origin_state:
+        query['origin_state'] = {"$regex": origin_state, "$options": "i"}
+    if destination_state:
+        query['destination_state'] = {"$regex": destination_state, "$options": "i"}
+    if equipment_type:
+        query['equipment_type'] = equipment_type
+    
+    loads = await db.loads.find(query, {"_id": 0}).to_list(1000)
+    
+    for load in loads:
+        if isinstance(load.get('pickup_date'), str):
+            load['pickup_date'] = datetime.fromisoformat(load['pickup_date'])
+        if isinstance(load.get('delivery_date'), str):
+            load['delivery_date'] = datetime.fromisoformat(load['delivery_date'])
+        if isinstance(load.get('created_at'), str):
+            load['created_at'] = datetime.fromisoformat(load['created_at'])
+    
+    return loads
+
+@api_router.post("/loads", response_model=Load)
+async def create_load(load_data: LoadCreate):
+    load = Load(**load_data.model_dump())
+    
+    load_doc = load.model_dump()
+    load_doc['pickup_date'] = load_doc['pickup_date'].isoformat()
+    load_doc['delivery_date'] = load_doc['delivery_date'].isoformat()
+    load_doc['created_at'] = load_doc['created_at'].isoformat()
+    
+    await db.loads.insert_one(load_doc)
+    logger.info(f"Load created: {load.origin_city} to {load.destination_city}")
+    return load
+
+# ============== EXPENSE TRACKER ROUTES ==============
+
+@api_router.get("/expenses/{driver_email}", response_model=List[Expense])
+async def get_expenses(driver_email: str):
+    expenses = await db.expenses.find({"driver_email": driver_email}, {"_id": 0}).to_list(1000)
+    
+    for expense in expenses:
+        if isinstance(expense.get('date'), str):
+            expense['date'] = datetime.fromisoformat(expense['date'])
+        if isinstance(expense.get('created_at'), str):
+            expense['created_at'] = datetime.fromisoformat(expense['created_at'])
+    
+    return expenses
+
+@api_router.post("/expenses", response_model=Expense)
+async def create_expense(expense_data: ExpenseCreate, driver_email: str):
+    expense = Expense(
+        driver_email=driver_email,
+        **expense_data.model_dump()
+    )
+    
+    expense_doc = expense.model_dump()
+    expense_doc['date'] = expense_doc['date'].isoformat()
+    expense_doc['created_at'] = expense_doc['created_at'].isoformat()
+    
+    await db.expenses.insert_one(expense_doc)
+    logger.info(f"Expense logged: {expense.category} - ${expense.amount}")
+    return expense
+
+@api_router.get("/expenses/{driver_email}/summary")
+async def get_expense_summary(driver_email: str):
+    expenses = await db.expenses.find({"driver_email": driver_email}, {"_id": 0}).to_list(10000)
+    
+    total = sum(e['amount'] for e in expenses)
+    by_category = {}
+    for e in expenses:
+        cat = e['category']
+        by_category[cat] = by_category.get(cat, 0) + e['amount']
+    
+    return {
+        "total": total,
+        "by_category": by_category,
+        "count": len(expenses)
+    }
+
+# ============== MAINTENANCE REMINDERS ==============
+
+@api_router.get("/maintenance/{driver_email}", response_model=List[MaintenanceReminder])
+async def get_maintenance_reminders(driver_email: str):
+    reminders = await db.maintenance_reminders.find(
+        {"driver_email": driver_email, "is_completed": False},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    for reminder in reminders:
+        if isinstance(reminder.get('created_at'), str):
+            reminder['created_at'] = datetime.fromisoformat(reminder['created_at'])
+    
+    return reminders
+
+@api_router.post("/maintenance", response_model=MaintenanceReminder)
+async def create_maintenance_reminder(reminder_data: MaintenanceReminderCreate, driver_email: str):
+    reminder = MaintenanceReminder(
+        driver_email=driver_email,
+        **reminder_data.model_dump()
+    )
+    
+    reminder_doc = reminder.model_dump()
+    reminder_doc['created_at'] = reminder_doc['created_at'].isoformat()
+    
+    await db.maintenance_reminders.insert_one(reminder_doc)
+    logger.info(f"Maintenance reminder created: {reminder.maintenance_type}")
+    return reminder
+
+@api_router.put("/maintenance/{reminder_id}/complete")
+async def complete_maintenance(reminder_id: str):
+    result = await db.maintenance_reminders.update_one(
+        {"id": reminder_id},
+        {"$set": {"is_completed": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Reminder not found")
+    
+    return {"message": "Maintenance marked as completed"}
+
+# ============== EMERGENCY SOS ==============
+
+@api_router.post("/emergency/sos", response_model=EmergencySOS)
+async def create_emergency_sos(sos_data: EmergencySOSCreate, driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    sos = EmergencySOS(
+        driver_email=user['email'],
+        driver_name=user['name'],
+        driver_phone=user.get('phone', 'N/A'),
+        **sos_data.model_dump()
+    )
+    
+    sos_doc = sos.model_dump()
+    sos_doc['created_at'] = sos_doc['created_at'].isoformat()
+    
+    await db.emergency_sos.insert_one(sos_doc)
+    logger.critical(f"EMERGENCY SOS: {user['name']} at ({sos.latitude}, {sos.longitude}) - {sos.emergency_type}")
+    
+    return sos
+
+@api_router.get("/emergency/sos/active")
+async def get_active_emergencies():
+    emergencies = await db.emergency_sos.find(
+        {"status": "active"},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    for sos in emergencies:
+        if isinstance(sos.get('created_at'), str):
+            sos['created_at'] = datetime.fromisoformat(sos['created_at'])
+    
+    return emergencies
+
+# ============== HOS (HOURS OF SERVICE) ==============
+
+@api_router.get("/hos/{driver_email}")
+async def get_hos_status(driver_email: str):
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate hours since last reset
+    last_reset = datetime.fromisoformat(user['hos_last_reset'])
+    hours_since_reset = (datetime.now(timezone.utc) - last_reset).total_seconds() / 3600
+    
+    hours_remaining = max(0, user['hos_hours_remaining'] - hours_since_reset)
+    
+    return {
+        "hours_remaining": round(hours_remaining, 1),
+        "last_reset": user['hos_last_reset'],
+        "status": "good" if hours_remaining > 2 else "warning" if hours_remaining > 0 else "violation"
+    }
+
+@api_router.post("/hos/{driver_email}/reset")
+async def reset_hos(driver_email: str):
+    result = await db.users.update_one(
+        {"email": driver_email},
+        {
+            "$set": {
+                "hos_hours_remaining": 11.0,
+                "hos_last_reset": datetime.now(timezone.utc).isoformat()
+            }
+        }
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Award 50 points for completing a rest period
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": 50}}
+    )
+    
+    return {"message": "HOS reset successful. Awarded 50 points for rest compliance."}
 
 # ============== ADMIN ROUTES ==============
 
@@ -489,7 +773,6 @@ async def get_dashboard_stats(admin_email: str):
     active_spots = await db.parking_spots.count_documents({"status": "active"})
     total_bookings = await db.bookings.count_documents({})
     
-    # Calculate total revenue
     bookings = await db.bookings.find({"payment_status": "paid"}).to_list(10000)
     total_revenue = sum(b['total_price'] for b in bookings)
     
@@ -511,6 +794,8 @@ async def get_all_users(admin_email: str):
     for u in users:
         if isinstance(u.get('created_at'), str):
             u['created_at'] = datetime.fromisoformat(u['created_at'])
+        if isinstance(u.get('hos_last_reset'), str):
+            u['hos_last_reset'] = datetime.fromisoformat(u['hos_last_reset'])
     
     return users
 
