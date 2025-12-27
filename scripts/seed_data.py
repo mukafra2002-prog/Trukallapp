@@ -266,6 +266,206 @@ async def seed_database():
     await db.loads.insert_many(loads)
     print(f"✓ Created {len(loads)} available loads on load board")
     
+    # Create sample broker ratings
+    await db.broker_ratings.delete_many({})
+    broker_ratings = [
+        {
+            "id": "br-001",
+            "broker_name": "ABC Logistics",
+            "mc_number": "MC-123456",
+            "driver_email": "driver@test.com",
+            "driver_name": "John Driver",
+            "rating": 5,
+            "payment_rating": 5,
+            "communication_rating": 5,
+            "load_accuracy_rating": 5,
+            "would_work_again": True,
+            "payment_days": 15,
+            "fraud_reported": False,
+            "fraud_type": None,
+            "comment": "Great broker! Always pays on time and load details are accurate.",
+            "verified_load": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "br-002",
+            "broker_name": "Quick Freight Services",
+            "mc_number": "MC-789012",
+            "driver_email": "driver@test.com",
+            "driver_name": "John Driver",
+            "rating": 2,
+            "payment_rating": 1,
+            "communication_rating": 3,
+            "load_accuracy_rating": 2,
+            "would_work_again": False,
+            "payment_days": 45,
+            "fraud_reported": True,
+            "fraud_type": "double_broker",
+            "comment": "Double brokered my load! Took 45 days to get paid. AVOID!",
+            "verified_load": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "br-003",
+            "broker_name": "Reliable Transport Brokers",
+            "mc_number": "MC-345678",
+            "driver_email": "driver@test.com",
+            "driver_name": "John Driver",
+            "rating": 4,
+            "payment_rating": 4,
+            "communication_rating": 5,
+            "load_accuracy_rating": 4,
+            "would_work_again": True,
+            "payment_days": 21,
+            "fraud_reported": False,
+            "fraud_type": None,
+            "comment": "Good broker overall. Communication is excellent.",
+            "verified_load": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+    ]
+    await db.broker_ratings.insert_many(broker_ratings)
+    print(f"✓ Created {len(broker_ratings)} broker ratings")
+    
+    # Create sample shower credits
+    await db.shower_credits.delete_many({})
+    shower_credits = [
+        {
+            "id": "sc-001",
+            "driver_email": "driver@test.com",
+            "chain": "pilot_flying_j",
+            "rewards_number": "PFJ-12345678",
+            "available_showers": 3,
+            "points_balance": 2500,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "sc-002",
+            "driver_email": "driver@test.com",
+            "chain": "loves",
+            "rewards_number": "LOVES-87654321",
+            "available_showers": 2,
+            "points_balance": 1800,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "sc-003",
+            "driver_email": "driver@test.com",
+            "chain": "ta_petro",
+            "rewards_number": "TAPETRO-55555",
+            "available_showers": 1,
+            "points_balance": 950,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+    ]
+    await db.shower_credits.insert_many(shower_credits)
+    print(f"✓ Created {len(shower_credits)} shower credit records")
+    
+    # Create sample retail parking locations
+    await db.retail_parking.delete_many({})
+    retail_parking = [
+        {
+            "id": "rp-001",
+            "name": "Walmart Supercenter - Dallas",
+            "chain": "walmart",
+            "address": "4545 S Lamar St",
+            "city": "Dallas",
+            "state": "TX",
+            "latitude": 32.7357,
+            "longitude": -96.8271,
+            "allows_overnight": True,
+            "truck_parking_spaces": 15,
+            "restrictions": ["no_idling", "max_12_hours"],
+            "amenities": ["restroom", "food", "wifi"],
+            "last_verified": datetime.now(timezone.utc).isoformat(),
+            "community_verified": True,
+            "total_reviews": 45,
+            "average_rating": 4.2,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "rp-002",
+            "name": "Cracker Barrel - Atlanta",
+            "chain": "cracker_barrel",
+            "address": "2801 Cobb Pkwy SE",
+            "city": "Atlanta",
+            "state": "GA",
+            "latitude": 33.8923,
+            "longitude": -84.4678,
+            "allows_overnight": True,
+            "truck_parking_spaces": 8,
+            "restrictions": ["must_shop", "max_10_hours"],
+            "amenities": ["restroom", "food"],
+            "last_verified": datetime.now(timezone.utc).isoformat(),
+            "community_verified": True,
+            "total_reviews": 32,
+            "average_rating": 4.5,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "rp-003",
+            "name": "Cabela's - Phoenix",
+            "chain": "cabelas",
+            "address": "9380 W Glendale Ave",
+            "city": "Phoenix",
+            "state": "AZ",
+            "latitude": 33.5326,
+            "longitude": -112.2274,
+            "allows_overnight": True,
+            "truck_parking_spaces": 20,
+            "restrictions": [],
+            "amenities": ["restroom", "security_patrol"],
+            "last_verified": datetime.now(timezone.utc).isoformat(),
+            "community_verified": True,
+            "total_reviews": 28,
+            "average_rating": 4.7,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "rp-004",
+            "name": "Lowe's Home Improvement - Chicago",
+            "chain": "lowes",
+            "address": "1111 N Larrabee St",
+            "city": "Chicago",
+            "state": "IL",
+            "latitude": 41.9030,
+            "longitude": -87.6432,
+            "allows_overnight": True,
+            "truck_parking_spaces": 10,
+            "restrictions": ["no_idling", "security_patrol"],
+            "amenities": ["restroom"],
+            "last_verified": datetime.now(timezone.utc).isoformat(),
+            "community_verified": False,
+            "total_reviews": 15,
+            "average_rating": 3.8,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "rp-005",
+            "name": "Rest Area - I-10 Mile Marker 234",
+            "chain": "rest_area",
+            "address": "I-10 Mile Marker 234",
+            "city": "Houston",
+            "state": "TX",
+            "latitude": 29.7604,
+            "longitude": -95.3698,
+            "allows_overnight": True,
+            "truck_parking_spaces": 50,
+            "restrictions": ["max_8_hours"],
+            "amenities": ["restroom", "picnic_area"],
+            "last_verified": datetime.now(timezone.utc).isoformat(),
+            "community_verified": True,
+            "total_reviews": 89,
+            "average_rating": 3.5,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+    ]
+    await db.retail_parking.insert_many(retail_parking)
+    print(f"✓ Created {len(retail_parking)} retail parking locations")
+    
     print("\n🎉 Database seeded successfully!")
     print("\n📝 Test accounts created:")
     print("   Driver: driver@test.com / password123")
