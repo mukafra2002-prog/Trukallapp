@@ -111,7 +111,75 @@ export default function DriverDashboard() {
       </header>
 
       {/* Alerts and Rewards Bar */}
-      <div className=\"bg-card border-b border-white/10 p-3\">\n        <div className=\"max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3\">\n          {/* Reward Points */}\n          <Card className=\"bg-accent/50 border-secondary/30\" data-testid=\"rewards-card\">\n            <CardContent className=\"p-3 flex items-center justify-between\">\n              <div className=\"flex items-center gap-2\">\n                <Award className=\"w-6 h-6 text-secondary\" />\n                <div>\n                  <p className=\"text-xs text-muted-foreground\">Your Points</p>\n                  <p className=\"text-2xl font-bold mono text-secondary\">{rewardPoints}</p>\n                </div>\n              </div>\n              <Button variant=\"ghost\" size=\"sm\" onClick={() => toast.info(\"Earn points by booking parking, reporting spots, and using TrukAll daily!\")}>\n                <span className=\"text-xs\">How to earn?</span>\n              </Button>\n            </CardContent>\n          </Card>\n\n          {/* Fatigue Monitor */}\n          <Card className={`bg-accent/50 ${\n            fatigueLevel === 'danger' ? 'border-destructive/50' : \n            fatigueLevel === 'warning' ? 'border-yellow-500/50' : \n            'border-secondary/30'\n          }`} data-testid=\"fatigue-card\">\n            <CardContent className=\"p-3 flex items-center justify-between\">\n              <div className=\"flex items-center gap-2\">\n                <AlertTriangle className={`w-6 h-6 ${\n                  fatigueLevel === 'danger' ? 'text-destructive' :\n                  fatigueLevel === 'warning' ? 'text-yellow-500' :\n                  'text-secondary'\n                }`} />\n                <div>\n                  <p className=\"text-xs text-muted-foreground\">Fatigue Status</p>\n                  <p className=\"text-sm font-bold uppercase\">{fatigueLevel === 'good' ? 'All Good' : fatigueLevel === 'warning' ? 'Take Break Soon' : 'REST NOW!'}</p>\n                </div>\n              </div>\n              <Button variant=\"ghost\" size=\"sm\" onClick={() => toast.info(\"We monitor your activity to help you stay safe. Take breaks when needed!\")}>\n                <span className=\"text-xs\">Info</span>\n              </Button>\n            </CardContent>\n          </Card>\n\n          {/* Wake-Up Timer */}\n          <Card className=\"bg-accent/50 border-primary/30\" data-testid=\"wakeup-card\">\n            <CardContent className=\"p-3 flex items-center justify-between\">\n              <div className=\"flex items-center gap-2\">\n                <Clock className=\"w-6 h-6 text-primary\" />\n                <div>\n                  <p className=\"text-xs text-muted-foreground\">Wake-Up Alert</p>\n                  {wakeUpTime ? (\n                    <p className=\"text-sm font-bold mono\">{wakeUpTime}</p>\n                  ) : (\n                    <p className=\"text-xs text-muted-foreground\">Not set</p>\n                  )}\n                </div>\n              </div>\n              <Button variant=\"ghost\" size=\"sm\" onClick={() => {\n                const time = prompt('Set wake-up time (HH:MM format, e.g., 14:30):')\n                if (time) {\n                  setWakeUpTime(time)\n                  toast.success(`Wake-up alert set for ${time}`)\n                }\n              }}>\n                <span className=\"text-xs\">Set</span>\n              </Button>\n            </CardContent>\n          </Card>\n        </div>\n      </div>
+      <div className="bg-card border-b border-white/10 p-3">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Reward Points */}
+          <Card className="bg-accent/50 border-secondary/30" data-testid="rewards-card">
+            <CardContent className="p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Award className="w-6 h-6 text-secondary" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Your Points</p>
+                  <p className="text-2xl font-bold mono text-secondary">{rewardPoints}</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => toast.info("Earn points by booking parking, reporting spots, and using TrukAll daily!")}>
+                <span className="text-xs">How to earn?</span>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Fatigue Monitor */}
+          <Card className={`bg-accent/50 ${
+            fatigueLevel === 'danger' ? 'border-destructive/50' : 
+            fatigueLevel === 'warning' ? 'border-yellow-500/50' : 
+            'border-secondary/30'
+          }`} data-testid="fatigue-card">
+            <CardContent className="p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className={`w-6 h-6 ${
+                  fatigueLevel === 'danger' ? 'text-destructive' :
+                  fatigueLevel === 'warning' ? 'text-yellow-500' :
+                  'text-secondary'
+                }`} />
+                <div>
+                  <p className="text-xs text-muted-foreground">Fatigue Status</p>
+                  <p className="text-sm font-bold uppercase">{fatigueLevel === 'good' ? 'All Good' : fatigueLevel === 'warning' ? 'Take Break Soon' : 'REST NOW!'}</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => toast.info("We monitor your activity to help you stay safe. Take breaks when needed!")}>
+                <span className="text-xs">Info</span>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Wake-Up Timer */}
+          <Card className="bg-accent/50 border-primary/30" data-testid="wakeup-card">
+            <CardContent className="p-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="w-6 h-6 text-primary" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Wake-Up Alert</p>
+                  {wakeUpTime ? (
+                    <p className="text-sm font-bold mono">{wakeUpTime}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Not set</p>
+                  )}
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => {
+                const time = prompt('Set wake-up time (HH:MM format, e.g., 14:30):')
+                if (time) {
+                  setWakeUpTime(time)
+                  toast.success(`Wake-up alert set for ${time}`)
+                }
+              }}>
+                <span className="text-xs">Set</span>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* Search Bar */}
       <div className="bg-card border-b border-white/10 p-4">
