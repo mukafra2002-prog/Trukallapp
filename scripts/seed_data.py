@@ -5,7 +5,7 @@ Seed script to populate the database with sample data
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import sys
 sys.path.append('/app/backend')
 
