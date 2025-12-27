@@ -742,7 +742,7 @@ class TrukAllAPITester:
         return self.tests_passed == self.tests_run
 
 def main():
-    tester = NightHaulAPITester()
+    tester = TrukAllAPITester()
     success = tester.run_all_tests()
     
     # Save detailed results
