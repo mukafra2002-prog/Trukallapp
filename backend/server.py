@@ -342,7 +342,13 @@ async def create_booking(booking_data: BookingCreate, driver_email: str):
         {"$inc": {"available_spaces": -1}}
     )
     
-    logger.info(f"Booking created: {booking.id} for spot {spot['name']}")
+    # Award 100 reward points to the driver
+    await db.users.update_one(
+        {"email": user['email']},
+        {"$inc": {"reward_points": 100}}
+    )
+    
+    logger.info(f"Booking created: {booking.id} for spot {spot['name']}. Driver awarded 100 points.")
     return booking
 
 @api_router.get("/bookings/driver/{driver_email}", response_model=List[Booking])
