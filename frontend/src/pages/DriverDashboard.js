@@ -330,7 +330,7 @@ export default function DriverDashboard() {
 
       {/* Tabs */}
       <div className="max-w-7xl mx-auto p-4">
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           <Button
             variant={activeTab === "map" ? "default" : "outline"}
             onClick={() => setActiveTab("map")}
@@ -348,6 +348,33 @@ export default function DriverDashboard() {
           >
             <History className="w-4 h-4 mr-2" />
             My Bookings
+          </Button>
+          <Button
+            variant={activeTab === "showers" ? "default" : "outline"}
+            onClick={() => setActiveTab("showers")}
+            className="touch-target"
+            data-testid="tab-showers"
+          >
+            <ShowerHead className="w-4 h-4 mr-2" />
+            Shower Credits
+          </Button>
+          <Button
+            variant={activeTab === "brokers" ? "default" : "outline"}
+            onClick={() => setActiveTab("brokers")}
+            className="touch-target"
+            data-testid="tab-brokers"
+          >
+            <Building2 className="w-4 h-4 mr-2" />
+            Broker Ratings
+          </Button>
+          <Button
+            variant={activeTab === "retail" ? "default" : "outline"}
+            onClick={() => setActiveTab("retail")}
+            className="touch-target"
+            data-testid="tab-retail"
+          >
+            <Store className="w-4 h-4 mr-2" />
+            Retail Parking
           </Button>
         </div>
 
