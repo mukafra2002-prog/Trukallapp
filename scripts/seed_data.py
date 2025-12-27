@@ -208,6 +208,64 @@ async def seed_database():
     await db.parking_spots.insert_many(parking_spots)
     print(f"✓ Created {len(parking_spots)} parking spots across different cities")
     
+    # Create sample loads for load board
+    loads = [
+        {
+            "id": "load-001",
+            "origin_city": "Dallas",
+            "origin_state": "TX",
+            "destination_city": "Atlanta",
+            "destination_state": "GA",
+            "pickup_date": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
+            "delivery_date": (datetime.now(timezone.utc) + timedelta(days=3)).isoformat(),
+            "weight": 42000,
+            "distance": 780,
+            "rate": 1950.00,
+            "equipment_type": "dry_van",
+            "contact_name": "ABC Logistics",
+            "contact_phone": "555-1001",
+            "status": "available",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "load-002",
+            "origin_city": "Chicago",
+            "origin_state": "IL",
+            "destination_city": "Phoenix",
+            "destination_state": "AZ",
+            "pickup_date": (datetime.now(timezone.utc) + timedelta(days=2)).isoformat(),
+            "delivery_date": (datetime.now(timezone.utc) + timedelta(days=5)).isoformat(),
+            "weight": 38000,
+            "distance": 1750,
+            "rate": 3500.00,
+            "equipment_type": "reefer",
+            "contact_name": "Cold Chain Express",
+            "contact_phone": "555-2002",
+            "status": "available",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "load-003",
+            "origin_city": "Miami",
+            "origin_state": "FL",
+            "destination_city": "Dallas",
+            "destination_state": "TX",
+            "pickup_date": (datetime.now(timezone.utc) + timedelta(hours=12)).isoformat(),
+            "delivery_date": (datetime.now(timezone.utc) + timedelta(days=2)).isoformat(),
+            "weight": 45000,
+            "distance": 1300,
+            "rate": 2600.00,
+            "equipment_type": "flatbed",
+            "contact_name": "Heavy Haul Inc",
+            "contact_phone": "555-3003",
+            "status": "available",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+    ]
+    
+    await db.loads.insert_many(loads)
+    print(f"✓ Created {len(loads)} available loads on load board")
+    
     print("\n🎉 Database seeded successfully!")
     print("\n📝 Test accounts created:")
     print("   Driver: driver@test.com / password123")
