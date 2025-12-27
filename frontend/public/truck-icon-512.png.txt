@@ -1,0 +1,2 @@
+# Placeholder for truck icon - 512x512
+# In production, replace with actual PNG image
