@@ -28,6 +28,10 @@ export default function DriverDashboard() {
   const [searchCity, setSearchCity] = useState("");
   const [activeTab, setActiveTab] = useState("map");
   const [loading, setLoading] = useState(true);
+  const [rewardPoints, setRewardPoints] = useState(0);
+  const [fatigueLevel, setFatigueLevel] = useState("good"); // good, warning, danger
+  const [wakeUpTime, setWakeUpTime] = useState("");
+  const [showFatigueAlert, setShowFatigueAlert] = useState(false);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
