@@ -120,6 +120,8 @@ class Booking(BaseModel):
     payment_status: str
     booking_status: str
     session_id: Optional[str] = None
+    is_reservation: bool = False  # NEW: 24hr advance reservation
+    reservation_confirmed: bool = False  # NEW: Partner confirmed
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class BookingCreate(BaseModel):
