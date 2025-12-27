@@ -6,7 +6,7 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 
-class NightHaulAPITester:
+class TrukAllAPITester:
     def __init__(self, base_url="https://trucker-dash-3.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
