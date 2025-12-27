@@ -108,6 +108,58 @@ export default function DriverDashboard() {
     }
   };
 
+  const fetchShowerCredits = async () => {
+    try {
+      const [creditsRes, totalsRes] = await Promise.all([
+        axios.get(`${API}/shower-credits/${user.email}`),
+        axios.get(`${API}/shower-credits/${user.email}/total`)
+      ]);
+      setShowerCredits(creditsRes.data);
+      setShowerTotals(totalsRes.data);
+    } catch (error) {
+      console.error("Failed to load shower credits", error);
+    }
+  };
+
+  const fetchBrokerRatings = async (brokerName) => {
+    try {
+      if (!brokerName.trim()) return;
+      const [ratingsRes, summaryRes] = await Promise.all([
+        axios.get(`${API}/brokers/ratings/${encodeURIComponent(brokerName)}`),
+        axios.get(`${API}/brokers/summary/${encodeURIComponent(brokerName)}`).catch(() => null)
+      ]);
+      setBrokerRatings(ratingsRes.data);
+      if (summaryRes) {
+        setBrokerSummary(summaryRes.data);
+      }
+    } catch (error) {
+      setBrokerRatings([]);
+      setBrokerSummary(null);
+      if (error.response?.status === 404) {
+        toast.info("No ratings found for this broker");
+      }
+    }
+  };
+
+  const fetchRetailParking = async (chain = "") => {
+    try {
+      const params = chain ? { chain } : {};
+      const response = await axios.get(`${API}/retail-parking`, { params });
+      setRetailParking(response.data);
+    } catch (error) {
+      console.error("Failed to load retail parking", error);
+    }
+  };
+
+  const fetchRetailChains = async () => {
+    try {
+      const response = await axios.get(`${API}/retail-parking/chains`);
+      setRetailChains(response.data.chains);
+    } catch (error) {
+      console.error("Failed to load retail chains", error);
+    }
+  };
+
   const handleSearch = async () => {
     try {
       setLoading(true);
