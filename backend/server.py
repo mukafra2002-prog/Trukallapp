@@ -355,6 +355,142 @@ class DOTComplianceCreate(BaseModel):
     hazmat_expiry: Optional[datetime] = None
     twic_card_expiry: Optional[datetime] = None
 
+# NEW CRITICAL FEATURES
+
+class BrokerRating(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    broker_name: str
+    mc_number: Optional[str] = None  # Motor Carrier number
+    driver_email: str
+    driver_name: str
+    rating: int  # 1-5 stars
+    payment_rating: int  # 1-5 (how fast they pay)
+    communication_rating: int  # 1-5
+    load_accuracy_rating: int  # 1-5 (load details match actual)
+    would_work_again: bool
+    payment_days: Optional[int] = None  # How many days to get paid
+    fraud_reported: bool = False
+    fraud_type: Optional[str] = None  # "non_payment", "double_broker", "fake_load", "other"
+    comment: str
+    verified_load: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class BrokerRatingCreate(BaseModel):
+    broker_name: str
+    mc_number: Optional[str] = None
+    rating: int
+    payment_rating: int
+    communication_rating: int
+    load_accuracy_rating: int
+    would_work_again: bool
+    payment_days: Optional[int] = None
+    fraud_reported: bool = False
+    fraud_type: Optional[str] = None
+    comment: str
+
+class BrokerSummary(BaseModel):
+    broker_name: str
+    mc_number: Optional[str] = None
+    total_reviews: int
+    average_rating: float
+    average_payment_rating: float
+    average_payment_days: float
+    fraud_reports: int
+    would_work_again_percentage: float
+    verified_reviews: int
+
+class ShowerCredit(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    chain: str  # "pilot_flying_j", "loves", "ta_petro", "speedway"
+    rewards_number: Optional[str] = None
+    available_showers: int
+    points_balance: int
+    last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ShowerCreditCreate(BaseModel):
+    chain: str
+    rewards_number: Optional[str] = None
+    available_showers: int = 0
+    points_balance: int = 0
+
+class ShowerCreditUpdate(BaseModel):
+    available_showers: Optional[int] = None
+    points_balance: Optional[int] = None
+
+class RetailParking(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    chain: str  # "walmart", "lowes", "home_depot", "rest_area", "cracker_barrel", "cabelas"
+    address: str
+    city: str
+    state: str
+    latitude: float
+    longitude: float
+    allows_overnight: bool = True
+    truck_parking_spaces: Optional[int] = None
+    restrictions: List[str] = []  # ["no_idling", "max_12_hours", "must_shop", "security_patrol"]
+    amenities: List[str] = []
+    last_verified: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    community_verified: bool = False
+    total_reviews: int = 0
+    average_rating: float = 0.0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class RetailParkingCreate(BaseModel):
+    name: str
+    chain: str
+    address: str
+    city: str
+    state: str
+    latitude: float
+    longitude: float
+    allows_overnight: bool = True
+    truck_parking_spaces: Optional[int] = None
+    restrictions: List[str] = []
+    amenities: List[str] = []
+
+class TruckRoute(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    origin_address: str
+    origin_lat: float
+    origin_lng: float
+    destination_address: str
+    destination_lat: float
+    destination_lng: float
+    truck_type: str  # "straight_truck", "semi", "double", "triple"
+    truck_height_ft: float
+    truck_weight_lbs: int
+    hazmat: bool = False
+    avoid_tolls: bool = False
+    waypoints: List[dict] = []  # List of parking stops, fuel stops
+    total_distance_miles: float
+    estimated_drive_time_hours: float
+    estimated_fuel_cost: float
+    estimated_toll_cost: float
+    warnings: List[str] = []  # Low bridge, weight restriction, etc
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TruckRouteRequest(BaseModel):
+    origin_address: str
+    origin_lat: float
+    origin_lng: float
+    destination_address: str
+    destination_lat: float
+    destination_lng: float
+    truck_type: str = "semi"
+    truck_height_ft: float = 13.6
+    truck_weight_lbs: int = 80000
+    hazmat: bool = False
+    avoid_tolls: bool = False
+    include_parking_stops: bool = True
+
 # ============== AUTH HELPERS ==============
 
 def hash_password(password: str) -> str:
