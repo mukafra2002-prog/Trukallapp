@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import "@/index.css";
 import App from "@/App";
 
-// Add dark mode class to html element
-document.documentElement.classList.add('dark');
+// Remove dark mode class for light theme
+document.documentElement.classList.remove('dark');
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
