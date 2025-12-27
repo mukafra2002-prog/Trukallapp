@@ -32,6 +32,16 @@ export default function DriverDashboard() {
   const [fatigueLevel, setFatigueLevel] = useState("good"); // good, warning, danger
   const [wakeUpTime, setWakeUpTime] = useState("");
   const [showFatigueAlert, setShowFatigueAlert] = useState(false);
+  
+  // New state for additional features
+  const [showerCredits, setShowerCredits] = useState([]);
+  const [showerTotals, setShowerTotals] = useState({ total_available_showers: 0, total_points: 0, chains_tracked: 0 });
+  const [brokerSearch, setBrokerSearch] = useState("");
+  const [brokerRatings, setBrokerRatings] = useState([]);
+  const [brokerSummary, setBrokerSummary] = useState(null);
+  const [retailParking, setRetailParking] = useState([]);
+  const [retailChains, setRetailChains] = useState([]);
+  const [selectedChain, setSelectedChain] = useState("");
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
