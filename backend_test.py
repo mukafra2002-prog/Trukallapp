@@ -388,6 +388,276 @@ class NightHaulAPITester:
                 "Skipped - admin user not available"
             )
 
+    def test_shower_credits_endpoints(self):
+        """Test shower credits endpoints"""
+        print("\n🚿 Testing Shower Credits Endpoints...")
+        
+        driver_email = "driver@test.com"
+        
+        # Test get shower credits for driver
+        success, response = self.make_request(
+            'GET',
+            f'/shower-credits/{driver_email}'
+        )
+        credits_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get Shower Credits",
+            success,
+            f"Retrieved {credits_count} shower credit records" if success else "Failed to get shower credits",
+            response if not success else None
+        )
+        
+        # Verify we have the expected 3 chains (Pilot Flying J, Love's, TA/Petro)
+        if success and isinstance(response, list):
+            chains = [credit.get('chain') for credit in response]
+            expected_chains = ['pilot_flying_j', 'loves', 'ta_petro']
+            found_chains = [chain for chain in expected_chains if chain in chains]
+            self.log_test(
+                "Shower Credits - Expected Chains",
+                len(found_chains) == 3,
+                f"Found {len(found_chains)}/3 expected chains: {found_chains}" if len(found_chains) > 0 else "No expected chains found",
+                {"expected": expected_chains, "found": chains} if len(found_chains) != 3 else None
+            )
+        
+        # Test get shower totals
+        success, response = self.make_request(
+            'GET',
+            f'/shower-credits/{driver_email}/total'
+        )
+        
+        if success and isinstance(response, dict):
+            total_showers = response.get('total_available_showers', 0)
+            total_points = response.get('total_points', 0)
+            chains_tracked = response.get('chains_tracked', 0)
+            
+            # Expected: 6 showers, 5250 points, 3 chains
+            expected_showers = 6
+            expected_points = 5250
+            expected_chains = 3
+            
+            self.log_test(
+                "Shower Credits - Total Showers",
+                total_showers == expected_showers,
+                f"Expected {expected_showers} showers, got {total_showers}",
+                response if total_showers != expected_showers else None
+            )
+            
+            self.log_test(
+                "Shower Credits - Total Points",
+                total_points == expected_points,
+                f"Expected {expected_points} points, got {total_points}",
+                response if total_points != expected_points else None
+            )
+            
+            self.log_test(
+                "Shower Credits - Chains Count",
+                chains_tracked == expected_chains,
+                f"Expected {expected_chains} chains, got {chains_tracked}",
+                response if chains_tracked != expected_chains else None
+            )
+        else:
+            self.log_test(
+                "Get Shower Totals",
+                False,
+                "Failed to get shower totals",
+                response
+            )
+
+    def test_broker_ratings_endpoints(self):
+        """Test broker ratings endpoints"""
+        print("\n📊 Testing Broker Ratings Endpoints...")
+        
+        # Test get broker ratings for ABC Logistics
+        broker_name = "ABC"
+        success, response = self.make_request(
+            'GET',
+            f'/brokers/ratings/{broker_name}'
+        )
+        ratings_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get Broker Ratings - ABC",
+            success,
+            f"Retrieved {ratings_count} ratings for ABC Logistics" if success else "Failed to get ABC Logistics ratings",
+            response if not success else None
+        )
+        
+        # Test get broker summary for ABC Logistics
+        success, response = self.make_request(
+            'GET',
+            f'/brokers/summary/{broker_name}'
+        )
+        
+        if success and isinstance(response, dict):
+            avg_rating = response.get('average_rating', 0)
+            total_reviews = response.get('total_reviews', 0)
+            broker_name_resp = response.get('broker_name', '')
+            
+            # Expected: 5.0 rating for ABC Logistics
+            expected_rating = 5.0
+            
+            self.log_test(
+                "Broker Summary - ABC Rating",
+                avg_rating == expected_rating,
+                f"Expected {expected_rating} rating, got {avg_rating} for {broker_name_resp}",
+                response if avg_rating != expected_rating else None
+            )
+            
+            self.log_test(
+                "Broker Summary - ABC Reviews Count",
+                total_reviews > 0,
+                f"Found {total_reviews} reviews for {broker_name_resp}",
+                response if total_reviews == 0 else None
+            )
+        else:
+            self.log_test(
+                "Get Broker Summary - ABC",
+                False,
+                "Failed to get ABC Logistics summary",
+                response
+            )
+        
+        # Test search for "Quick Freight" - should show fraud alert
+        fraud_broker = "Quick Freight"
+        success, response = self.make_request(
+            'GET',
+            f'/brokers/ratings/{fraud_broker}'
+        )
+        
+        if success and isinstance(response, list):
+            fraud_reports = [rating for rating in response if rating.get('fraud_reported', False)]
+            self.log_test(
+                "Broker Ratings - Quick Freight Fraud Alert",
+                len(fraud_reports) > 0,
+                f"Found {len(fraud_reports)} fraud reports for {fraud_broker}" if len(fraud_reports) > 0 else f"No fraud reports found for {fraud_broker}",
+                {"total_ratings": len(response), "fraud_reports": len(fraud_reports)} if len(fraud_reports) == 0 else None
+            )
+        else:
+            self.log_test(
+                "Get Broker Ratings - Quick Freight",
+                False,
+                "Failed to get Quick Freight ratings",
+                response
+            )
+
+    def test_retail_parking_endpoints(self):
+        """Test retail parking endpoints"""
+        print("\n🏪 Testing Retail Parking Endpoints...")
+        
+        # Test get all retail parking locations
+        success, response = self.make_request(
+            'GET',
+            '/retail-parking'
+        )
+        locations_count = len(response) if success and isinstance(response, list) else 0
+        
+        # Expected: 5 retail parking locations
+        expected_locations = 5
+        self.log_test(
+            "Get Retail Parking Locations",
+            success and locations_count == expected_locations,
+            f"Expected {expected_locations} locations, got {locations_count}" if success else "Failed to get retail parking locations",
+            response if not success or locations_count != expected_locations else None
+        )
+        
+        # Verify we have expected chains (Walmart, Cracker Barrel, Cabela's)
+        if success and isinstance(response, list):
+            chains = [location.get('chain') for location in response]
+            expected_chains = ['walmart', 'cracker_barrel', 'cabelas']
+            found_chains = [chain for chain in expected_chains if chain in chains]
+            self.log_test(
+                "Retail Parking - Expected Chains",
+                len(found_chains) >= 2,  # At least 2 of the 3 expected chains
+                f"Found {len(found_chains)}/3 expected chains: {found_chains}",
+                {"expected": expected_chains, "found": list(set(chains))} if len(found_chains) < 2 else None
+            )
+        
+        # Test filter by Walmart chain
+        success, response = self.make_request(
+            'GET',
+            '/retail-parking',
+            params={"chain": "walmart"}
+        )
+        walmart_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Filter Retail Parking - Walmart",
+            success,
+            f"Found {walmart_count} Walmart locations" if success else "Failed to filter by Walmart",
+            response if not success else None
+        )
+        
+        # Verify all returned locations are Walmart
+        if success and isinstance(response, list) and walmart_count > 0:
+            all_walmart = all(location.get('chain') == 'walmart' for location in response)
+            self.log_test(
+                "Walmart Filter Accuracy",
+                all_walmart,
+                f"All {walmart_count} locations are Walmart" if all_walmart else "Some non-Walmart locations returned",
+                [loc.get('chain') for loc in response] if not all_walmart else None
+            )
+        
+        # Test get retail chains
+        success, response = self.make_request(
+            'GET',
+            '/retail-parking/chains'
+        )
+        
+        if success and isinstance(response, dict) and 'chains' in response:
+            chains_list = response['chains']
+            chains_count = len(chains_list)
+            self.log_test(
+                "Get Retail Chains",
+                chains_count > 0,
+                f"Retrieved {chains_count} available chains",
+                response if chains_count == 0 else None
+            )
+            
+            # Verify expected chains are in the list
+            chain_ids = [chain.get('id') for chain in chains_list]
+            expected_chain_ids = ['walmart', 'cracker_barrel', 'cabelas']
+            found_expected = [chain_id for chain_id in expected_chain_ids if chain_id in chain_ids]
+            self.log_test(
+                "Retail Chains - Expected Chains Available",
+                len(found_expected) >= 2,
+                f"Found {len(found_expected)}/3 expected chains in available list: {found_expected}",
+                {"expected": expected_chain_ids, "available": chain_ids} if len(found_expected) < 2 else None
+            )
+        else:
+            self.log_test(
+                "Get Retail Chains",
+                False,
+                "Failed to get retail chains list",
+                response
+            )
+
+    def test_loads_endpoints(self):
+        """Test load board endpoints"""
+        print("\n📦 Testing Load Board Endpoints...")
+        
+        # Test get all loads
+        success, response = self.make_request('GET', '/loads')
+        loads_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get All Loads",
+            success,
+            f"Retrieved {loads_count} loads" if success else "Failed to get loads",
+            response if not success else None
+        )
+        
+        # Test filter by equipment type
+        if loads_count > 0:
+            success, response = self.make_request(
+                'GET',
+                '/loads',
+                params={"equipment_type": "dry_van"}
+            )
+            filtered_count = len(response) if success and isinstance(response, list) else 0
+            self.log_test(
+                "Filter Loads by Equipment Type",
+                success,
+                f"Found {filtered_count} dry van loads" if success else "Failed to filter loads",
+                response if not success else None
+            )
+
     def test_error_handling(self):
         """Test error handling"""
         print("\n🚨 Testing Error Handling...")
