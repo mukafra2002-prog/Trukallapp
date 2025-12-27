@@ -1,0 +1,42 @@
+{
+  "name": "TrukAll - Complete Truck Driver Solution",
+  "short_name": "TrukAll",
+  "description": "Find parking, track expenses, find loads, and more - all in one app",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#f59e0b",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/truck-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/truck-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["navigation", "transportation", "business"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Find Parking",
+      "short_name": "Parking",
+      "description": "Find available parking spots",
+      "url": "/driver",
+      "icons": [{ "src": "/truck-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Load Board",
+      "short_name": "Loads",
+      "description": "Find available loads",
+      "url": "/driver",
+      "icons": [{ "src": "/truck-icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
