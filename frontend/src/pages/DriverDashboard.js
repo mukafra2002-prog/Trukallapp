@@ -360,8 +360,14 @@ export default function DriverDashboard() {
                   'text-green-600'
                 }`} />
                 <div>
-                  <p className="text-xs text-muted-foreground">Fatigue Status</p>
-                  <p className="text-sm font-bold uppercase">{fatigueLevel === 'good' ? 'All Good' : fatigueLevel === 'warning' ? 'Take Break Soon' : 'REST NOW!'}</p>
+                  <p className="text-xs text-slate-600">Fatigue Status</p>
+                  <p className={`font-bold ${
+                    fatigueLevel === 'danger' ? 'text-red-600' :
+                    fatigueLevel === 'warning' ? 'text-amber-600' :
+                    'text-green-600'
+                  }`}>
+                    {fatigueLevel === 'danger' ? 'TAKE A BREAK!' : fatigueLevel === 'warning' ? 'TAKE BREAK SOON' : 'ALL GOOD'}
+                  </p>
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => toast.info("We monitor your activity to help you stay safe. Take breaks when needed!")}>
