@@ -14,6 +14,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
@@ -24,6 +25,12 @@ export default function LandingPage() {
     role: "driver",
     phone: ""
   });
+  
+  // Password reset states
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [resetStep, setResetStep] = useState(1); // 1 = enter email, 2 = enter code + new password
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -50,6 +57,47 @@ export default function LandingPage() {
       navigate(`/${response.data.role}`);
     } catch (error) {
       toast.error(error.response?.data?.detail || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API}/auth/forgot-password`, { email: resetEmail });
+      toast.success("Reset code sent! Check your email.");
+      // For testing, show the code (remove in production)
+      if (response.data.reset_code) {
+        toast.info(`Test mode - Your reset code: ${response.data.reset_code}`);
+      }
+      setResetStep(2);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to send reset code");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.post(`${API}/auth/reset-password`, {
+        email: resetEmail,
+        reset_code: resetCode,
+        new_password: newPassword
+      });
+      toast.success("Password reset successfully! Please login.");
+      setIsForgotPassword(false);
+      setResetStep(1);
+      setResetEmail("");
+      setResetCode("");
+      setNewPassword("");
+      setIsLogin(true);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to reset password");
     } finally {
       setLoading(false);
     }
