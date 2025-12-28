@@ -495,7 +495,7 @@ export default function DriverDashboard() {
           <Button
             variant={activeTab === "subscription" ? "default" : "outline"}
             onClick={() => setActiveTab("subscription")}
-            className="touch-target"
+            className={`touch-target ${activeTab === "subscription" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
             data-testid="tab-subscription"
           >
             <Crown className="w-4 h-4 mr-2" />
