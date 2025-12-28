@@ -307,20 +307,20 @@ export default function DriverDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-card border-b border-white/10 p-4">
+      <header className="bg-white border-b border-slate-200 p-4 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary">{user.name.charAt(0)}</span>
+            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center">
+              <span className="text-2xl font-bold text-white">{user.name.charAt(0)}</span>
             </div>
             <div>
-              <h2 className="text-lg font-bold" data-testid="driver-name">{user.name}</h2>
-              <p className="text-sm text-muted-foreground">Truck Driver</p>
+              <h2 className="text-lg font-bold text-slate-900" data-testid="driver-name">{user.name}</h2>
+              <p className="text-sm text-slate-500">Truck Driver</p>
             </div>
           </div>
-          <Button variant="outline" onClick={logout} data-testid="logout-btn">
+          <Button variant="outline" onClick={logout} data-testid="logout-btn" className="border-slate-300 text-slate-700 hover:bg-slate-100">
             <LogOut className="w-4 h-4 mr-2" />
             Logout
           </Button>
@@ -328,36 +328,36 @@ export default function DriverDashboard() {
       </header>
 
       {/* Alerts and Rewards Bar */}
-      <div className="bg-card border-b border-white/10 p-3">
+      <div className="bg-white border-b border-slate-200 p-3">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Reward Points */}
-          <Card className="bg-accent/50 border-secondary/30" data-testid="rewards-card">
+          <Card className="bg-blue-50 border-blue-200" data-testid="rewards-card">
             <CardContent className="p-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Award className="w-6 h-6 text-secondary" />
+                <Award className="w-6 h-6 text-blue-600" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Your Points</p>
-                  <p className="text-2xl font-bold mono text-secondary">{rewardPoints}</p>
+                  <p className="text-xs text-slate-600">Your Points</p>
+                  <p className="text-2xl font-bold mono text-blue-600">{rewardPoints}</p>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => toast.info("Earn points by booking parking, reporting spots, and using TrukAll daily!")}>
+              <Button variant="ghost" size="sm" onClick={() => toast.info("Earn points by booking parking, reporting spots, and using TrukAll daily!")} className="text-slate-600 hover:text-blue-600">
                 <span className="text-xs">How to earn?</span>
               </Button>
             </CardContent>
           </Card>
 
           {/* Fatigue Monitor */}
-          <Card className={`bg-accent/50 ${
-            fatigueLevel === 'danger' ? 'border-destructive/50' : 
-            fatigueLevel === 'warning' ? 'border-yellow-500/50' : 
-            'border-secondary/30'
+          <Card className={`${
+            fatigueLevel === 'danger' ? 'bg-red-50 border-red-300' : 
+            fatigueLevel === 'warning' ? 'bg-amber-50 border-amber-300' : 
+            'bg-green-50 border-green-200'
           }`} data-testid="fatigue-card">
             <CardContent className="p-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertTriangle className={`w-6 h-6 ${
-                  fatigueLevel === 'danger' ? 'text-destructive' :
-                  fatigueLevel === 'warning' ? 'text-yellow-500' :
-                  'text-secondary'
+                  fatigueLevel === 'danger' ? 'text-red-600' :
+                  fatigueLevel === 'warning' ? 'text-amber-600' :
+                  'text-green-600'
                 }`} />
                 <div>
                   <p className="text-xs text-muted-foreground">Fatigue Status</p>
