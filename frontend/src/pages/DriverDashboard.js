@@ -459,7 +459,7 @@ export default function DriverDashboard() {
           <Button
             variant={activeTab === "retail" ? "default" : "outline"}
             onClick={() => setActiveTab("retail")}
-            className="touch-target"
+            className={`touch-target ${activeTab === "retail" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
             data-testid="tab-retail"
           >
             <Store className="w-4 h-4 mr-2" />
