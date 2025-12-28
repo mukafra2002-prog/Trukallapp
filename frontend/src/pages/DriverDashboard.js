@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
-import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell, TrendingUp, ShowerHead, Building2, Star, ThumbsUp, ThumbsDown, AlertOctagon, Store } from "lucide-react";
+import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell, TrendingUp, ShowerHead, Building2, Star, ThumbsUp, ThumbsDown, AlertOctagon, Store, Users, Calculator, FileText, CreditCard, Crown, Check, Truck, Calendar } from "lucide-react";
+import ConvoyFinder from "@/components/ConvoyFinder";
 
 const mapContainerStyle = {
   width: '100%',
@@ -42,6 +43,17 @@ export default function DriverDashboard() {
   const [retailParking, setRetailParking] = useState([]);
   const [retailChains, setRetailChains] = useState([]);
   const [selectedChain, setSelectedChain] = useState("");
+  
+  // Additional feature states
+  const [loads, setLoads] = useState([]);
+  const [selectedLoad, setSelectedLoad] = useState(null);
+  const [tripCalculation, setTripCalculation] = useState(null);
+  const [compliance, setCompliance] = useState(null);
+  const [detentionClaims, setDetentionClaims] = useState([]);
+  const [detentionTotals, setDetentionTotals] = useState({ total_pending: 0, total_paid: 0, total_claims: 0 });
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+  const [userSubscription, setUserSubscription] = useState(null);
+  const [currentPlan, setCurrentPlan] = useState(null);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
