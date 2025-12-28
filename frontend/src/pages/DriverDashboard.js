@@ -401,17 +401,17 @@ export default function DriverDashboard() {
       </div>
 
       {/* Search Bar */}
-      <div className="bg-card border-b border-white/10 p-4">
+      <div className="bg-white border-b border-slate-200 p-4">
         <div className="max-w-7xl mx-auto flex gap-3">
           <Input
             type="text"
             placeholder="Search by city (e.g., Dallas, Atlanta)"
             value={searchCity}
             onChange={(e) => setSearchCity(e.target.value)}
-            className="touch-target"
+            className="touch-target border-slate-300"
             data-testid="search-city-input"
           />
-          <Button onClick={handleSearch} className="btn-primary" data-testid="search-btn">
+          <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700 text-white h-12 px-6" data-testid="search-btn">
             <Search className="w-5 h-5" />
           </Button>
         </div>
