@@ -370,7 +370,7 @@ export default function DriverDashboard() {
                   </p>
                 </div>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => toast.info("We monitor your activity to help you stay safe. Take breaks when needed!")}>
+              <Button variant="ghost" size="sm" onClick={() => toast.info("Based on your driving hours and time of day. Rest when needed!")} className="text-slate-600">
                 <span className="text-xs">Info</span>
               </Button>
             </CardContent>
