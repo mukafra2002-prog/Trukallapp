@@ -423,7 +423,7 @@ export default function DriverDashboard() {
           <Button
             variant={activeTab === "map" ? "default" : "outline"}
             onClick={() => setActiveTab("map")}
-            className="touch-target"
+            className={`touch-target ${activeTab === "map" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
             data-testid="tab-map"
           >
             <MapPin className="w-4 h-4 mr-2" />
