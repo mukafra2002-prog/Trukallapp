@@ -186,6 +186,54 @@ backend:
         agent: "main"
         comment: "GET /api/loads returns 3 loads"
 
+  - task: "Subscription Plans API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: All subscription plan endpoints working perfectly. GET /api/subscriptions/plans returns exactly 3 plans: Free ($0), Pro Driver ($9.99), and Premium Fleet ($24.99). GET /api/subscriptions/user/driver@test.com returns user subscription info. POST /api/subscriptions/create-checkout successfully activates free plan. All plan details and pricing match requirements."
+
+  - task: "Trip Calculator API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Trip profit calculator working perfectly. POST /api/calculator/trip-profit?load_id=load-001&driver_email=driver@test.com returns complete calculation with all required fields: load_rate, distance, estimated_fuel_cost, toll_cost, parking_cost, total_expenses, net_profit ($1341.30), profit_per_mile, and is_profitable. Mathematical accuracy verified - calculations are correct."
+
+  - task: "Convoy API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Convoy endpoints working correctly. GET /api/convoy/posts returns convoy posts list (currently empty as expected for new system). GET /api/chat/General returns chat messages (currently empty as expected). Both endpoints respond properly with correct data structures."
+
+  - task: "Compliance & Detention APIs"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: All compliance and detention endpoints working perfectly. GET /api/compliance/driver@test.com returns compliance info with proper data structure. GET /api/detention/driver@test.com returns detention claims list. GET /api/detention/driver@test.com/total returns correct totals structure with total_pending ($0), total_paid ($0), and total_claims (0). All endpoints handle data correctly."
+
 frontend:
   - task: "Landing Page"
     implemented: true
