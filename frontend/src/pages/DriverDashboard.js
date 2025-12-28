@@ -376,27 +376,23 @@ export default function DriverDashboard() {
             </CardContent>
           </Card>
 
-          {/* Wake-Up Timer */}
-          <Card className="bg-accent/50 border-primary/30" data-testid="wakeup-card">
+          {/* Wake-up Alarm */}
+          <Card className="bg-slate-50 border-slate-200" data-testid="wakeup-card">
             <CardContent className="p-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Clock className="w-6 h-6 text-primary" />
+                <Bell className="w-6 h-6 text-slate-600" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Wake-Up Alert</p>
-                  {wakeUpTime ? (
-                    <p className="text-sm font-bold mono">{wakeUpTime}</p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">Not set</p>
-                  )}
+                  <p className="text-xs text-slate-600">Wake-up Alarm</p>
+                  <p className="font-bold text-slate-900">{wakeUpTime || 'Not set'}</p>
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => {
-                const time = prompt('Set wake-up time (HH:MM format, e.g., 14:30):')
+                const time = prompt("Set wake-up time (e.g., 6:00 AM):");
                 if (time) {
-                  setWakeUpTime(time)
-                  toast.success(`Wake-up alert set for ${time}`)
+                  setWakeUpTime(time);
+                  toast.success(`Wake-up alarm set for ${time}`);
                 }
-              }}>
+              }} className="text-blue-600 hover:text-blue-700">
                 <span className="text-xs">Set</span>
               </Button>
             </CardContent>
