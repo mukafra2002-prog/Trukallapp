@@ -664,7 +664,13 @@ class TrukAllAPITester:
         
         # Test get subscription plans
         success, response = self.make_request('GET', '/subscriptions/plans')
-        plans_count = len(response) if success and isinstance(response, list) else 0
+        
+        # Handle both direct array and nested structure
+        plans_list = response
+        if isinstance(response, dict) and 'plans' in response:
+            plans_list = response['plans']
+        
+        plans_count = len(plans_list) if success and isinstance(plans_list, list) else 0
         
         # Expected: 3 plans (Free, Pro Driver $9.99, Premium Fleet $24.99)
         expected_plans = 3
@@ -676,12 +682,12 @@ class TrukAllAPITester:
         )
         
         # Verify plan details if we got the plans
-        if success and isinstance(response, list) and plans_count > 0:
-            plan_names = [plan.get('name', '') for plan in response]
+        if success and isinstance(plans_list, list) and plans_count > 0:
+            plan_names = [plan.get('name', '') for plan in plans_list]
             expected_plan_names = ['Free', 'Pro Driver', 'Premium Fleet']
             
             # Check for Free plan
-            free_plan = next((p for p in response if 'free' in p.get('name', '').lower()), None)
+            free_plan = next((p for p in plans_list if 'free' in p.get('name', '').lower()), None)
             self.log_test(
                 "Subscription Plans - Free Plan Available",
                 free_plan is not None,
@@ -690,21 +696,21 @@ class TrukAllAPITester:
             )
             
             # Check for Pro Driver plan ($9.99)
-            pro_plan = next((p for p in response if 'pro' in p.get('name', '').lower() and p.get('price') == 9.99), None)
+            pro_plan = next((p for p in plans_list if 'pro' in p.get('name', '').lower() and p.get('price') == 9.99), None)
             self.log_test(
                 "Subscription Plans - Pro Driver Plan",
                 pro_plan is not None,
                 f"Found Pro Driver plan at $9.99: {pro_plan.get('name') if pro_plan else 'Not found'}",
-                {"available_plans": [(p.get('name'), p.get('price')) for p in response]} if not pro_plan else None
+                {"available_plans": [(p.get('name'), p.get('price')) for p in plans_list]} if not pro_plan else None
             )
             
             # Check for Premium Fleet plan ($24.99)
-            premium_plan = next((p for p in response if 'premium' in p.get('name', '').lower() and p.get('price') == 24.99), None)
+            premium_plan = next((p for p in plans_list if 'premium' in p.get('name', '').lower() and p.get('price') == 24.99), None)
             self.log_test(
                 "Subscription Plans - Premium Fleet Plan",
                 premium_plan is not None,
                 f"Found Premium Fleet plan at $24.99: {premium_plan.get('name') if premium_plan else 'Not found'}",
-                {"available_plans": [(p.get('name'), p.get('price')) for p in response]} if not premium_plan else None
+                {"available_plans": [(p.get('name'), p.get('price')) for p in plans_list]} if not premium_plan else None
             )
         
         # Test get user subscription
