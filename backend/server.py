@@ -1764,6 +1764,221 @@ async def get_all_users(admin_email: str):
     
     return users
 
+# ============== SUBSCRIPTION PLANS ==============
+
+class SubscriptionPlan(BaseModel):
+    id: str
+    name: str
+    price: float
+    interval: str  # "month" or "year"
+    features: List[str]
+    is_popular: bool = False
+
+class UserSubscription(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_email: str
+    plan_id: str
+    plan_name: str
+    status: str = "active"  # "active", "cancelled", "expired"
+    stripe_subscription_id: Optional[str] = None
+    current_period_start: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    current_period_end: datetime = Field(default_factory=lambda: datetime.now(timezone.utc) + timedelta(days=30))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SubscriptionCreate(BaseModel):
+    plan_id: str
+
+# Define subscription plans
+SUBSCRIPTION_PLANS = [
+    {
+        "id": "free",
+        "name": "Free",
+        "price": 0,
+        "interval": "month",
+        "features": [
+            "Basic parking search",
+            "View 5 parking spots/day",
+            "Basic load board access",
+            "Community reviews (read only)"
+        ],
+        "is_popular": False
+    },
+    {
+        "id": "pro",
+        "name": "Pro Driver",
+        "price": 9.99,
+        "interval": "month",
+        "features": [
+            "Unlimited parking search",
+            "Real-time availability alerts",
+            "Full load board access",
+            "Broker ratings & fraud alerts",
+            "Shower credits tracker",
+            "Retail parking database",
+            "Trip profit calculator",
+            "Priority support"
+        ],
+        "is_popular": True
+    },
+    {
+        "id": "premium",
+        "name": "Premium Fleet",
+        "price": 24.99,
+        "interval": "month",
+        "features": [
+            "Everything in Pro",
+            "DOT compliance tracking",
+            "Detention claims manager",
+            "Convoy finder access",
+            "Route planning (coming soon)",
+            "Fuel price alerts",
+            "Expense reports & analytics",
+            "Multi-driver fleet management",
+            "24/7 premium support"
+        ],
+        "is_popular": False
+    }
+]
+
+@api_router.get("/subscriptions/plans")
+async def get_subscription_plans():
+    return {"plans": SUBSCRIPTION_PLANS}
+
+@api_router.get("/subscriptions/user/{user_email}")
+async def get_user_subscription(user_email: str):
+    subscription = await db.subscriptions.find_one(
+        {"user_email": user_email, "status": "active"},
+        {"_id": 0}
+    )
+    
+    if not subscription:
+        # Return free plan by default
+        return {
+            "subscription": None,
+            "current_plan": SUBSCRIPTION_PLANS[0],  # Free plan
+            "is_subscribed": False
+        }
+    
+    # Find the plan details
+    plan = next((p for p in SUBSCRIPTION_PLANS if p["id"] == subscription["plan_id"]), SUBSCRIPTION_PLANS[0])
+    
+    if isinstance(subscription.get('current_period_start'), str):
+        subscription['current_period_start'] = datetime.fromisoformat(subscription['current_period_start'])
+    if isinstance(subscription.get('current_period_end'), str):
+        subscription['current_period_end'] = datetime.fromisoformat(subscription['current_period_end'])
+    if isinstance(subscription.get('created_at'), str):
+        subscription['created_at'] = datetime.fromisoformat(subscription['created_at'])
+    
+    return {
+        "subscription": subscription,
+        "current_plan": plan,
+        "is_subscribed": True
+    }
+
+@api_router.post("/subscriptions/create-checkout")
+async def create_subscription_checkout(plan_id: str, user_email: str, request: Request):
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    plan = next((p for p in SUBSCRIPTION_PLANS if p["id"] == plan_id), None)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    if plan["price"] == 0:
+        # Free plan - just create the subscription
+        subscription = UserSubscription(
+            user_email=user_email,
+            plan_id=plan_id,
+            plan_name=plan["name"]
+        )
+        
+        sub_doc = subscription.model_dump()
+        sub_doc['current_period_start'] = sub_doc['current_period_start'].isoformat()
+        sub_doc['current_period_end'] = sub_doc['current_period_end'].isoformat()
+        sub_doc['created_at'] = sub_doc['created_at'].isoformat()
+        
+        # Remove any existing subscription
+        await db.subscriptions.delete_many({"user_email": user_email})
+        await db.subscriptions.insert_one(sub_doc)
+        
+        return {"message": "Free plan activated", "subscription_id": subscription.id}
+    
+    # For paid plans, create Stripe checkout
+    origin = str(request.base_url).rstrip('/')
+    
+    stripe_key = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
+    webhook_url = f"{origin}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=stripe_key, webhook_url=webhook_url)
+    
+    checkout_request = CheckoutSessionRequest(
+        amount=plan["price"],
+        currency="usd",
+        success_url=f"{origin}/subscription-success?session_id={{{{CHECKOUT_SESSION_ID}}}}&plan_id={plan_id}",
+        cancel_url=f"{origin}/subscription-cancelled",
+        metadata={
+            "user_email": user_email,
+            "plan_id": plan_id,
+            "plan_name": plan["name"],
+            "type": "subscription"
+        }
+    )
+    
+    session = await stripe_checkout.create_checkout_session(checkout_request)
+    
+    return {"url": session.url, "session_id": session.session_id}
+
+@api_router.post("/subscriptions/activate")
+async def activate_subscription(plan_id: str, user_email: str, session_id: Optional[str] = None):
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    plan = next((p for p in SUBSCRIPTION_PLANS if p["id"] == plan_id), None)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    # Verify payment if session_id provided
+    if session_id and plan["price"] > 0:
+        stripe_key = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
+        stripe_checkout = StripeCheckout(api_key=stripe_key, webhook_url="")
+        status = await stripe_checkout.get_checkout_status(session_id)
+        
+        if status.payment_status != "paid":
+            raise HTTPException(status_code=400, detail="Payment not completed")
+    
+    subscription = UserSubscription(
+        user_email=user_email,
+        plan_id=plan_id,
+        plan_name=plan["name"],
+        stripe_subscription_id=session_id
+    )
+    
+    sub_doc = subscription.model_dump()
+    sub_doc['current_period_start'] = sub_doc['current_period_start'].isoformat()
+    sub_doc['current_period_end'] = sub_doc['current_period_end'].isoformat()
+    sub_doc['created_at'] = sub_doc['created_at'].isoformat()
+    
+    # Remove any existing subscription
+    await db.subscriptions.delete_many({"user_email": user_email})
+    await db.subscriptions.insert_one(sub_doc)
+    
+    logger.info(f"Subscription activated: {plan['name']} for {user_email}")
+    return {"message": "Subscription activated", "subscription": subscription}
+
+@api_router.post("/subscriptions/cancel")
+async def cancel_subscription(user_email: str):
+    result = await db.subscriptions.update_one(
+        {"user_email": user_email, "status": "active"},
+        {"$set": {"status": "cancelled"}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="No active subscription found")
+    
+    return {"message": "Subscription cancelled"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
