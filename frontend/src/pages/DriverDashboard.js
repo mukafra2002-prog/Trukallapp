@@ -441,7 +441,7 @@ export default function DriverDashboard() {
           <Button
             variant={activeTab === "showers" ? "default" : "outline"}
             onClick={() => setActiveTab("showers")}
-            className="touch-target"
+            className={`touch-target ${activeTab === "showers" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
             data-testid="tab-showers"
           >
             <ShowerHead className="w-4 h-4 mr-2" />
