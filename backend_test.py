@@ -658,6 +658,226 @@ class TrukAllAPITester:
                 response if not success else None
             )
 
+    def test_subscription_plans_endpoints(self):
+        """Test subscription plans endpoints - NEW FEATURE"""
+        print("\n💳 Testing Subscription Plans Endpoints...")
+        
+        # Test get subscription plans
+        success, response = self.make_request('GET', '/subscriptions/plans')
+        plans_count = len(response) if success and isinstance(response, list) else 0
+        
+        # Expected: 3 plans (Free, Pro Driver $9.99, Premium Fleet $24.99)
+        expected_plans = 3
+        self.log_test(
+            "Get Subscription Plans",
+            success and plans_count == expected_plans,
+            f"Expected {expected_plans} plans, got {plans_count}" if success else "Failed to get subscription plans",
+            response if not success or plans_count != expected_plans else None
+        )
+        
+        # Verify plan details if we got the plans
+        if success and isinstance(response, list) and plans_count > 0:
+            plan_names = [plan.get('name', '') for plan in response]
+            expected_plan_names = ['Free', 'Pro Driver', 'Premium Fleet']
+            
+            # Check for Free plan
+            free_plan = next((p for p in response if 'free' in p.get('name', '').lower()), None)
+            self.log_test(
+                "Subscription Plans - Free Plan Available",
+                free_plan is not None,
+                f"Found Free plan: {free_plan.get('name') if free_plan else 'Not found'}",
+                {"available_plans": plan_names} if not free_plan else None
+            )
+            
+            # Check for Pro Driver plan ($9.99)
+            pro_plan = next((p for p in response if 'pro' in p.get('name', '').lower() and p.get('price') == 9.99), None)
+            self.log_test(
+                "Subscription Plans - Pro Driver Plan",
+                pro_plan is not None,
+                f"Found Pro Driver plan at $9.99: {pro_plan.get('name') if pro_plan else 'Not found'}",
+                {"available_plans": [(p.get('name'), p.get('price')) for p in response]} if not pro_plan else None
+            )
+            
+            # Check for Premium Fleet plan ($24.99)
+            premium_plan = next((p for p in response if 'premium' in p.get('name', '').lower() and p.get('price') == 24.99), None)
+            self.log_test(
+                "Subscription Plans - Premium Fleet Plan",
+                premium_plan is not None,
+                f"Found Premium Fleet plan at $24.99: {premium_plan.get('name') if premium_plan else 'Not found'}",
+                {"available_plans": [(p.get('name'), p.get('price')) for p in response]} if not premium_plan else None
+            )
+        
+        # Test get user subscription
+        driver_email = "driver@test.com"
+        success, response = self.make_request(
+            'GET',
+            f'/subscriptions/user/{driver_email}'
+        )
+        self.log_test(
+            "Get User Subscription",
+            success,
+            f"Retrieved subscription info for {driver_email}" if success else "Failed to get user subscription",
+            response if not success else None
+        )
+        
+        # Test create checkout for free plan
+        success, response = self.make_request(
+            'POST',
+            f'/subscriptions/create-checkout?plan_id=free&user_email={driver_email}'
+        )
+        self.log_test(
+            "Create Free Plan Checkout",
+            success,
+            "Successfully activated free plan" if success else "Failed to activate free plan",
+            response if not success else None
+        )
+
+    def test_trip_calculator_endpoints(self):
+        """Test trip calculator endpoints - NEW FEATURE"""
+        print("\n🧮 Testing Trip Calculator Endpoints...")
+        
+        driver_email = "driver@test.com"
+        load_id = "load-001"  # Test load ID from requirements
+        
+        # Test trip profit calculation
+        success, response = self.make_request(
+            'POST',
+            f'/calculator/trip-profit?load_id={load_id}&driver_email={driver_email}'
+        )
+        
+        if success and isinstance(response, dict):
+            required_fields = ['load_id', 'load_rate', 'distance', 'estimated_fuel_cost', 
+                             'toll_cost', 'parking_cost', 'total_expenses', 'net_profit', 
+                             'profit_per_mile', 'is_profitable']
+            
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            self.log_test(
+                "Trip Profit Calculation",
+                len(missing_fields) == 0,
+                f"Calculation completed with all required fields" if len(missing_fields) == 0 else f"Missing fields: {missing_fields}",
+                response if len(missing_fields) > 0 else None
+            )
+            
+            # Verify calculation makes sense
+            if len(missing_fields) == 0:
+                net_profit = response.get('net_profit', 0)
+                total_expenses = response.get('total_expenses', 0)
+                load_rate = response.get('load_rate', 0)
+                
+                calculated_profit = load_rate - total_expenses
+                profit_matches = abs(net_profit - calculated_profit) < 0.01  # Allow for rounding
+                
+                self.log_test(
+                    "Trip Profit Calculation - Math Accuracy",
+                    profit_matches,
+                    f"Net profit calculation correct: ${net_profit:.2f}" if profit_matches else f"Math error: Expected ${calculated_profit:.2f}, got ${net_profit:.2f}",
+                    {"load_rate": load_rate, "total_expenses": total_expenses, "calculated": calculated_profit, "returned": net_profit} if not profit_matches else None
+                )
+        else:
+            self.log_test(
+                "Trip Profit Calculation",
+                False,
+                "Failed to calculate trip profit",
+                response
+            )
+
+    def test_convoy_endpoints(self):
+        """Test convoy endpoints - NEW FEATURE"""
+        print("\n🚛 Testing Convoy Endpoints...")
+        
+        # Test get convoy posts
+        success, response = self.make_request('GET', '/convoy/posts')
+        posts_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get Convoy Posts",
+            success,
+            f"Retrieved {posts_count} convoy posts" if success else "Failed to get convoy posts",
+            response if not success else None
+        )
+        
+        # Test get chat messages for General location
+        success, response = self.make_request('GET', '/chat/General')
+        messages_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get Chat Messages - General",
+            success,
+            f"Retrieved {messages_count} chat messages for General location" if success else "Failed to get chat messages",
+            response if not success else None
+        )
+
+    def test_compliance_detention_endpoints(self):
+        """Test compliance and detention endpoints - NEW FEATURE"""
+        print("\n📋 Testing Compliance & Detention Endpoints...")
+        
+        driver_email = "driver@test.com"
+        
+        # Test get compliance info
+        success, response = self.make_request(
+            'GET',
+            f'/compliance/{driver_email}'
+        )
+        
+        # Should return compliance info or "No compliance data found"
+        compliance_found = success and isinstance(response, dict)
+        no_data_message = success and isinstance(response, dict) and response.get('message') == "No compliance data found"
+        
+        self.log_test(
+            "Get Compliance Info",
+            success and (compliance_found or no_data_message),
+            "Retrieved compliance info" if compliance_found else "No compliance data found (expected)" if no_data_message else "Failed to get compliance info",
+            response if not success and not no_data_message else None
+        )
+        
+        # Test get detention claims
+        success, response = self.make_request(
+            'GET',
+            f'/detention/{driver_email}'
+        )
+        claims_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get Detention Claims",
+            success,
+            f"Retrieved {claims_count} detention claims" if success else "Failed to get detention claims",
+            response if not success else None
+        )
+        
+        # Test get detention totals
+        success, response = self.make_request(
+            'GET',
+            f'/detention/{driver_email}/total'
+        )
+        
+        if success and isinstance(response, dict):
+            required_fields = ['total_pending', 'total_paid', 'total_claims']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            self.log_test(
+                "Get Detention Totals",
+                len(missing_fields) == 0,
+                f"Retrieved detention totals with all fields" if len(missing_fields) == 0 else f"Missing fields: {missing_fields}",
+                response if len(missing_fields) > 0 else None
+            )
+            
+            if len(missing_fields) == 0:
+                total_pending = response.get('total_pending', 0)
+                total_paid = response.get('total_paid', 0)
+                total_claims = response.get('total_claims', 0)
+                
+                self.log_test(
+                    "Detention Totals - Data Structure",
+                    isinstance(total_pending, (int, float)) and isinstance(total_paid, (int, float)) and isinstance(total_claims, int),
+                    f"Pending: ${total_pending}, Paid: ${total_paid}, Claims: {total_claims}",
+                    response if not all(isinstance(v, (int, float)) for v in [total_pending, total_paid, total_claims]) else None
+                )
+        else:
+            self.log_test(
+                "Get Detention Totals",
+                False,
+                "Failed to get detention totals",
+                response
+            )
+
     def test_error_handling(self):
         """Test error handling"""
         print("\n🚨 Testing Error Handling...")
