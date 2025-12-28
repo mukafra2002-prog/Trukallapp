@@ -973,6 +973,310 @@ export default function DriverDashboard() {
             </div>
           </div>
         )}
+
+        {/* Convoy Finder Tab */}
+        {activeTab === "convoy" && (
+          <ConvoyFinder />
+        )}
+
+        {/* Trip Calculator Tab */}
+        {activeTab === "calculator" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="w-6 h-6" />
+                  Trip Profit Calculator
+                </CardTitle>
+                <CardDescription>Calculate if a load is profitable before accepting</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">Select a load from the list below to calculate estimated profit:</p>
+                
+                <div className="space-y-3">
+                  {loads.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-4">No loads available</p>
+                  ) : (
+                    loads.slice(0, 5).map((load) => (
+                      <Card key={load.id} className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => calculateTripProfit(load.id)}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-semibold">{load.origin_city}, {load.origin_state} → {load.destination_city}, {load.destination_state}</p>
+                              <p className="text-sm text-muted-foreground">{load.distance} miles • {load.equipment_type}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xl font-bold text-green-500">${load.rate.toLocaleString()}</p>
+                              <p className="text-xs text-muted-foreground">${(load.rate / load.distance).toFixed(2)}/mile</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Calculation Result */}
+            {tripCalculation && selectedLoad && (
+              <Card className={`border-2 ${tripCalculation.is_profitable ? 'border-green-500/50 bg-green-500/5' : 'border-red-500/50 bg-red-500/5'}`}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    {tripCalculation.is_profitable ? (
+                      <Check className="w-6 h-6 text-green-500" />
+                    ) : (
+                      <AlertTriangle className="w-6 h-6 text-red-500" />
+                    )}
+                    {tripCalculation.is_profitable ? 'Profitable Trip!' : 'Not Profitable'}
+                  </CardTitle>
+                  <CardDescription>
+                    {selectedLoad.origin_city}, {selectedLoad.origin_state} → {selectedLoad.destination_city}, {selectedLoad.destination_state}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="text-center p-3 bg-accent/30 rounded-lg">
+                      <p className="text-2xl font-bold text-green-500">${tripCalculation.load_rate.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">Load Rate</p>
+                    </div>
+                    <div className="text-center p-3 bg-accent/30 rounded-lg">
+                      <p className="text-2xl font-bold text-red-500">-${tripCalculation.estimated_fuel_cost}</p>
+                      <p className="text-xs text-muted-foreground">Fuel Cost</p>
+                    </div>
+                    <div className="text-center p-3 bg-accent/30 rounded-lg">
+                      <p className="text-2xl font-bold text-red-500">-${tripCalculation.toll_cost}</p>
+                      <p className="text-xs text-muted-foreground">Tolls</p>
+                    </div>
+                    <div className="text-center p-3 bg-accent/30 rounded-lg">
+                      <p className="text-2xl font-bold text-red-500">-${tripCalculation.parking_cost}</p>
+                      <p className="text-xs text-muted-foreground">Parking</p>
+                    </div>
+                  </div>
+                  <div className="border-t pt-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Net Profit</p>
+                      <p className={`text-3xl font-bold ${tripCalculation.is_profitable ? 'text-green-500' : 'text-red-500'}`}>
+                        ${tripCalculation.net_profit.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Profit per Mile</p>
+                      <p className={`text-xl font-bold ${tripCalculation.profit_per_mile > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                        ${tripCalculation.profit_per_mile}/mile
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* DOT Compliance Tab */}
+        {activeTab === "compliance" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-6 h-6" />
+                  DOT Compliance Tracker
+                </CardTitle>
+                <CardDescription>Track your licenses, certifications, and inspections</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {compliance ? (
+                  <div className="space-y-4">
+                    {/* Alerts */}
+                    {compliance.alerts && compliance.alerts.length > 0 && (
+                      <div className="space-y-2 mb-4">
+                        {compliance.alerts.map((alert, i) => (
+                          <div key={i} className={`p-3 rounded-lg border ${alert.severity === 'high' ? 'bg-red-500/10 border-red-500/50' : 'bg-yellow-500/10 border-yellow-500/50'}`}>
+                            <p className={`text-sm font-medium ${alert.severity === 'high' ? 'text-red-600' : 'text-yellow-600'}`}>
+                              ⚠️ {alert.message}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="bg-accent/30">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-muted-foreground">CDL Expiry</p>
+                              <p className="font-bold">{new Date(compliance.cdl_expiry).toLocaleDateString()}</p>
+                            </div>
+                            <Truck className="w-8 h-8 text-blue-500" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-accent/30">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-muted-foreground">Medical Card Expiry</p>
+                              <p className="font-bold">{new Date(compliance.medical_card_expiry).toLocaleDateString()}</p>
+                            </div>
+                            <FileText className="w-8 h-8 text-green-500" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                      {compliance.hazmat_expiry && (
+                        <Card className="bg-accent/30">
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm text-muted-foreground">HAZMAT Endorsement</p>
+                                <p className="font-bold">{new Date(compliance.hazmat_expiry).toLocaleDateString()}</p>
+                              </div>
+                              <AlertOctagon className="w-8 h-8 text-orange-500" />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                      <Card className="bg-accent/30">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-muted-foreground">CSA Score</p>
+                              <p className="font-bold text-2xl">{compliance.csa_score}</p>
+                            </div>
+                            <Shield className="w-8 h-8 text-purple-500" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground">No compliance data added yet</p>
+                    <p className="text-sm text-muted-foreground mt-2">Add your CDL and medical card info to track expiration dates</p>
+                    <Button className="mt-4" variant="outline">Add Compliance Info</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Detention Claims */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="w-6 h-6" />
+                  Detention Claims
+                </CardTitle>
+                <CardDescription>Track detention time and money owed</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <div className="text-center p-3 bg-yellow-500/10 rounded-lg">
+                    <p className="text-2xl font-bold text-yellow-500">${detentionTotals.total_pending.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Pending</p>
+                  </div>
+                  <div className="text-center p-3 bg-green-500/10 rounded-lg">
+                    <p className="text-2xl font-bold text-green-500">${detentionTotals.total_paid.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Collected</p>
+                  </div>
+                  <div className="text-center p-3 bg-accent/30 rounded-lg">
+                    <p className="text-2xl font-bold">{detentionTotals.total_claims}</p>
+                    <p className="text-xs text-muted-foreground">Total Claims</p>
+                  </div>
+                </div>
+
+                {detentionClaims.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">No detention claims yet</p>
+                ) : (
+                  <div className="space-y-2">
+                    {detentionClaims.slice(0, 5).map((claim) => (
+                      <Card key={claim.id} className="bg-accent/20">
+                        <CardContent className="p-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-semibold">{claim.broker_name}</p>
+                              <p className="text-xs text-muted-foreground">{claim.location} • {claim.detention_hours}hrs</p>
+                            </div>
+                            <Badge className={claim.status === 'paid' ? 'bg-green-500' : claim.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'}>
+                              ${claim.total_amount}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Subscription Plans Tab */}
+        {activeTab === "subscription" && (
+          <div className="space-y-6">
+            {currentPlan && (
+              <Card className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/30">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Crown className="w-8 h-8 text-purple-500" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Current Plan</p>
+                        <p className="text-xl font-bold">{currentPlan.name}</p>
+                      </div>
+                    </div>
+                    {currentPlan.price > 0 && (
+                      <Badge className="bg-purple-500">${currentPlan.price}/mo</Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {subscriptionPlans.map((plan) => (
+                <Card 
+                  key={plan.id} 
+                  className={`relative overflow-hidden ${plan.is_popular ? 'border-2 border-blue-500 shadow-lg' : ''} ${currentPlan?.id === plan.id ? 'bg-accent/30' : ''}`}
+                >
+                  {plan.is_popular && (
+                    <div className="absolute top-0 right-0 bg-blue-500 text-white text-xs px-3 py-1 rounded-bl-lg font-semibold">
+                      MOST POPULAR
+                    </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      {plan.id === 'premium' && <Crown className="w-5 h-5 text-yellow-500" />}
+                      {plan.name}
+                    </CardTitle>
+                    <div className="mt-2">
+                      <span className="text-4xl font-bold">${plan.price}</span>
+                      <span className="text-muted-foreground">/{plan.interval}</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 mb-6">
+                      {plan.features.map((feature, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm">
+                          <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      className={`w-full ${plan.is_popular ? 'btn-primary' : ''}`}
+                      variant={plan.is_popular ? 'default' : 'outline'}
+                      disabled={currentPlan?.id === plan.id}
+                      onClick={() => handleSubscribe(plan.id)}
+                    >
+                      {currentPlan?.id === plan.id ? 'Current Plan' : plan.price === 0 ? 'Get Started' : 'Subscribe'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Mobile Navigation */}
