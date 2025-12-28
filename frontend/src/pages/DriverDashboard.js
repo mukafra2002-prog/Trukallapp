@@ -477,7 +477,7 @@ export default function DriverDashboard() {
           <Button
             variant={activeTab === "calculator" ? "default" : "outline"}
             onClick={() => setActiveTab("calculator")}
-            className="touch-target"
+            className={`touch-target ${activeTab === "calculator" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
             data-testid="tab-calculator"
           >
             <Calculator className="w-4 h-4 mr-2" />
