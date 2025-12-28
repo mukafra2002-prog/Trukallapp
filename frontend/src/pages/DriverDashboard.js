@@ -66,6 +66,10 @@ export default function DriverDashboard() {
     fetchShowerCredits();
     fetchRetailChains();
     fetchRetailParking();
+    fetchLoads();
+    fetchCompliance();
+    fetchDetentionClaims();
+    fetchSubscription();
     
     // Calculate reward points based on bookings
     // 100 points per booking
