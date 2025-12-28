@@ -928,6 +928,7 @@ class TrukAllAPITester:
         print("=" * 60)
         
         try:
+            # Existing features
             self.test_auth_endpoints()
             self.test_parking_spots_endpoints()
             self.test_booking_endpoints()
@@ -936,6 +937,14 @@ class TrukAllAPITester:
             self.test_broker_ratings_endpoints()
             self.test_retail_parking_endpoints()
             self.test_loads_endpoints()
+            
+            # NEW FEATURES
+            self.test_subscription_plans_endpoints()
+            self.test_trip_calculator_endpoints()
+            self.test_convoy_endpoints()
+            self.test_compliance_detention_endpoints()
+            
+            # Admin and error handling
             self.test_admin_endpoints()
             self.test_error_handling()
             
