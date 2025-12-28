@@ -507,35 +507,35 @@ export default function DriverDashboard() {
           <div>
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <Card data-testid="stat-available">
+              <Card className="bg-blue-50 border-blue-200" data-testid="stat-available">
                 <CardHeader>
-                  <CardTitle className="text-2xl mono">{spots.filter(s => s.available_spaces > 0).length}</CardTitle>
-                  <CardDescription>Available Now</CardDescription>
+                  <CardTitle className="text-2xl mono text-blue-600">{spots.filter(s => s.available_spaces > 0).length}</CardTitle>
+                  <CardDescription className="text-slate-600">Available Now</CardDescription>
                 </CardHeader>
               </Card>
-              <Card data-testid="stat-free">
+              <Card className="bg-green-50 border-green-200" data-testid="stat-free">
                 <CardHeader>
-                  <CardTitle className="text-2xl mono">{spots.filter(s => s.is_free).length}</CardTitle>
-                  <CardDescription>Free Parking</CardDescription>
+                  <CardTitle className="text-2xl mono text-green-600">{spots.filter(s => s.is_free).length}</CardTitle>
+                  <CardDescription className="text-slate-600">Free Parking</CardDescription>
                 </CardHeader>
               </Card>
-              <Card data-testid="stat-secure">
+              <Card className="bg-purple-50 border-purple-200" data-testid="stat-secure">
                 <CardHeader>
-                  <CardTitle className="text-2xl mono">{spots.filter(s => s.security_level === 'high').length}</CardTitle>
-                  <CardDescription>High Security</CardDescription>
+                  <CardTitle className="text-2xl mono text-purple-600">{spots.filter(s => s.security_level === 'high').length}</CardTitle>
+                  <CardDescription className="text-slate-600">High Security</CardDescription>
                 </CardHeader>
               </Card>
             </div>
 
             {/* Map */}
-            <Card className="mb-6">
+            <Card className="mb-6 bg-white border-slate-200">
               <CardHeader>
-                <CardTitle>Parking Locations</CardTitle>
-                <CardDescription>Click on any spot to view details and book</CardDescription>
+                <CardTitle className="text-slate-900">Parking Locations</CardTitle>
+                <CardDescription className="text-slate-600">Click on any spot to view details and book</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="map-container bg-zinc-900 rounded-lg flex items-center justify-center" data-testid="map-container">
-                  <p className="text-muted-foreground">Map view with {spots.length} parking spots</p>
+                <div className="map-container bg-slate-800 rounded-lg flex items-center justify-center" data-testid="map-container">
+                  <p className="text-slate-400">Map view with {spots.length} parking spots</p>
                 </div>
               </CardContent>
             </Card>
