@@ -176,6 +176,77 @@ export default function DriverDashboard() {
     }
   };
 
+  const fetchLoads = async () => {
+    try {
+      const response = await axios.get(`${API}/loads`);
+      setLoads(response.data);
+    } catch (error) {
+      console.error("Failed to load loads", error);
+    }
+  };
+
+  const calculateTripProfit = async (loadId) => {
+    try {
+      const response = await axios.post(`${API}/calculator/trip-profit?load_id=${loadId}&driver_email=${user.email}`);
+      setTripCalculation(response.data);
+      setSelectedLoad(loads.find(l => l.id === loadId));
+    } catch (error) {
+      toast.error("Failed to calculate trip profit");
+    }
+  };
+
+  const fetchCompliance = async () => {
+    try {
+      const response = await axios.get(`${API}/compliance/${user.email}`);
+      if (response.data.message !== "No compliance data found") {
+        setCompliance(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to load compliance", error);
+    }
+  };
+
+  const fetchDetentionClaims = async () => {
+    try {
+      const [claimsRes, totalsRes] = await Promise.all([
+        axios.get(`${API}/detention/${user.email}`),
+        axios.get(`${API}/detention/${user.email}/total`)
+      ]);
+      setDetentionClaims(claimsRes.data);
+      setDetentionTotals(totalsRes.data);
+    } catch (error) {
+      console.error("Failed to load detention claims", error);
+    }
+  };
+
+  const fetchSubscription = async () => {
+    try {
+      const [plansRes, subRes] = await Promise.all([
+        axios.get(`${API}/subscriptions/plans`),
+        axios.get(`${API}/subscriptions/user/${user.email}`)
+      ]);
+      setSubscriptionPlans(plansRes.data.plans);
+      setUserSubscription(subRes.data.subscription);
+      setCurrentPlan(subRes.data.current_plan);
+    } catch (error) {
+      console.error("Failed to load subscription", error);
+    }
+  };
+
+  const handleSubscribe = async (planId) => {
+    try {
+      const response = await axios.post(`${API}/subscriptions/create-checkout?plan_id=${planId}&user_email=${user.email}`);
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      } else {
+        toast.success("Plan activated!");
+        fetchSubscription();
+      }
+    } catch (error) {
+      toast.error("Failed to start subscription");
+    }
+  };
+
   const handleSearch = async () => {
     try {
       setLoading(true);
