@@ -463,6 +463,42 @@ export default function DriverDashboard() {
             <Store className="w-4 h-4 mr-2" />
             Retail Parking
           </Button>
+          <Button
+            variant={activeTab === "convoy" ? "default" : "outline"}
+            onClick={() => setActiveTab("convoy")}
+            className="touch-target"
+            data-testid="tab-convoy"
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Convoy
+          </Button>
+          <Button
+            variant={activeTab === "calculator" ? "default" : "outline"}
+            onClick={() => setActiveTab("calculator")}
+            className="touch-target"
+            data-testid="tab-calculator"
+          >
+            <Calculator className="w-4 h-4 mr-2" />
+            Trip Calculator
+          </Button>
+          <Button
+            variant={activeTab === "compliance" ? "default" : "outline"}
+            onClick={() => setActiveTab("compliance")}
+            className="touch-target"
+            data-testid="tab-compliance"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            DOT Compliance
+          </Button>
+          <Button
+            variant={activeTab === "subscription" ? "default" : "outline"}
+            onClick={() => setActiveTab("subscription")}
+            className="touch-target"
+            data-testid="tab-subscription"
+          >
+            <Crown className="w-4 h-4 mr-2" />
+            Plans
+          </Button>
         </div>
 
         {activeTab === "map" && (
