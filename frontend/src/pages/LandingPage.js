@@ -403,7 +403,84 @@ export default function LandingPage() {
               <CardDescription>{isLogin ? 'Login to your TrukAll account' : 'Join 10,000+ drivers today'}</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLogin ? (
+              {isForgotPassword ? (
+                /* Forgot Password Form */
+                <div className="space-y-4">
+                  {resetStep === 1 ? (
+                    <form onSubmit={handleForgotPassword} className="space-y-4">
+                      <div className="text-center mb-4">
+                        <h3 className="text-lg font-semibold">Reset Your Password</h3>
+                        <p className="text-sm text-gray-500">Enter your email to receive a reset code</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="reset-email">Email Address</Label>
+                        <Input
+                          id="reset-email"
+                          type="email"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          required
+                          className="h-12"
+                          placeholder="your@email.com"
+                          data-testid="reset-email-input"
+                        />
+                      </div>
+                      <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12" disabled={loading} data-testid="send-reset-code-btn">
+                        {loading ? 'Sending...' : 'Send Reset Code'}
+                      </Button>
+                      <p className="text-center text-sm text-gray-600">
+                        Remember your password?{' '}
+                        <button type="button" className="text-blue-600 font-semibold" onClick={() => { setIsForgotPassword(false); setResetStep(1); }}>
+                          Back to Login
+                        </button>
+                      </p>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleResetPassword} className="space-y-4">
+                      <div className="text-center mb-4">
+                        <h3 className="text-lg font-semibold">Enter Reset Code</h3>
+                        <p className="text-sm text-gray-500">We sent a 6-digit code to {resetEmail}</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="reset-code">Reset Code</Label>
+                        <Input
+                          id="reset-code"
+                          type="text"
+                          value={resetCode}
+                          onChange={(e) => setResetCode(e.target.value)}
+                          required
+                          className="h-12 text-center text-2xl tracking-widest"
+                          placeholder="000000"
+                          maxLength={6}
+                          data-testid="reset-code-input"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="new-password">New Password</Label>
+                        <Input
+                          id="new-password"
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          required
+                          className="h-12"
+                          placeholder="Enter new password"
+                          minLength={6}
+                          data-testid="new-password-input"
+                        />
+                      </div>
+                      <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12" disabled={loading} data-testid="reset-password-btn">
+                        {loading ? 'Resetting...' : 'Reset Password'}
+                      </Button>
+                      <p className="text-center text-sm text-gray-600">
+                        <button type="button" className="text-blue-600 font-semibold" onClick={() => setResetStep(1)}>
+                          Try different email
+                        </button>
+                      </p>
+                    </form>
+                  )}
+                </div>
+              ) : isLogin ? (
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div>
                     <Label htmlFor="login-email">Email</Label>
@@ -429,8 +506,13 @@ export default function LandingPage() {
                       data-testid="modal-login-password"
                     />
                   </div>
-                  <Button type="submit" className="w-full btn-primary" disabled={loading} data-testid="modal-login-submit">
-                    {loading ? 'Logging in...' : 'Login'}
+                  <div className="flex justify-end">
+                    <button type="button" className="text-sm text-blue-600 hover:underline" onClick={() => setIsForgotPassword(true)} data-testid="forgot-password-link">
+                      Forgot password?
+                    </button>
+                  </div>
+                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12" disabled={loading} data-testid="modal-login-submit">
+                    {loading ? 'Logging in...' : 'LOGIN'}
                   </Button>
                   <p className="text-center text-sm text-gray-600">
                     Don't have an account?{' '}
