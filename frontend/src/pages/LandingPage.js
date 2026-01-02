@@ -399,8 +399,12 @@ export default function LandingPage() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowAuthModal(false)}>
           <Card className="max-w-md w-full" onClick={(e) => e.stopPropagation()} data-testid="auth-modal">
             <CardHeader>
-              <CardTitle className="text-2xl">{isLogin ? 'Welcome Back' : 'Create Free Account'}</CardTitle>
-              <CardDescription>{isLogin ? 'Login to your TrukAll account' : 'Join 10,000+ drivers today'}</CardDescription>
+              <CardTitle className="text-2xl">
+                {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Create Free Account'}
+              </CardTitle>
+              <CardDescription>
+                {isForgotPassword ? 'We\'ll help you recover your account' : isLogin ? 'Login to your TrukAll account' : 'Join 10,000+ drivers today'}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {isForgotPassword ? (
