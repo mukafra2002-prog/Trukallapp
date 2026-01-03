@@ -86,8 +86,43 @@ class ParkingSpot(BaseModel):
     weather_alert: Optional[str] = None  # "clear", "storm", "snow", "rain"
     weigh_station_nearby: bool = False
     weigh_station_status: Optional[str] = None  # "open", "closed", "bypass"
+    # Real-time availability fields
+    last_reported_at: Optional[str] = None
+    last_reported_by: Optional[str] = None
+    last_reported_spaces: Optional[int] = None
+    report_accuracy_score: float = 0.0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Real-Time Parking Report Model (Driver-Powered)
+class ParkingReport(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    spot_id: str
+    spot_name: str
+    driver_email: str
+    driver_name: str
+    reported_spaces: int  # How many spaces the driver sees available
+    fill_rate: str  # "empty", "filling", "almost_full", "full"
+    conditions: List[str] = []  # ["well_lit", "clean", "security_present", "crowded", "dark", "sketchy"]
+    wait_time_minutes: Optional[int] = None  # Estimated wait if full
+    notes: Optional[str] = None
+    photo_url: Optional[str] = None
+    # Accuracy tracking
+    helpful_votes: int = 0
+    not_helpful_votes: int = 0
+    accuracy_score: float = 0.0
+    verified: bool = False
+    expires_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc) + timedelta(hours=2))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ParkingReportCreate(BaseModel):
+    spot_id: str
+    reported_spaces: int
+    fill_rate: str
+    conditions: List[str] = []
+    wait_time_minutes: Optional[int] = None
+    notes: Optional[str] = None
 
 class ParkingSpotCreate(BaseModel):
     name: str
