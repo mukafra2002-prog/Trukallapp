@@ -512,6 +512,15 @@ export default function DriverDashboard() {
       <div className="max-w-7xl mx-auto p-4">
         <div className="flex gap-2 mb-6 flex-wrap">
           <Button
+            variant={activeTab === "live" ? "default" : "outline"}
+            onClick={() => { setActiveTab("live"); fetchLiveSpots(); }}
+            className={`touch-target ${activeTab === "live" ? "bg-green-600 hover:bg-green-700" : "border-green-300 text-green-700"}`}
+            data-testid="tab-live"
+          >
+            <Radio className="w-4 h-4 mr-2 animate-pulse" />
+            LIVE Updates
+          </Button>
+          <Button
             variant={activeTab === "map" ? "default" : "outline"}
             onClick={() => setActiveTab("map")}
             className={`touch-target ${activeTab === "map" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
