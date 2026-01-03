@@ -253,6 +253,77 @@ export default function DriverDashboard() {
     }
   };
 
+  const fetchLiveSpots = async () => {
+    try {
+      const response = await axios.get(`${API}/spots/live-updates`, {
+        params: searchCity ? { city: searchCity } : {}
+      });
+      setLiveSpots(response.data);
+    } catch (error) {
+      console.error("Failed to load live spots", error);
+    }
+  };
+
+  const fetchLeaderboard = async () => {
+    try {
+      const response = await axios.get(`${API}/reports/leaderboard`);
+      setLeaderboard(response.data);
+    } catch (error) {
+      console.error("Failed to load leaderboard", error);
+    }
+  };
+
+  const submitParkingReport = async () => {
+    if (!selectedSpotForReport) return;
+    
+    try {
+      const response = await axios.post(
+        `${API}/spots/${selectedSpotForReport.id}/report?driver_email=${user.email}`,
+        reportData
+      );
+      toast.success(`${response.data.message} +${response.data.points_earned} points!`);
+      setShowReportModal(false);
+      setSelectedSpotForReport(null);
+      setReportData({ reported_spaces: 0, fill_rate: "filling", conditions: [], notes: "" });
+      fetchLiveSpots();
+      fetchSpots();
+      // Refresh user points
+      setRewardPoints(prev => prev + response.data.points_earned);
+    } catch (error) {
+      toast.error("Failed to submit report");
+    }
+  };
+
+  const voteOnReport = async (reportId, vote) => {
+    try {
+      await axios.post(`${API}/reports/${reportId}/vote?vote=${vote}&driver_email=${user.email}`);
+      toast.success("Thanks for your feedback!");
+      fetchLiveSpots();
+    } catch (error) {
+      toast.error("Failed to submit vote");
+    }
+  };
+
+  const openReportModal = (spot) => {
+    setSelectedSpotForReport(spot);
+    setReportData({
+      reported_spaces: spot.available_spaces || 0,
+      fill_rate: "filling",
+      conditions: [],
+      notes: ""
+    });
+    setShowReportModal(true);
+  };
+
+  const toggleCondition = (condition) => {
+    setReportData(prev => ({
+      ...prev,
+      conditions: prev.conditions.includes(condition)
+        ? prev.conditions.filter(c => c !== condition)
+        : [...prev.conditions, condition]
+    }));
+  };
+
   const handleSubscribe = async (planId) => {
     try {
       const response = await axios.post(`${API}/subscriptions/create-checkout?plan_id=${planId}&user_email=${user.email}`);
