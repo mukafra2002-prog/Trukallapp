@@ -678,6 +678,52 @@ async def get_parking_spots(
     
     return spots
 
+# IMPORTANT: This route must be BEFORE /spots/{spot_id} to avoid path conflicts
+@api_router.get("/spots/live-updates")
+async def get_live_parking_updates(city: Optional[str] = None):
+    """Get all spots with recent driver reports (live data)"""
+    query = {"status": "active"}
+    if city:
+        query['city'] = {"$regex": city, "$options": "i"}
+    
+    spots = await db.parking_spots.find(query, {"_id": 0}).to_list(1000)
+    
+    # Enrich with recent reports
+    live_spots = []
+    for spot in spots:
+        # Get the most recent report for this spot
+        latest_report = await db.parking_reports.find_one(
+            {"spot_id": spot['id']},
+            {"_id": 0},
+            sort=[("created_at", -1)]
+        )
+        
+        if latest_report:
+            expires_at = datetime.fromisoformat(latest_report['expires_at'])
+            if expires_at > datetime.now(timezone.utc):
+                created_at = datetime.fromisoformat(latest_report['created_at'])
+                minutes_ago = (datetime.now(timezone.utc) - created_at).total_seconds() / 60
+                spot['has_live_report'] = True
+                spot['live_report'] = {
+                    "reported_spaces": latest_report['reported_spaces'],
+                    "fill_rate": latest_report['fill_rate'],
+                    "reported_by": latest_report['driver_name'],
+                    "minutes_ago": round(minutes_ago),
+                    "conditions": latest_report.get('conditions', []),
+                    "freshness": "fresh" if minutes_ago < 30 else "recent" if minutes_ago < 60 else "older"
+                }
+            else:
+                spot['has_live_report'] = False
+        else:
+            spot['has_live_report'] = False
+        
+        live_spots.append(spot)
+    
+    # Sort by freshness - spots with live reports first
+    live_spots.sort(key=lambda x: (not x.get('has_live_report', False), x.get('live_report', {}).get('minutes_ago', 999)))
+    
+    return live_spots
+
 @api_router.get("/spots/{spot_id}", response_model=ParkingSpot)
 async def get_parking_spot(spot_id: str):
     spot = await db.parking_spots.find_one({"id": spot_id}, {"_id": 0})
