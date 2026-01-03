@@ -756,6 +756,33 @@ export default function DriverDashboard() {
             <Crown className="w-4 h-4 mr-2" />
             Plans
           </Button>
+          <Button
+            variant={activeTab === "emergency" ? "default" : "outline"}
+            onClick={() => setActiveTab("emergency")}
+            className={`touch-target ${activeTab === "emergency" ? "bg-red-600 hover:bg-red-700" : "border-red-300 text-red-700"}`}
+            data-testid="tab-emergency"
+          >
+            <Phone className="w-4 h-4 mr-2" />
+            SOS
+          </Button>
+          <Button
+            variant={activeTab === "documents" ? "default" : "outline"}
+            onClick={() => setActiveTab("documents")}
+            className={`touch-target ${activeTab === "documents" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
+            data-testid="tab-documents"
+          >
+            <Camera className="w-4 h-4 mr-2" />
+            Documents
+          </Button>
+          <Button
+            variant={activeTab === "fuel" ? "default" : "outline"}
+            onClick={() => setActiveTab("fuel")}
+            className={`touch-target ${activeTab === "fuel" ? "bg-amber-600 hover:bg-amber-700" : "border-amber-300 text-amber-700"}`}
+            data-testid="tab-fuel"
+          >
+            <Fuel className="w-4 h-4 mr-2" />
+            Fuel Prices
+          </Button>
         </div>
 
         {/* LIVE Updates Tab */}
