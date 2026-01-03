@@ -751,6 +751,202 @@ async def get_partner_spots(partner_email: str):
     
     return spots
 
+# ============== REAL-TIME PARKING REPORTS (Driver-Powered) ==============
+
+@api_router.post("/spots/{spot_id}/report")
+async def report_parking_availability(spot_id: str, report: ParkingReportCreate, driver_email: str):
+    """Driver reports real-time parking availability"""
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    spot = await db.parking_spots.find_one({"id": spot_id}, {"_id": 0})
+    if not spot:
+        raise HTTPException(status_code=404, detail="Parking spot not found")
+    
+    # Create the report
+    parking_report = ParkingReport(
+        spot_id=spot_id,
+        spot_name=spot['name'],
+        driver_email=driver_email,
+        driver_name=user['name'],
+        reported_spaces=report.reported_spaces,
+        fill_rate=report.fill_rate,
+        conditions=report.conditions,
+        wait_time_minutes=report.wait_time_minutes,
+        notes=report.notes
+    )
+    
+    report_doc = parking_report.model_dump()
+    report_doc['expires_at'] = report_doc['expires_at'].isoformat()
+    report_doc['created_at'] = report_doc['created_at'].isoformat()
+    
+    await db.parking_reports.insert_one(report_doc)
+    
+    # Update the parking spot with latest report info
+    await db.parking_spots.update_one(
+        {"id": spot_id},
+        {"$set": {
+            "last_reported_at": datetime.now(timezone.utc).isoformat(),
+            "last_reported_by": user['name'],
+            "last_reported_spaces": report.reported_spaces,
+            "available_spaces": report.reported_spaces,  # Update actual availability
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Award points to the driver for contributing
+    points_earned = 25  # Base points for reporting
+    if report.conditions:
+        points_earned += len(report.conditions) * 5  # Bonus for detailed report
+    if report.notes:
+        points_earned += 10  # Bonus for adding notes
+    
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": points_earned}}
+    )
+    
+    logger.info(f"Parking report submitted by {driver_email} for {spot['name']}: {report.reported_spaces} spaces")
+    
+    return {
+        "message": "Report submitted successfully! Thank you for helping fellow drivers.",
+        "points_earned": points_earned,
+        "report_id": parking_report.id
+    }
+
+@api_router.get("/spots/{spot_id}/reports")
+async def get_spot_reports(spot_id: str, limit: int = 10):
+    """Get recent reports for a parking spot"""
+    # Only get non-expired reports
+    current_time = datetime.now(timezone.utc).isoformat()
+    
+    reports = await db.parking_reports.find(
+        {"spot_id": spot_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    # Filter out expired reports and calculate freshness
+    valid_reports = []
+    for report in reports:
+        expires_at = datetime.fromisoformat(report['expires_at'])
+        if expires_at > datetime.now(timezone.utc):
+            created_at = datetime.fromisoformat(report['created_at'])
+            minutes_ago = (datetime.now(timezone.utc) - created_at).total_seconds() / 60
+            report['minutes_ago'] = round(minutes_ago)
+            report['freshness'] = "fresh" if minutes_ago < 30 else "recent" if minutes_ago < 60 else "older"
+            valid_reports.append(report)
+    
+    return valid_reports
+
+@api_router.get("/spots/live-updates")
+async def get_live_parking_updates(city: Optional[str] = None):
+    """Get all spots with recent driver reports (live data)"""
+    query = {"status": "active"}
+    if city:
+        query['city'] = {"$regex": city, "$options": "i"}
+    
+    spots = await db.parking_spots.find(query, {"_id": 0}).to_list(1000)
+    
+    # Enrich with recent reports
+    live_spots = []
+    for spot in spots:
+        # Get the most recent report for this spot
+        latest_report = await db.parking_reports.find_one(
+            {"spot_id": spot['id']},
+            {"_id": 0},
+            sort=[("created_at", -1)]
+        )
+        
+        if latest_report:
+            expires_at = datetime.fromisoformat(latest_report['expires_at'])
+            if expires_at > datetime.now(timezone.utc):
+                created_at = datetime.fromisoformat(latest_report['created_at'])
+                minutes_ago = (datetime.now(timezone.utc) - created_at).total_seconds() / 60
+                spot['has_live_report'] = True
+                spot['live_report'] = {
+                    "reported_spaces": latest_report['reported_spaces'],
+                    "fill_rate": latest_report['fill_rate'],
+                    "reported_by": latest_report['driver_name'],
+                    "minutes_ago": round(minutes_ago),
+                    "conditions": latest_report.get('conditions', []),
+                    "freshness": "fresh" if minutes_ago < 30 else "recent" if minutes_ago < 60 else "older"
+                }
+            else:
+                spot['has_live_report'] = False
+        else:
+            spot['has_live_report'] = False
+        
+        live_spots.append(spot)
+    
+    # Sort by freshness - spots with live reports first
+    live_spots.sort(key=lambda x: (not x.get('has_live_report', False), x.get('live_report', {}).get('minutes_ago', 999)))
+    
+    return live_spots
+
+@api_router.post("/reports/{report_id}/vote")
+async def vote_on_report(report_id: str, vote: str, driver_email: str):
+    """Vote on whether a report was helpful"""
+    if vote not in ["helpful", "not_helpful"]:
+        raise HTTPException(status_code=400, detail="Vote must be 'helpful' or 'not_helpful'")
+    
+    report = await db.parking_reports.find_one({"id": report_id}, {"_id": 0})
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    
+    # Update vote count
+    if vote == "helpful":
+        await db.parking_reports.update_one(
+            {"id": report_id},
+            {"$inc": {"helpful_votes": 1}}
+        )
+        # Award points to the reporter for helpful report
+        await db.users.update_one(
+            {"email": report['driver_email']},
+            {"$inc": {"reward_points": 5}}
+        )
+    else:
+        await db.parking_reports.update_one(
+            {"id": report_id},
+            {"$inc": {"not_helpful_votes": 1}}
+        )
+    
+    # Recalculate accuracy score
+    updated_report = await db.parking_reports.find_one({"id": report_id}, {"_id": 0})
+    total_votes = updated_report['helpful_votes'] + updated_report['not_helpful_votes']
+    if total_votes > 0:
+        accuracy = updated_report['helpful_votes'] / total_votes
+        await db.parking_reports.update_one(
+            {"id": report_id},
+            {"$set": {"accuracy_score": accuracy}}
+        )
+    
+    return {"message": "Vote recorded", "vote": vote}
+
+@api_router.get("/reports/leaderboard")
+async def get_reporter_leaderboard():
+    """Get top contributors for parking reports"""
+    pipeline = [
+        {"$group": {
+            "_id": "$driver_email",
+            "driver_name": {"$first": "$driver_name"},
+            "total_reports": {"$sum": 1},
+            "total_helpful": {"$sum": "$helpful_votes"},
+            "avg_accuracy": {"$avg": "$accuracy_score"}
+        }},
+        {"$sort": {"total_reports": -1}},
+        {"$limit": 10}
+    ]
+    
+    leaders = await db.parking_reports.aggregate(pipeline).to_list(10)
+    
+    # Add rank and format
+    for i, leader in enumerate(leaders):
+        leader['rank'] = i + 1
+        leader['email'] = leader.pop('_id')
+    
+    return leaders
+
 # ============== BOOKING ROUTES ==============
 
 @api_router.post("/bookings", response_model=Booking)
