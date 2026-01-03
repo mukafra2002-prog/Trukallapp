@@ -884,6 +884,135 @@ class TrukAllAPITester:
                 response
             )
 
+    def test_password_reset_endpoints(self):
+        """Test password reset endpoints"""
+        print("\n🔑 Testing Password Reset Endpoints...")
+        
+        # Test forgot password
+        success, response = self.make_request(
+            'POST',
+            '/auth/forgot-password',
+            {"email": "driver@test.com"}
+        )
+        
+        reset_code = None
+        if success and 'reset_code' in response:
+            reset_code = response['reset_code']
+            self.log_test(
+                "Forgot Password",
+                True,
+                f"Reset code generated: {reset_code}"
+            )
+        else:
+            self.log_test(
+                "Forgot Password",
+                False,
+                "Failed to generate reset code",
+                response
+            )
+        
+        # Test reset password with the code
+        if reset_code:
+            success, response = self.make_request(
+                'POST',
+                '/auth/reset-password',
+                {
+                    "email": "driver@test.com",
+                    "reset_code": reset_code,
+                    "new_password": "newpassword123"
+                }
+            )
+            self.log_test(
+                "Reset Password",
+                success,
+                "Password reset successful" if success else "Password reset failed",
+                response if not success else None
+            )
+
+    def test_parking_reports_endpoints(self):
+        """Test parking reports endpoints"""
+        print("\n📊 Testing Parking Reports Endpoints...")
+        
+        driver_email = "driver@test.com"
+        spot_id = "spot-001"
+        
+        # Test submit parking report
+        report_data = {
+            "spot_id": spot_id,
+            "reported_spaces": 15,
+            "fill_rate": "filling",
+            "conditions": ["well_lit", "clean"],
+            "notes": "Good spot, clean facilities"
+        }
+        
+        success, response = self.make_request(
+            'POST',
+            f'/spots/{spot_id}/report?driver_email={driver_email}',
+            report_data
+        )
+        self.log_test(
+            "Submit Parking Report",
+            success,
+            f"Report submitted successfully" if success else "Failed to submit report",
+            response if not success else None
+        )
+        
+        # Test get spot reports
+        success, response = self.make_request(
+            'GET',
+            f'/spots/{spot_id}/reports'
+        )
+        reports_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get Spot Reports",
+            success,
+            f"Retrieved {reports_count} reports for spot" if success else "Failed to get spot reports",
+            response if not success else None
+        )
+        
+        # Test get live updates
+        success, response = self.make_request(
+            'GET',
+            '/spots/live-updates'
+        )
+        live_spots_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get Live Updates",
+            success,
+            f"Retrieved {live_spots_count} spots with live data" if success else "Failed to get live updates",
+            response if not success else None
+        )
+
+    def test_leaderboard_endpoints(self):
+        """Test leaderboard endpoints"""
+        print("\n🏆 Testing Leaderboard Endpoints...")
+        
+        # Test get reports leaderboard
+        success, response = self.make_request(
+            'GET',
+            '/reports/leaderboard'
+        )
+        leaders_count = len(response) if success and isinstance(response, list) else 0
+        self.log_test(
+            "Get Reports Leaderboard",
+            success,
+            f"Retrieved {leaders_count} leaders" if success else "Failed to get leaderboard",
+            response if not success else None
+        )
+        
+        # Verify leaderboard structure
+        if success and isinstance(response, list) and leaders_count > 0:
+            first_leader = response[0]
+            required_fields = ['driver_name', 'total_reports', 'rank', 'email']
+            missing_fields = [field for field in required_fields if field not in first_leader]
+            
+            self.log_test(
+                "Leaderboard Structure",
+                len(missing_fields) == 0,
+                f"Leaderboard has all required fields" if len(missing_fields) == 0 else f"Missing fields: {missing_fields}",
+                first_leader if len(missing_fields) > 0 else None
+            )
+
     def test_error_handling(self):
         """Test error handling"""
         print("\n🚨 Testing Error Handling...")
