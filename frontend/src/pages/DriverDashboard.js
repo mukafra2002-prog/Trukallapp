@@ -1764,6 +1764,233 @@ export default function DriverDashboard() {
             </div>
           </div>
         )}
+
+        {/* Emergency SOS Tab */}
+        {activeTab === "emergency" && (
+          <div className="space-y-6">
+            {/* SOS Button */}
+            <Card className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border-red-500/30">
+              <CardContent className="p-6 text-center">
+                <Button 
+                  onClick={() => setShowSOSModal(true)}
+                  className="w-48 h-48 rounded-full bg-red-600 hover:bg-red-700 text-white text-2xl font-bold shadow-lg animate-pulse"
+                >
+                  <div className="flex flex-col items-center">
+                    <Phone className="w-16 h-16 mb-2" />
+                    <span>SOS</span>
+                    <span className="text-sm font-normal">Tap for Emergency</span>
+                  </div>
+                </Button>
+                <p className="mt-4 text-slate-600">Press the SOS button to alert your emergency contacts and get help</p>
+              </CardContent>
+            </Card>
+
+            {/* Emergency Contacts */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Emergency Contacts
+                  </CardTitle>
+                  <Button onClick={() => setShowAddContactModal(true)} size="sm">
+                    <Plus className="w-4 h-4 mr-1" /> Add Contact
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {emergencyContacts.length === 0 ? (
+                  <p className="text-center text-slate-500 py-4">No emergency contacts. Add one now!</p>
+                ) : (
+                  <div className="space-y-3">
+                    {emergencyContacts.map(contact => (
+                      <div key={contact.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                        <div>
+                          <p className="font-semibold">{contact.name}</p>
+                          <p className="text-sm text-slate-500">{contact.phone} • {contact.relationship}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {contact.is_primary && <Badge className="bg-green-500">Primary</Badge>}
+                          <Button variant="ghost" size="sm" onClick={() => deleteEmergencyContact(contact.id)}>
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Emergency Numbers */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Important Numbers</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-red-50 rounded-lg text-center">
+                    <p className="text-3xl font-bold text-red-600">911</p>
+                    <p className="text-sm text-slate-600">Emergency Services</p>
+                  </div>
+                  <div className="p-4 bg-blue-50 rounded-lg text-center">
+                    <p className="text-lg font-bold text-blue-600">1-800-TRUCKERS</p>
+                    <p className="text-sm text-slate-600">Roadside Assistance</p>
+                  </div>
+                  <div className="p-4 bg-green-50 rounded-lg text-center">
+                    <p className="text-lg font-bold text-green-600">FMCSA Hotline</p>
+                    <p className="text-sm text-slate-600">1-888-368-7238</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Documents Tab */}
+        {activeTab === "documents" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Camera className="w-5 h-5" />
+                      Document Scanner
+                    </CardTitle>
+                    <CardDescription>Scan and organize BOLs, receipts, and paperwork</CardDescription>
+                  </div>
+                  <Button onClick={() => setShowDocModal(true)} className="bg-blue-600 hover:bg-blue-700">
+                    <Camera className="w-4 h-4 mr-2" /> New Document
+                  </Button>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Document Categories */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { type: "bol", label: "Bills of Lading", icon: "📄", color: "bg-blue-50 border-blue-200" },
+                { type: "receipt", label: "Receipts", icon: "🧾", color: "bg-green-50 border-green-200" },
+                { type: "lumper", label: "Lumper Receipts", icon: "📦", color: "bg-purple-50 border-purple-200" },
+                { type: "scale_ticket", label: "Scale Tickets", icon: "⚖️", color: "bg-amber-50 border-amber-200" }
+              ].map(cat => (
+                <Card key={cat.type} className={`${cat.color} cursor-pointer hover:shadow-md`}>
+                  <CardContent className="p-4 text-center">
+                    <span className="text-3xl">{cat.icon}</span>
+                    <p className="font-semibold mt-2">{cat.label}</p>
+                    <p className="text-sm text-slate-500">{documents.filter(d => d.doc_type === cat.type).length} docs</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Recent Documents */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Documents</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {documents.length === 0 ? (
+                  <p className="text-center text-slate-500 py-8">No documents yet. Scan your first document!</p>
+                ) : (
+                  <div className="space-y-3">
+                    {documents.slice(0, 10).map(doc => (
+                      <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <FolderOpen className="w-8 h-8 text-blue-500" />
+                          <div>
+                            <p className="font-semibold">{doc.title}</p>
+                            <p className="text-xs text-slate-500">{doc.doc_type.toUpperCase()} • {new Date(doc.created_at).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={() => deleteDocument(doc.id)}>
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Fuel Prices Tab */}
+        {activeTab === "fuel" && (
+          <div className="space-y-6">
+            <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Fuel className="w-5 h-5 text-amber-600" />
+                      Fuel Price Tracker
+                    </CardTitle>
+                    <CardDescription>Find the cheapest diesel prices & earn points for reporting</CardDescription>
+                  </div>
+                  <Button onClick={() => setShowFuelReportModal(true)} className="bg-amber-600 hover:bg-amber-700">
+                    <Plus className="w-4 h-4 mr-2" /> Report Price
+                  </Button>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* State Averages */}
+            {fuelAverages.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>State Averages (Diesel)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-2 flex-wrap">
+                    {fuelAverages.slice(0, 10).map(avg => (
+                      <Badge key={avg.state} variant="outline" className="px-3 py-1">
+                        <span className="font-bold">{avg.state}</span>
+                        <span className="ml-2 text-green-600">${avg.avg_diesel?.toFixed(2) || 'N/A'}</span>
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Cheapest Prices */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-green-500" />
+                  Cheapest Diesel Prices
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {fuelPrices.length === 0 ? (
+                  <p className="text-center text-slate-500 py-8">No fuel prices reported yet. Be the first!</p>
+                ) : (
+                  <div className="space-y-3">
+                    {fuelPrices.map((price, i) => (
+                      <div key={price.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <span className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${i === 0 ? 'bg-green-500' : i === 1 ? 'bg-green-400' : i === 2 ? 'bg-green-300' : 'bg-slate-300'}`}>
+                            {i + 1}
+                          </span>
+                          <div>
+                            <p className="font-semibold">{price.station_name}</p>
+                            <p className="text-xs text-slate-500">{price.city}, {price.state} • {price.chain}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-green-600">${price.diesel_price?.toFixed(3)}</p>
+                          <p className="text-xs text-slate-500">per gallon</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
 
       {/* Mobile Navigation */}
