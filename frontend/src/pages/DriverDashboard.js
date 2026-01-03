@@ -55,6 +55,18 @@ export default function DriverDashboard() {
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [userSubscription, setUserSubscription] = useState(null);
   const [currentPlan, setCurrentPlan] = useState(null);
+  
+  // Real-time parking report states
+  const [liveSpots, setLiveSpots] = useState([]);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [selectedSpotForReport, setSelectedSpotForReport] = useState(null);
+  const [reportData, setReportData] = useState({
+    reported_spaces: 0,
+    fill_rate: "filling",
+    conditions: [],
+    notes: ""
+  });
+  const [leaderboard, setLeaderboard] = useState([]);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -71,6 +83,11 @@ export default function DriverDashboard() {
     fetchCompliance();
     fetchDetentionClaims();
     fetchSubscription();
+    fetchLiveSpots();
+    fetchLeaderboard();
+    
+    // Set up polling for live updates every 30 seconds
+    const liveInterval = setInterval(fetchLiveSpots, 30000);
     
     // Calculate reward points based on bookings
     // 100 points per booking
@@ -82,6 +99,8 @@ export default function DriverDashboard() {
     if (bookings.length > 0) {
       calculatePoints();
     }
+    
+    return () => clearInterval(liveInterval);
     
     // Simulate fatigue monitoring based on time
     const monitorFatigue = () => {
