@@ -2173,6 +2173,189 @@ export default function DriverDashboard() {
           </Card>
         </div>
       )}
+
+      {/* SOS Emergency Modal */}
+      {showSOSModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowSOSModal(false)}>
+          <Card className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <CardHeader className="bg-red-50 border-b border-red-200">
+              <CardTitle className="text-red-700 flex items-center gap-2">
+                <AlertCircle className="w-6 h-6" />
+                Emergency SOS
+              </CardTitle>
+              <CardDescription>Select the type of emergency</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              {[
+                { type: "medical", label: "Medical Emergency", icon: "🏥", color: "bg-red-500" },
+                { type: "accident", label: "Accident", icon: "💥", color: "bg-orange-500" },
+                { type: "breakdown", label: "Vehicle Breakdown", icon: "🚛", color: "bg-amber-500" },
+                { type: "threat", label: "Safety Threat", icon: "⚠️", color: "bg-purple-500" },
+                { type: "other", label: "Other Emergency", icon: "🆘", color: "bg-slate-500" }
+              ].map(sos => (
+                <Button 
+                  key={sos.type}
+                  onClick={() => sendSOS(sos.type)}
+                  className={`w-full h-14 ${sos.color} hover:opacity-90 text-white text-lg justify-start`}
+                >
+                  <span className="text-2xl mr-3">{sos.icon}</span>
+                  {sos.label}
+                </Button>
+              ))}
+              <Button variant="outline" onClick={() => setShowSOSModal(false)} className="w-full mt-4">
+                Cancel
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Add Emergency Contact Modal */}
+      {showAddContactModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowAddContactModal(false)}>
+          <Card className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <CardHeader>
+              <CardTitle>Add Emergency Contact</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Name</label>
+                <Input value={newContact.name} onChange={(e) => setNewContact(prev => ({ ...prev, name: e.target.value }))} placeholder="Contact name" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Phone</label>
+                <Input value={newContact.phone} onChange={(e) => setNewContact(prev => ({ ...prev, phone: e.target.value }))} placeholder="+1-555-123-4567" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Relationship</label>
+                <select 
+                  value={newContact.relationship} 
+                  onChange={(e) => setNewContact(prev => ({ ...prev, relationship: e.target.value }))}
+                  className="w-full h-10 px-3 border rounded-md"
+                >
+                  <option value="spouse">Spouse</option>
+                  <option value="family">Family</option>
+                  <option value="friend">Friend</option>
+                  <option value="employer">Employer/Dispatch</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setShowAddContactModal(false)} className="flex-1">Cancel</Button>
+                <Button onClick={addEmergencyContact} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">Add Contact</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Add Document Modal */}
+      {showDocModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowDocModal(false)}>
+          <Card className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Camera className="w-5 h-5" />
+                New Document
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Document Type</label>
+                <select 
+                  value={newDoc.doc_type} 
+                  onChange={(e) => setNewDoc(prev => ({ ...prev, doc_type: e.target.value }))}
+                  className="w-full h-10 px-3 border rounded-md"
+                >
+                  <option value="bol">Bill of Lading (BOL)</option>
+                  <option value="receipt">Receipt</option>
+                  <option value="lumper">Lumper Receipt</option>
+                  <option value="scale_ticket">Scale Ticket</option>
+                  <option value="delivery_receipt">Delivery Receipt</option>
+                  <option value="inspection">Inspection Report</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Title</label>
+                <Input value={newDoc.title} onChange={(e) => setNewDoc(prev => ({ ...prev, title: e.target.value }))} placeholder="e.g., BOL #12345 - Dallas to Atlanta" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Notes (optional)</label>
+                <Textarea value={newDoc.notes} onChange={(e) => setNewDoc(prev => ({ ...prev, notes: e.target.value }))} placeholder="Any additional notes..." />
+              </div>
+              <div className="bg-blue-50 p-3 rounded-lg text-center border border-blue-200">
+                <Camera className="w-12 h-12 mx-auto mb-2 text-blue-500" />
+                <p className="text-sm text-slate-600">Camera capture coming soon!</p>
+                <p className="text-xs text-slate-400">For now, documents are saved as records</p>
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setShowDocModal(false)} className="flex-1">Cancel</Button>
+                <Button onClick={saveDocument} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">Save Document</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Report Fuel Price Modal */}
+      {showFuelReportModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowFuelReportModal(false)}>
+          <Card className="max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <CardHeader className="bg-amber-50 border-b border-amber-200">
+              <CardTitle className="flex items-center gap-2 text-amber-700">
+                <Fuel className="w-5 h-5" />
+                Report Fuel Price
+              </CardTitle>
+              <CardDescription>Help fellow drivers find cheap fuel (+15 points)</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Station Name</label>
+                <Input value={newFuelReport.station_name} onChange={(e) => setNewFuelReport(prev => ({ ...prev, station_name: e.target.value }))} placeholder="e.g., Pilot Flying J" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Chain</label>
+                <select 
+                  value={newFuelReport.chain} 
+                  onChange={(e) => setNewFuelReport(prev => ({ ...prev, chain: e.target.value }))}
+                  className="w-full h-10 px-3 border rounded-md"
+                >
+                  <option value="pilot">Pilot Flying J</option>
+                  <option value="loves">Love's</option>
+                  <option value="ta_petro">TA/Petro</option>
+                  <option value="speedway">Speedway</option>
+                  <option value="independent">Independent</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">City</label>
+                  <Input value={newFuelReport.city} onChange={(e) => setNewFuelReport(prev => ({ ...prev, city: e.target.value }))} placeholder="Dallas" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">State</label>
+                  <Input value={newFuelReport.state} onChange={(e) => setNewFuelReport(prev => ({ ...prev, state: e.target.value }))} placeholder="TX" maxLength={2} />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Diesel Price (per gallon)</label>
+                <Input 
+                  type="number" 
+                  step="0.001"
+                  value={newFuelReport.diesel_price} 
+                  onChange={(e) => setNewFuelReport(prev => ({ ...prev, diesel_price: e.target.value }))} 
+                  placeholder="3.459" 
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setShowFuelReportModal(false)} className="flex-1">Cancel</Button>
+                <Button onClick={reportFuelPrice} className="flex-1 bg-amber-600 hover:bg-amber-700 text-white">Submit Price</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
