@@ -102,6 +102,10 @@ export default function DriverDashboard() {
     fetchSubscription();
     fetchLiveSpots();
     fetchLeaderboard();
+    fetchEmergencyContacts();
+    fetchDocuments();
+    fetchFuelPrices();
+    fetchFuelAverages();
     
     // Set up polling for live updates every 30 seconds
     const liveInterval = setInterval(fetchLiveSpots, 30000);
