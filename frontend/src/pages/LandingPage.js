@@ -294,14 +294,14 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Comparison Section */}
+      {/* Features Section */}
       <div className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4">
-              Why TrukAll Beats <span className="gradient-text">TruckPath</span>
+              Everything You Need <span className="gradient-text">In One App</span>
             </h2>
-            <p className="text-xl text-gray-600">17 features they don't have. All free forever.</p>
+            <p className="text-xl text-gray-600">Built by drivers, for drivers. 17+ powerful features.</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -310,41 +310,41 @@ export default function LandingPage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="font-semibold">🟢 LIVE Parking Updates</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <span className="font-semibold">Reserve Parking Ahead</span>
                   </div>
                   <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="font-semibold">Real-Time Spot Countdown</span>
+                    <span className="font-semibold">Broker Fraud Alerts</span>
                   </div>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="font-semibold">Shower Credits Tracker</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="font-semibold">Trip Profit Calculator</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
                   <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <span className="font-semibold">Convoy Finder</span>
                   </div>
                   <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="font-semibold">Trip Profit Calculator</span>
+                    <span className="font-semibold">Retail Parking (Walmart+)</span>
                   </div>
                   <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="font-semibold">Detention Pay Tracker</span>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="font-semibold">Emergency SOS</span>
-                  </div>
-                  <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="font-semibold">Document Scanner</span>
+                    <span className="font-semibold">DOT Compliance Tracker</span>
                   </div>
                   <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <span className="font-semibold">Fatigue Monitor</span>
-                  </div>
-                  <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="font-semibold">Rewards Points</span>
                   </div>
                   <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
@@ -353,8 +353,8 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="text-center mt-8">
-                <p className="text-lg font-bold text-gray-700 mb-2">+ 7 more features!</p>
-                <p className="text-gray-600">All included. Forever free.</p>
+                <p className="text-lg font-bold text-gray-700 mb-2">+ Rewards, Load Board, Expense Tracker & More!</p>
+                <p className="text-gray-600">All included. Start free today.</p>
               </div>
             </div>
           </div>
