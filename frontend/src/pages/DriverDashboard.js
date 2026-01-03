@@ -359,6 +359,140 @@ export default function DriverDashboard() {
     }
   };
 
+  // Emergency SOS Functions
+  const fetchEmergencyContacts = async () => {
+    try {
+      const response = await axios.get(`${API}/emergency/contacts/${user.email}`);
+      setEmergencyContacts(response.data);
+    } catch (error) {
+      console.error("Failed to load emergency contacts", error);
+    }
+  };
+
+  const sendSOS = async (emergencyType) => {
+    try {
+      const response = await axios.post(`${API}/emergency/sos`, null, {
+        params: {
+          driver_email: user.email,
+          emergency_type: emergencyType,
+          location_address: "Current Location" // In production, use actual GPS
+        }
+      });
+      toast.success(response.data.message);
+      setShowSOSModal(false);
+    } catch (error) {
+      toast.error("Failed to send SOS");
+    }
+  };
+
+  const addEmergencyContact = async () => {
+    try {
+      await axios.post(`${API}/emergency/contacts`, null, {
+        params: {
+          driver_email: user.email,
+          name: newContact.name,
+          phone: newContact.phone,
+          relationship: newContact.relationship
+        }
+      });
+      toast.success("Emergency contact added");
+      setShowAddContactModal(false);
+      setNewContact({ name: "", phone: "", relationship: "family" });
+      fetchEmergencyContacts();
+    } catch (error) {
+      toast.error("Failed to add contact");
+    }
+  };
+
+  const deleteEmergencyContact = async (contactId) => {
+    try {
+      await axios.delete(`${API}/emergency/contacts/${contactId}`);
+      toast.success("Contact deleted");
+      fetchEmergencyContacts();
+    } catch (error) {
+      toast.error("Failed to delete contact");
+    }
+  };
+
+  // Document Functions
+  const fetchDocuments = async () => {
+    try {
+      const response = await axios.get(`${API}/documents/${user.email}`);
+      setDocuments(response.data);
+    } catch (error) {
+      console.error("Failed to load documents", error);
+    }
+  };
+
+  const saveDocument = async () => {
+    try {
+      const response = await axios.post(`${API}/documents/scan`, null, {
+        params: {
+          driver_email: user.email,
+          doc_type: newDoc.doc_type,
+          title: newDoc.title,
+          notes: newDoc.notes
+        }
+      });
+      toast.success(`Document saved! +${response.data.points_earned} points`);
+      setShowDocModal(false);
+      setNewDoc({ doc_type: "bol", title: "", notes: "" });
+      fetchDocuments();
+    } catch (error) {
+      toast.error("Failed to save document");
+    }
+  };
+
+  const deleteDocument = async (docId) => {
+    try {
+      await axios.delete(`${API}/documents/${docId}`);
+      toast.success("Document deleted");
+      fetchDocuments();
+    } catch (error) {
+      toast.error("Failed to delete document");
+    }
+  };
+
+  // Fuel Functions
+  const fetchFuelPrices = async () => {
+    try {
+      const response = await axios.get(`${API}/fuel/prices/cheapest`, { params: { limit: 20 } });
+      setFuelPrices(response.data);
+    } catch (error) {
+      console.error("Failed to load fuel prices", error);
+    }
+  };
+
+  const fetchFuelAverages = async () => {
+    try {
+      const response = await axios.get(`${API}/fuel/average`);
+      setFuelAverages(response.data);
+    } catch (error) {
+      console.error("Failed to load fuel averages", error);
+    }
+  };
+
+  const reportFuelPrice = async () => {
+    try {
+      const response = await axios.post(`${API}/fuel/prices/report`, null, {
+        params: {
+          station_name: newFuelReport.station_name,
+          chain: newFuelReport.chain,
+          city: newFuelReport.city,
+          state: newFuelReport.state,
+          diesel_price: parseFloat(newFuelReport.diesel_price),
+          driver_email: user.email
+        }
+      });
+      toast.success(`${response.data.message}! +${response.data.points_earned} points`);
+      setShowFuelReportModal(false);
+      setNewFuelReport({ station_name: "", chain: "pilot", city: "", state: "", diesel_price: "" });
+      fetchFuelPrices();
+    } catch (error) {
+      toast.error("Failed to report fuel price");
+    }
+  };
+
   const handleSearch = async () => {
     try {
       setLoading(true);
