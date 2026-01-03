@@ -622,6 +622,75 @@ export default function DriverDashboard() {
               </CardHeader>
             </Card>
 
+            {/* How It Works - Feature Explanation */}
+            <Card className="border-blue-200 bg-blue-50/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-blue-700">How Live Availability Works</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Live Availability */}
+                  <div className="bg-white rounded-lg p-4 border border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <h4 className="font-bold text-slate-800">Live Availability</h4>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2">
+                      <li>• Drivers tap:</li>
+                      <li className="pl-3 flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span>"Spots Available"</span>
+                      </li>
+                      <li className="pl-3 flex items-center gap-2">
+                        <span className="text-red-500 font-bold">✕</span>
+                        <span>"Full"</span>
+                      </li>
+                      <li>• Updates visible instantly</li>
+                    </ul>
+                  </div>
+
+                  {/* Time-Stamped Accuracy */}
+                  <div className="bg-white rounded-lg p-4 border border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <h4 className="font-bold text-slate-800">Time-Stamped Accuracy</h4>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2">
+                      <li>• "Last confirmed 8 minutes ago"</li>
+                      <li>• Trust score per location</li>
+                      <li>• Fresh data highlighted</li>
+                    </ul>
+                  </div>
+
+                  {/* Driver Trust Score */}
+                  <div className="bg-white rounded-lg p-4 border border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <h4 className="font-bold text-slate-800">Driver Trust Score</h4>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2">
+                      <li>• Reliable drivers' updates count more</li>
+                      <li>• Reduces fake data</li>
+                      <li>• Earn points for accuracy</li>
+                    </ul>
+                  </div>
+
+                  {/* Smart Alerts */}
+                  <div className="bg-white rounded-lg p-4 border border-slate-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <h4 className="font-bold text-slate-800">Smart Alerts</h4>
+                    </div>
+                    <ul className="text-sm text-slate-600 space-y-2">
+                      <li>• Notify when a spot opens nearby</li>
+                      <li>• Geo-based push notifications</li>
+                      <li>• Never miss parking again</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Leaderboard */}
             {leaderboard.length > 0 && (
               <Card className="bg-amber-50 border-amber-200">
