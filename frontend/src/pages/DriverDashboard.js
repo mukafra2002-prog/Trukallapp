@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
-import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell, TrendingUp, ShowerHead, Building2, Star, ThumbsUp, ThumbsDown, AlertOctagon, Store, Users, Calculator, FileText, CreditCard, Crown, Check, Truck, Calendar } from "lucide-react";
+import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell, TrendingUp, ShowerHead, Building2, Star, ThumbsUp, ThumbsDown, AlertOctagon, Store, Users, Calculator, FileText, CreditCard, Crown, Check, Truck, Calendar, Radio, Eye, Send, Zap } from "lucide-react";
 import ConvoyFinder from "@/components/ConvoyFinder";
 
 const mapContainerStyle = {
