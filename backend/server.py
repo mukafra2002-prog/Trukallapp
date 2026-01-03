@@ -2031,6 +2031,398 @@ async def get_saved_routes(driver_email: str):
     
     return routes
 
+# ============== EMERGENCY SOS ==============
+
+class EmergencySOS(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    driver_name: str
+    driver_phone: Optional[str] = None
+    emergency_type: str  # "medical", "breakdown", "accident", "threat", "other"
+    location_lat: Optional[float] = None
+    location_lng: Optional[float] = None
+    location_address: Optional[str] = None
+    message: Optional[str] = None
+    status: str = "active"  # "active", "responded", "resolved"
+    responder_notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    resolved_at: Optional[datetime] = None
+
+class EmergencyContact(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    name: str
+    phone: str
+    relationship: str  # "spouse", "family", "friend", "employer", "other"
+    is_primary: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.post("/emergency/sos")
+async def send_emergency_sos(
+    driver_email: str,
+    emergency_type: str,
+    location_lat: Optional[float] = None,
+    location_lng: Optional[float] = None,
+    location_address: Optional[str] = None,
+    message: Optional[str] = None
+):
+    """Send an emergency SOS alert"""
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    sos = EmergencySOS(
+        driver_email=driver_email,
+        driver_name=user['name'],
+        driver_phone=user.get('phone'),
+        emergency_type=emergency_type,
+        location_lat=location_lat,
+        location_lng=location_lng,
+        location_address=location_address,
+        message=message
+    )
+    
+    sos_doc = sos.model_dump()
+    sos_doc['created_at'] = sos_doc['created_at'].isoformat()
+    
+    await db.emergency_sos.insert_one(sos_doc)
+    
+    # Get emergency contacts
+    contacts = await db.emergency_contacts.find(
+        {"driver_email": driver_email},
+        {"_id": 0}
+    ).to_list(10)
+    
+    # In production, send SMS/calls to contacts here
+    logger.warning(f"🚨 EMERGENCY SOS from {user['name']}: {emergency_type} at {location_address}")
+    
+    return {
+        "message": "Emergency SOS sent! Help is on the way.",
+        "sos_id": sos.id,
+        "contacts_notified": len(contacts),
+        "emergency_numbers": {
+            "911": "For immediate emergency",
+            "roadside": "1-800-TRUCKERS",
+            "police_non_emergency": "Local police"
+        }
+    }
+
+@api_router.get("/emergency/sos/{driver_email}")
+async def get_driver_sos_history(driver_email: str):
+    """Get driver's SOS history"""
+    sos_list = await db.emergency_sos.find(
+        {"driver_email": driver_email},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    return sos_list
+
+@api_router.post("/emergency/contacts")
+async def add_emergency_contact(
+    driver_email: str,
+    name: str,
+    phone: str,
+    relationship: str,
+    is_primary: bool = False
+):
+    """Add an emergency contact"""
+    contact = EmergencyContact(
+        driver_email=driver_email,
+        name=name,
+        phone=phone,
+        relationship=relationship,
+        is_primary=is_primary
+    )
+    
+    # If setting as primary, unset other primaries
+    if is_primary:
+        await db.emergency_contacts.update_many(
+            {"driver_email": driver_email},
+            {"$set": {"is_primary": False}}
+        )
+    
+    contact_doc = contact.model_dump()
+    contact_doc['created_at'] = contact_doc['created_at'].isoformat()
+    
+    await db.emergency_contacts.insert_one(contact_doc)
+    
+    return {"message": "Emergency contact added", "contact_id": contact.id}
+
+@api_router.get("/emergency/contacts/{driver_email}")
+async def get_emergency_contacts(driver_email: str):
+    """Get driver's emergency contacts"""
+    contacts = await db.emergency_contacts.find(
+        {"driver_email": driver_email},
+        {"_id": 0}
+    ).to_list(20)
+    return contacts
+
+@api_router.delete("/emergency/contacts/{contact_id}")
+async def delete_emergency_contact(contact_id: str):
+    """Delete an emergency contact"""
+    result = await db.emergency_contacts.delete_one({"id": contact_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Contact not found")
+    return {"message": "Contact deleted"}
+
+# ============== DOCUMENT SCANNER ==============
+
+class ScannedDocument(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    doc_type: str  # "bol", "receipt", "lumper", "scale_ticket", "delivery_receipt", "inspection", "other"
+    title: str
+    file_url: Optional[str] = None
+    file_data: Optional[str] = None  # Base64 encoded for small files
+    load_id: Optional[str] = None
+    broker_name: Optional[str] = None
+    amount: Optional[float] = None
+    notes: Optional[str] = None
+    tags: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.post("/documents/scan")
+async def save_scanned_document(
+    driver_email: str,
+    doc_type: str,
+    title: str,
+    file_data: Optional[str] = None,
+    load_id: Optional[str] = None,
+    broker_name: Optional[str] = None,
+    amount: Optional[float] = None,
+    notes: Optional[str] = None
+):
+    """Save a scanned document"""
+    doc = ScannedDocument(
+        driver_email=driver_email,
+        doc_type=doc_type,
+        title=title,
+        file_data=file_data,
+        load_id=load_id,
+        broker_name=broker_name,
+        amount=amount,
+        notes=notes
+    )
+    
+    doc_dict = doc.model_dump()
+    doc_dict['created_at'] = doc_dict['created_at'].isoformat()
+    
+    await db.scanned_documents.insert_one(doc_dict)
+    
+    # Award points for organizing documents
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": 10}}
+    )
+    
+    return {"message": "Document saved successfully", "document_id": doc.id, "points_earned": 10}
+
+@api_router.get("/documents/{driver_email}")
+async def get_driver_documents(driver_email: str, doc_type: Optional[str] = None):
+    """Get driver's scanned documents"""
+    query = {"driver_email": driver_email}
+    if doc_type:
+        query['doc_type'] = doc_type
+    
+    docs = await db.scanned_documents.find(
+        query,
+        {"_id": 0, "file_data": 0}  # Exclude file_data for list view
+    ).sort("created_at", -1).to_list(100)
+    return docs
+
+@api_router.get("/documents/detail/{document_id}")
+async def get_document_detail(document_id: str):
+    """Get a single document with full data"""
+    doc = await db.scanned_documents.find_one(
+        {"id": document_id},
+        {"_id": 0}
+    )
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return doc
+
+@api_router.delete("/documents/{document_id}")
+async def delete_document(document_id: str):
+    """Delete a scanned document"""
+    result = await db.scanned_documents.delete_one({"id": document_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"message": "Document deleted"}
+
+# ============== FUEL PRICES & ALERTS ==============
+
+class FuelPrice(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    station_name: str
+    chain: str  # "pilot", "loves", "ta_petro", "speedway", "independent"
+    city: str
+    state: str
+    latitude: float
+    longitude: float
+    diesel_price: float
+    unleaded_price: Optional[float] = None
+    def_price: Optional[float] = None  # Diesel Exhaust Fluid
+    last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    reported_by: Optional[str] = None
+
+class FuelAlert(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    alert_type: str  # "price_drop", "low_price", "route_alert"
+    target_price: Optional[float] = None  # Alert when price drops below this
+    target_city: Optional[str] = None
+    target_state: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.get("/fuel/prices")
+async def get_fuel_prices(city: Optional[str] = None, state: Optional[str] = None, chain: Optional[str] = None):
+    """Get fuel prices, optionally filtered by location or chain"""
+    query = {}
+    if city:
+        query['city'] = {"$regex": city, "$options": "i"}
+    if state:
+        query['state'] = state.upper()
+    if chain:
+        query['chain'] = chain
+    
+    prices = await db.fuel_prices.find(query, {"_id": 0}).sort("diesel_price", 1).to_list(100)
+    return prices
+
+@api_router.get("/fuel/prices/cheapest")
+async def get_cheapest_fuel(state: Optional[str] = None, limit: int = 10):
+    """Get the cheapest diesel prices"""
+    query = {}
+    if state:
+        query['state'] = state.upper()
+    
+    prices = await db.fuel_prices.find(query, {"_id": 0}).sort("diesel_price", 1).to_list(limit)
+    return prices
+
+@api_router.post("/fuel/prices/report")
+async def report_fuel_price(
+    station_name: str,
+    chain: str,
+    city: str,
+    state: str,
+    diesel_price: float,
+    driver_email: str,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    unleaded_price: Optional[float] = None,
+    def_price: Optional[float] = None
+):
+    """Report/update a fuel price"""
+    # Check if station exists
+    existing = await db.fuel_prices.find_one({
+        "station_name": station_name,
+        "city": {"$regex": city, "$options": "i"}
+    })
+    
+    price_data = {
+        "station_name": station_name,
+        "chain": chain,
+        "city": city,
+        "state": state.upper(),
+        "latitude": latitude or 0,
+        "longitude": longitude or 0,
+        "diesel_price": diesel_price,
+        "unleaded_price": unleaded_price,
+        "def_price": def_price,
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "reported_by": driver_email
+    }
+    
+    if existing:
+        await db.fuel_prices.update_one(
+            {"id": existing['id']},
+            {"$set": price_data}
+        )
+        message = "Fuel price updated"
+    else:
+        price_data['id'] = str(uuid.uuid4())
+        await db.fuel_prices.insert_one(price_data)
+        message = "Fuel price added"
+    
+    # Award points for reporting
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": 15}}
+    )
+    
+    logger.info(f"Fuel price reported: {station_name} in {city}, {state} - ${diesel_price}")
+    
+    return {"message": message, "points_earned": 15}
+
+@api_router.post("/fuel/alerts")
+async def create_fuel_alert(
+    driver_email: str,
+    alert_type: str,
+    target_price: Optional[float] = None,
+    target_city: Optional[str] = None,
+    target_state: Optional[str] = None
+):
+    """Create a fuel price alert"""
+    alert = FuelAlert(
+        driver_email=driver_email,
+        alert_type=alert_type,
+        target_price=target_price,
+        target_city=target_city,
+        target_state=target_state
+    )
+    
+    alert_doc = alert.model_dump()
+    alert_doc['created_at'] = alert_doc['created_at'].isoformat()
+    
+    await db.fuel_alerts.insert_one(alert_doc)
+    
+    return {"message": "Fuel alert created", "alert_id": alert.id}
+
+@api_router.get("/fuel/alerts/{driver_email}")
+async def get_fuel_alerts(driver_email: str):
+    """Get driver's fuel alerts"""
+    alerts = await db.fuel_alerts.find(
+        {"driver_email": driver_email, "is_active": True},
+        {"_id": 0}
+    ).to_list(20)
+    return alerts
+
+@api_router.delete("/fuel/alerts/{alert_id}")
+async def delete_fuel_alert(alert_id: str):
+    """Delete a fuel alert"""
+    result = await db.fuel_alerts.delete_one({"id": alert_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return {"message": "Alert deleted"}
+
+@api_router.get("/fuel/average")
+async def get_fuel_average():
+    """Get average fuel prices by state"""
+    pipeline = [
+        {"$group": {
+            "_id": "$state",
+            "avg_diesel": {"$avg": "$diesel_price"},
+            "min_diesel": {"$min": "$diesel_price"},
+            "max_diesel": {"$max": "$diesel_price"},
+            "station_count": {"$sum": 1}
+        }},
+        {"$sort": {"avg_diesel": 1}}
+    ]
+    
+    averages = await db.fuel_prices.aggregate(pipeline).to_list(60)
+    
+    for avg in averages:
+        avg['state'] = avg.pop('_id')
+        avg['avg_diesel'] = round(avg['avg_diesel'], 3) if avg['avg_diesel'] else 0
+        avg['min_diesel'] = round(avg['min_diesel'], 3) if avg['min_diesel'] else 0
+        avg['max_diesel'] = round(avg['max_diesel'], 3) if avg['max_diesel'] else 0
+    
+    return averages
+
 # ============== ADMIN ROUTES ==============
 
 @api_router.get("/admin/stats", response_model=DashboardStats)
