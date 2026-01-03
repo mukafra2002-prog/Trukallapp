@@ -67,6 +67,23 @@ export default function DriverDashboard() {
     notes: ""
   });
   const [leaderboard, setLeaderboard] = useState([]);
+  
+  // Emergency SOS states
+  const [emergencyContacts, setEmergencyContacts] = useState([]);
+  const [showSOSModal, setShowSOSModal] = useState(false);
+  const [showAddContactModal, setShowAddContactModal] = useState(false);
+  const [newContact, setNewContact] = useState({ name: "", phone: "", relationship: "family" });
+  
+  // Documents states
+  const [documents, setDocuments] = useState([]);
+  const [showDocModal, setShowDocModal] = useState(false);
+  const [newDoc, setNewDoc] = useState({ doc_type: "bol", title: "", notes: "" });
+  
+  // Fuel prices states
+  const [fuelPrices, setFuelPrices] = useState([]);
+  const [fuelAverages, setFuelAverages] = useState([]);
+  const [showFuelReportModal, setShowFuelReportModal] = useState(false);
+  const [newFuelReport, setNewFuelReport] = useState({ station_name: "", chain: "pilot", city: "", state: "", diesel_price: "" });
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
