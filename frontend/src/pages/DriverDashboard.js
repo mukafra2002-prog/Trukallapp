@@ -603,6 +603,140 @@ export default function DriverDashboard() {
           </Button>
         </div>
 
+        {/* LIVE Updates Tab */}
+        {activeTab === "live" && (
+          <div className="space-y-6">
+            {/* Live Header */}
+            <Card className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/30">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <CardTitle className="text-green-700">Real-Time Driver Reports</CardTitle>
+                  </div>
+                  <Badge className="bg-green-500 text-white">
+                    {liveSpots.filter(s => s.has_live_report).length} Live Updates
+                  </Badge>
+                </div>
+                <CardDescription>Live parking availability reported by fellow drivers. Help the community by reporting what you see!</CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Leaderboard */}
+            {leaderboard.length > 0 && (
+              <Card className="bg-amber-50 border-amber-200">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Award className="w-5 h-5 text-amber-500" />
+                    Top Contributors
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-4 overflow-x-auto pb-2">
+                    {leaderboard.slice(0, 5).map((leader, i) => (
+                      <div key={leader.email} className="flex items-center gap-2 min-w-fit">
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i === 0 ? 'bg-amber-500 text-white' : i === 1 ? 'bg-slate-400 text-white' : i === 2 ? 'bg-amber-700 text-white' : 'bg-slate-200'}`}>
+                          {i + 1}
+                        </span>
+                        <span className="text-sm font-medium">{leader.driver_name}</span>
+                        <Badge variant="outline" className="text-xs">{leader.total_reports} reports</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Live Spots Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {liveSpots.length === 0 ? (
+                <Card className="col-span-full">
+                  <CardContent className="py-8 text-center">
+                    <Radio className="w-12 h-12 mx-auto mb-4 text-slate-400" />
+                    <p className="text-slate-600">No parking spots found</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                liveSpots.map((spot) => (
+                  <Card 
+                    key={spot.id} 
+                    className={`overflow-hidden ${spot.has_live_report ? 'border-green-300 bg-green-50/30' : ''}`}
+                    data-testid={`live-spot-${spot.id}`}
+                  >
+                    {spot.has_live_report && (
+                      <div className={`h-1 ${spot.live_report.freshness === 'fresh' ? 'bg-green-500' : spot.live_report.freshness === 'recent' ? 'bg-amber-500' : 'bg-slate-400'}`}></div>
+                    )}
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-lg">{spot.name}</CardTitle>
+                          <CardDescription>{spot.city}, {spot.state}</CardDescription>
+                        </div>
+                        <div className="flex flex-col gap-1 items-end">
+                          {spot.has_live_report ? (
+                            <Badge className={`${spot.live_report.freshness === 'fresh' ? 'bg-green-500' : spot.live_report.freshness === 'recent' ? 'bg-amber-500' : 'bg-slate-500'} text-white`}>
+                              <Radio className="w-3 h-3 mr-1" />
+                              {spot.live_report.minutes_ago}m ago
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-slate-500">No recent report</Badge>
+                          )}
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {spot.has_live_report ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-slate-600">Reported Spaces</p>
+                              <p className="text-3xl font-bold text-green-600">{spot.live_report.reported_spaces}</p>
+                            </div>
+                            <Badge className={`
+                              ${spot.live_report.fill_rate === 'empty' ? 'bg-green-500' : 
+                                spot.live_report.fill_rate === 'filling' ? 'bg-amber-500' : 
+                                spot.live_report.fill_rate === 'almost_full' ? 'bg-orange-500' : 'bg-red-500'} text-white`}>
+                              {spot.live_report.fill_rate.replace('_', ' ')}
+                            </Badge>
+                          </div>
+                          
+                          {spot.live_report.conditions.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {spot.live_report.conditions.map((cond, i) => (
+                                <Badge key={i} variant="outline" className="text-xs">
+                                  {cond.replace('_', ' ')}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <p className="text-xs text-slate-500">
+                            Reported by {spot.live_report.reported_by}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-slate-500 mb-2">Official capacity: {spot.total_spaces} spaces</p>
+                          <p className="text-xs text-slate-400">Be the first to report!</p>
+                        </div>
+                      )}
+                      
+                      <Button 
+                        onClick={() => openReportModal(spot)} 
+                        className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
+                        data-testid={`report-btn-${spot.id}`}
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Report What You See
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
         {activeTab === "map" && (
           <div>
             {/* Quick Stats */}
