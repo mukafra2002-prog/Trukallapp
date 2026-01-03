@@ -1065,7 +1065,9 @@ class TrukAllAPITester:
         try:
             # Existing features
             self.test_auth_endpoints()
+            self.test_password_reset_endpoints()  # NEW
             self.test_parking_spots_endpoints()
+            self.test_parking_reports_endpoints()  # NEW
             self.test_booking_endpoints()
             self.test_payment_endpoints()
             self.test_shower_credits_endpoints()
@@ -1078,6 +1080,7 @@ class TrukAllAPITester:
             self.test_trip_calculator_endpoints()
             self.test_convoy_endpoints()
             self.test_compliance_detention_endpoints()
+            self.test_leaderboard_endpoints()  # NEW
             
             # Admin and error handling
             self.test_admin_endpoints()
