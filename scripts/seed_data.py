@@ -466,6 +466,108 @@ async def seed_database():
     await db.retail_parking.insert_many(retail_parking)
     print(f"✓ Created {len(retail_parking)} retail parking locations")
     
+    # Create sample fuel prices
+    await db.fuel_prices.delete_many({})
+    fuel_prices = [
+        {
+            "id": "fuel-001",
+            "station_name": "Pilot Flying J - Dallas",
+            "chain": "pilot",
+            "city": "Dallas",
+            "state": "TX",
+            "latitude": 32.7767,
+            "longitude": -96.7970,
+            "diesel_price": 3.459,
+            "unleaded_price": 2.899,
+            "def_price": 2.799,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "reported_by": "driver@test.com"
+        },
+        {
+            "id": "fuel-002",
+            "station_name": "Love's Travel Stop - Atlanta",
+            "chain": "loves",
+            "city": "Atlanta",
+            "state": "GA",
+            "latitude": 33.7490,
+            "longitude": -84.3880,
+            "diesel_price": 3.529,
+            "unleaded_price": 2.959,
+            "def_price": 2.849,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "reported_by": "driver@test.com"
+        },
+        {
+            "id": "fuel-003",
+            "station_name": "TA Petro - Phoenix",
+            "chain": "ta_petro",
+            "city": "Phoenix",
+            "state": "AZ",
+            "latitude": 33.4484,
+            "longitude": -112.0740,
+            "diesel_price": 3.389,
+            "unleaded_price": 2.849,
+            "def_price": 2.699,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "reported_by": "driver@test.com"
+        },
+        {
+            "id": "fuel-004",
+            "station_name": "Pilot Flying J - Chicago",
+            "chain": "pilot",
+            "city": "Chicago",
+            "state": "IL",
+            "latitude": 41.8781,
+            "longitude": -87.6298,
+            "diesel_price": 3.659,
+            "unleaded_price": 3.099,
+            "def_price": 2.899,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "reported_by": "driver@test.com"
+        },
+        {
+            "id": "fuel-005",
+            "station_name": "Love's - Houston",
+            "chain": "loves",
+            "city": "Houston",
+            "state": "TX",
+            "latitude": 29.7604,
+            "longitude": -95.3698,
+            "diesel_price": 3.419,
+            "unleaded_price": 2.879,
+            "def_price": 2.749,
+            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "reported_by": "driver@test.com"
+        }
+    ]
+    await db.fuel_prices.insert_many(fuel_prices)
+    print(f"✓ Created {len(fuel_prices)} fuel price records")
+    
+    # Create sample emergency contacts
+    await db.emergency_contacts.delete_many({})
+    emergency_contacts = [
+        {
+            "id": "ec-001",
+            "driver_email": "driver@test.com",
+            "name": "Jane Driver",
+            "phone": "+1-555-123-4567",
+            "relationship": "spouse",
+            "is_primary": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        },
+        {
+            "id": "ec-002",
+            "driver_email": "driver@test.com",
+            "name": "ABC Trucking Dispatch",
+            "phone": "+1-800-555-0199",
+            "relationship": "employer",
+            "is_primary": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+    ]
+    await db.emergency_contacts.insert_many(emergency_contacts)
+    print(f"✓ Created {len(emergency_contacts)} emergency contacts")
+    
     print("\n🎉 Database seeded successfully!")
     print("\n📝 Test accounts created:")
     print("   Driver: driver@test.com / password123")
