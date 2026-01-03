@@ -1558,6 +1558,143 @@ export default function DriverDashboard() {
           <span className="text-xs">Bookings</span>
         </button>
       </div>
+
+      {/* Report Parking Modal */}
+      {showReportModal && selectedSpotForReport && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowReportModal(false)}>
+          <Card className="max-w-lg w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <CardHeader className="bg-green-50 border-b border-green-200">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <CardTitle className="text-green-700">Report Live Availability</CardTitle>
+              </div>
+              <CardDescription>{selectedSpotForReport.name} - {selectedSpotForReport.city}, {selectedSpotForReport.state}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6">
+              {/* Spaces Available */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  How many spaces do you see available?
+                </label>
+                <div className="flex items-center gap-4">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setReportData(prev => ({ ...prev, reported_spaces: Math.max(0, prev.reported_spaces - 1) }))}
+                    className="h-12 w-12"
+                  >-</Button>
+                  <span className="text-4xl font-bold text-green-600 min-w-[80px] text-center">{reportData.reported_spaces}</span>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setReportData(prev => ({ ...prev, reported_spaces: prev.reported_spaces + 1 }))}
+                    className="h-12 w-12"
+                  >+</Button>
+                </div>
+              </div>
+
+              {/* Fill Rate */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Overall fill status
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { value: "empty", label: "Empty", color: "bg-green-500" },
+                    { value: "filling", label: "Filling", color: "bg-amber-500" },
+                    { value: "almost_full", label: "Almost Full", color: "bg-orange-500" },
+                    { value: "full", label: "Full", color: "bg-red-500" }
+                  ].map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setReportData(prev => ({ ...prev, fill_rate: opt.value }))}
+                      className={`p-3 rounded-lg border-2 text-center text-sm font-medium transition-all ${
+                        reportData.fill_rate === opt.value 
+                          ? `${opt.color} text-white border-transparent` 
+                          : 'border-slate-200 hover:border-slate-400'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Conditions */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  What conditions did you notice? (optional)
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: "well_lit", label: "Well Lit" },
+                    { value: "clean", label: "Clean" },
+                    { value: "security_present", label: "Security Present" },
+                    { value: "crowded", label: "Crowded" },
+                    { value: "dark", label: "Dark" },
+                    { value: "sketchy", label: "Sketchy" },
+                    { value: "truck_friendly", label: "Truck Friendly" },
+                    { value: "easy_access", label: "Easy Access" }
+                  ].map(cond => (
+                    <button
+                      key={cond.value}
+                      type="button"
+                      onClick={() => toggleCondition(cond.value)}
+                      className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
+                        reportData.conditions.includes(cond.value)
+                          ? 'bg-blue-500 text-white border-blue-500'
+                          : 'border-slate-300 hover:border-blue-500'
+                      }`}
+                    >
+                      {cond.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Additional notes (optional)
+                </label>
+                <Textarea
+                  value={reportData.notes}
+                  onChange={(e) => setReportData(prev => ({ ...prev, notes: e.target.value }))}
+                  placeholder="e.g., Construction near entrance, good fuel prices, busy but moving..."
+                  className="min-h-[80px]"
+                />
+              </div>
+
+              {/* Points Info */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-amber-500" />
+                  <span className="text-sm font-medium text-amber-700">Earn up to 50+ points for detailed reports!</span>
+                </div>
+              </div>
+
+              {/* Submit */}
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowReportModal(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={submitParkingReport}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Submit Report
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
