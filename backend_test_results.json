@@ -1,391 +1,410 @@
 {
   "summary": {
-    "total_tests": 54,
-    "passed_tests": 52,
-    "failed_tests": 2,
-    "success_rate": 96.29629629629629,
-    "timestamp": "2026-01-03T09:01:40.131474"
+    "total_tests": 57,
+    "passed_tests": 57,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "timestamp": "2026-01-09T08:45:34.842246"
   },
   "test_results": [
     {
       "test_name": "Login as driver",
-      "success": false,
-      "details": "Failed to login as driver@test.com",
-      "response_data": {
-        "detail": "Invalid credentials"
-      },
-      "timestamp": "2026-01-03T09:01:37.673669"
+      "success": true,
+      "details": "Successfully logged in as driver@test.com",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:45:31.502398"
     },
     {
       "test_name": "Login as partner",
       "success": true,
       "details": "Successfully logged in as partner@test.com",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:37.936977"
+      "timestamp": "2026-01-09T08:45:31.764421"
     },
     {
       "test_name": "Login as admin",
       "success": true,
       "details": "Successfully logged in as admin@test.com",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.200035"
+      "timestamp": "2026-01-09T08:45:32.025540"
     },
     {
       "test_name": "User Registration",
       "success": true,
-      "details": "Created new user: test_driver_090138@test.com",
+      "details": "Created new user: test_driver_084532@test.com",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.465518"
+      "timestamp": "2026-01-09T08:45:32.289598"
     },
     {
       "test_name": "Forgot Password",
       "success": true,
-      "details": "Reset code generated: 313313",
+      "details": "Reset code generated: 383617",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.506600"
+      "timestamp": "2026-01-09T08:45:32.323646"
     },
     {
       "test_name": "Reset Password",
       "success": true,
       "details": "Password reset successful",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.762788"
+      "timestamp": "2026-01-09T08:45:32.583696"
     },
     {
       "test_name": "Get All Parking Spots",
       "success": true,
-      "details": "Retrieved 8 parking spots",
+      "details": "Retrieved 4 parking spots",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.798081"
+      "timestamp": "2026-01-09T08:45:32.618302"
     },
     {
       "test_name": "Search Spots by City",
       "success": true,
       "details": "Found 1 spots in Dallas",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.832424"
+      "timestamp": "2026-01-09T08:45:32.649910"
     },
     {
       "test_name": "Get Specific Spot",
       "success": true,
       "details": "Retrieved spot details for spot-001",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.876567"
+      "timestamp": "2026-01-09T08:45:32.687584"
     },
     {
       "test_name": "Create Parking Spot",
       "success": true,
-      "details": "Created spot: Test Spot 090138 (ID: 4fff4dc9-8549-42a2-b2bc-30980865cdbe)",
+      "details": "Created spot: Test Spot 084532 (ID: 1d917db6-4bec-46b8-ba9d-daf1079a4655)",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.916684"
+      "timestamp": "2026-01-09T08:45:32.764193"
     },
     {
       "test_name": "Get Partner Spots",
       "success": true,
-      "details": "Partner has 10 spots",
+      "details": "Partner has 6 spots",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.954942"
+      "timestamp": "2026-01-09T08:45:32.803892"
     },
     {
       "test_name": "Submit Parking Report",
       "success": true,
       "details": "Report submitted successfully",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:38.998731"
+      "timestamp": "2026-01-09T08:45:32.843185"
     },
     {
       "test_name": "Get Spot Reports",
       "success": true,
       "details": "Retrieved 1 reports for spot",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.040684"
+      "timestamp": "2026-01-09T08:45:32.875507"
     },
     {
       "test_name": "Get Live Updates",
       "success": true,
-      "details": "Retrieved 10 spots with live data",
+      "details": "Retrieved 6 spots with live data",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.083588"
+      "timestamp": "2026-01-09T08:45:32.910836"
+    },
+    {
+      "test_name": "Create Booking",
+      "success": true,
+      "details": "Created booking: 2881fccc-fa35-44d2-be5d-382f52ab21f6 for spot spot-001",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:45:32.989401"
+    },
+    {
+      "test_name": "Get Driver Bookings",
+      "success": true,
+      "details": "Driver has 1 bookings",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:45:33.022603"
     },
     {
       "test_name": "Get Spot Bookings",
       "success": true,
-      "details": "Spot has 0 bookings",
+      "details": "Spot has 1 bookings",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.119655"
+      "timestamp": "2026-01-09T08:45:33.095288"
     },
     {
-      "test_name": "Payment Tests",
-      "success": false,
-      "details": "Skipped - no booking available for payment testing",
+      "test_name": "Create Checkout Session",
+      "success": true,
+      "details": "Created Stripe checkout session: cs_test_a1oS9TBBtazTgxwG6L3JJO8YGJ6llpobVyzdQuqkWB1RVyR5gNIoE2DmrJ",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.119682"
+      "timestamp": "2026-01-09T08:45:33.654492"
+    },
+    {
+      "test_name": "Get Payment Status",
+      "success": true,
+      "details": "Payment status: unpaid",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:45:33.914232"
     },
     {
       "test_name": "Get Shower Credits",
       "success": true,
       "details": "Retrieved 3 shower credit records",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.151990"
+      "timestamp": "2026-01-09T08:45:33.960098"
     },
     {
       "test_name": "Shower Credits - Expected Chains",
       "success": true,
       "details": "Found 3/3 expected chains: ['pilot_flying_j', 'loves', 'ta_petro']",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.152020"
+      "timestamp": "2026-01-09T08:45:33.960135"
     },
     {
       "test_name": "Shower Credits - Total Showers",
       "success": true,
       "details": "Expected 6 showers, got 6",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.189316"
+      "timestamp": "2026-01-09T08:45:34.035780"
     },
     {
       "test_name": "Shower Credits - Total Points",
       "success": true,
       "details": "Expected 5250 points, got 5250",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.189339"
+      "timestamp": "2026-01-09T08:45:34.035812"
     },
     {
       "test_name": "Shower Credits - Chains Count",
       "success": true,
       "details": "Expected 3 chains, got 3",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.189345"
+      "timestamp": "2026-01-09T08:45:34.035818"
     },
     {
       "test_name": "Get Broker Ratings - ABC",
       "success": true,
       "details": "Retrieved 1 ratings for ABC Logistics",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.231055"
+      "timestamp": "2026-01-09T08:45:34.072201"
     },
     {
       "test_name": "Broker Summary - ABC Rating",
       "success": true,
       "details": "Expected 5.0 rating, got 5.0 for ABC Logistics",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.266514"
+      "timestamp": "2026-01-09T08:45:34.106842"
     },
     {
       "test_name": "Broker Summary - ABC Reviews Count",
       "success": true,
       "details": "Found 1 reviews for ABC Logistics",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.266537"
+      "timestamp": "2026-01-09T08:45:34.106869"
     },
     {
       "test_name": "Broker Ratings - Quick Freight Fraud Alert",
       "success": true,
       "details": "Found 1 fraud reports for Quick Freight",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.343347"
+      "timestamp": "2026-01-09T08:45:34.138272"
     },
     {
       "test_name": "Get Retail Parking Locations",
       "success": true,
       "details": "Expected 5 locations, got 5",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.380138"
+      "timestamp": "2026-01-09T08:45:34.179713"
     },
     {
       "test_name": "Retail Parking - Expected Chains",
       "success": true,
       "details": "Found 3/3 expected chains: ['walmart', 'cracker_barrel', 'cabelas']",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.380169"
+      "timestamp": "2026-01-09T08:45:34.179757"
     },
     {
       "test_name": "Filter Retail Parking - Walmart",
       "success": true,
       "details": "Found 1 Walmart locations",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.416509"
+      "timestamp": "2026-01-09T08:45:34.213774"
     },
     {
       "test_name": "Walmart Filter Accuracy",
       "success": true,
       "details": "All 1 locations are Walmart",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.416536"
+      "timestamp": "2026-01-09T08:45:34.213808"
     },
     {
       "test_name": "Get Retail Chains",
       "success": true,
       "details": "Retrieved 8 available chains",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.449321"
+      "timestamp": "2026-01-09T08:45:34.249814"
     },
     {
       "test_name": "Retail Chains - Expected Chains Available",
       "success": true,
       "details": "Found 3/3 expected chains in available list: ['walmart', 'cracker_barrel', 'cabelas']",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.449351"
+      "timestamp": "2026-01-09T08:45:34.249857"
     },
     {
       "test_name": "Get All Loads",
       "success": true,
-      "details": "Retrieved 9 loads",
+      "details": "Retrieved 12 loads",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.483874"
+      "timestamp": "2026-01-09T08:45:34.289321"
     },
     {
       "test_name": "Filter Loads by Equipment Type",
       "success": true,
-      "details": "Found 3 dry van loads",
+      "details": "Found 4 dry van loads",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.516853"
+      "timestamp": "2026-01-09T08:45:34.322647"
     },
     {
       "test_name": "Get Subscription Plans",
       "success": true,
       "details": "Expected 3 plans, got 3",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.550936"
+      "timestamp": "2026-01-09T08:45:34.356689"
     },
     {
       "test_name": "Subscription Plans - Free Plan Available",
       "success": true,
       "details": "Found Free plan: Free",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.550965"
+      "timestamp": "2026-01-09T08:45:34.356724"
     },
     {
       "test_name": "Subscription Plans - Pro Driver Plan",
       "success": true,
       "details": "Found Pro Driver plan at $9.99: Pro Driver",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.550973"
+      "timestamp": "2026-01-09T08:45:34.356732"
     },
     {
       "test_name": "Subscription Plans - Premium Fleet Plan",
       "success": true,
       "details": "Found Premium Fleet plan at $24.99: Premium Fleet",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.550980"
+      "timestamp": "2026-01-09T08:45:34.356738"
     },
     {
       "test_name": "Get User Subscription",
       "success": true,
       "details": "Retrieved subscription info for driver@test.com",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.584576"
+      "timestamp": "2026-01-09T08:45:34.395479"
     },
     {
       "test_name": "Create Free Plan Checkout",
       "success": true,
       "details": "Successfully activated free plan",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.620334"
+      "timestamp": "2026-01-09T08:45:34.434120"
     },
     {
       "test_name": "Trip Profit Calculation",
       "success": true,
       "details": "Calculation completed with all required fields",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.655963"
+      "timestamp": "2026-01-09T08:45:34.468753"
     },
     {
       "test_name": "Trip Profit Calculation - Math Accuracy",
       "success": true,
       "details": "Net profit calculation correct: $1341.30",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.655993"
+      "timestamp": "2026-01-09T08:45:34.468786"
     },
     {
       "test_name": "Get Convoy Posts",
       "success": true,
       "details": "Retrieved 0 convoy posts",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.691163"
+      "timestamp": "2026-01-09T08:45:34.505437"
     },
     {
       "test_name": "Get Chat Messages - General",
       "success": true,
       "details": "Retrieved 0 chat messages for General location",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.725947"
+      "timestamp": "2026-01-09T08:45:34.538085"
     },
     {
       "test_name": "Get Compliance Info",
       "success": true,
       "details": "Retrieved compliance info",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.759299"
+      "timestamp": "2026-01-09T08:45:34.573142"
     },
     {
       "test_name": "Get Detention Claims",
       "success": true,
       "details": "Retrieved 0 detention claims",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.836475"
+      "timestamp": "2026-01-09T08:45:34.609986"
     },
     {
       "test_name": "Get Detention Totals",
       "success": true,
       "details": "Retrieved detention totals with all fields",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.872575"
+      "timestamp": "2026-01-09T08:45:34.644491"
     },
     {
       "test_name": "Detention Totals - Data Structure",
       "success": true,
       "details": "Pending: $0, Paid: $0, Claims: 0",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.872602"
+      "timestamp": "2026-01-09T08:45:34.644522"
     },
     {
       "test_name": "Get Reports Leaderboard",
       "success": true,
       "details": "Retrieved 1 leaders",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.909240"
+      "timestamp": "2026-01-09T08:45:34.674620"
     },
     {
       "test_name": "Leaderboard Structure",
       "success": true,
       "details": "Leaderboard has all required fields",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.909267"
+      "timestamp": "2026-01-09T08:45:34.674648"
     },
     {
       "test_name": "Get Dashboard Stats",
       "success": true,
-      "details": "Stats - Spots: 10, Bookings: 4, Revenue: $0.00",
+      "details": "Stats - Spots: 6, Bookings: 1, Revenue: $0.00",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.950895"
+      "timestamp": "2026-01-09T08:45:34.706018"
     },
     {
       "test_name": "Get All Users",
       "success": true,
-      "details": "Total users in system: 8",
+      "details": "Total users in system: 4",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:39.983297"
+      "timestamp": "2026-01-09T08:45:34.740391"
     },
     {
       "test_name": "Invalid Login Handling",
       "success": true,
       "details": "Correctly rejected invalid credentials",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:40.061887"
+      "timestamp": "2026-01-09T08:45:34.772143"
     },
     {
       "test_name": "Non-existent Spot Handling",
       "success": true,
       "details": "Correctly returned 404 for non-existent spot",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:40.097112"
+      "timestamp": "2026-01-09T08:45:34.807639"
     },
     {
       "test_name": "Unauthorized Spot Creation",
       "success": true,
       "details": "Correctly rejected unauthorized spot creation",
       "response_data": null,
-      "timestamp": "2026-01-03T09:01:40.131155"
+      "timestamp": "2026-01-09T08:45:34.841914"
     }
   ]
 }
