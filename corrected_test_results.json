@@ -1,0 +1,78 @@
+{
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 4,
+    "failed_tests": 2,
+    "success_rate": 66.66666666666666,
+    "timestamp": "2026-01-09T08:47:24.173121"
+  },
+  "test_results": [
+    {
+      "test_name": "Create Broker Rating (Corrected)",
+      "success": true,
+      "details": "Successfully created broker rating",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:47:23.922641"
+    },
+    {
+      "test_name": "Create Emergency SOS (Corrected)",
+      "success": false,
+      "details": "Failed to create emergency SOS",
+      "response_data": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          }
+        ]
+      },
+      "timestamp": "2026-01-09T08:47:23.965893"
+    },
+    {
+      "test_name": "Create Emergency Contact (Corrected)",
+      "success": true,
+      "details": "Successfully created emergency contact",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:47:24.008665"
+    },
+    {
+      "test_name": "Scan Document (Corrected)",
+      "success": true,
+      "details": "Successfully scanned document",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:47:24.054615"
+    },
+    {
+      "test_name": "Report Fuel Prices (Corrected)",
+      "success": true,
+      "details": "Successfully reported fuel prices",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:47:24.129715"
+    },
+    {
+      "test_name": "Subscription Activation",
+      "success": false,
+      "details": "Failed to activate subscription",
+      "response_data": {
+        "message": "Subscription activated",
+        "subscription": {
+          "id": "1236c893-45db-4e0e-9b66-7325059e1664",
+          "user_email": "driver@test.com",
+          "plan_id": "free",
+          "plan_name": "Free",
+          "status": "active",
+          "stripe_subscription_id": null,
+          "current_period_start": "2026-01-09T08:47:24.168121Z",
+          "current_period_end": "2026-02-08T08:47:24.168125Z",
+          "created_at": "2026-01-09T08:47:24.168129Z"
+        }
+      },
+      "timestamp": "2026-01-09T08:47:24.172890"
+    }
+  ]
+}
