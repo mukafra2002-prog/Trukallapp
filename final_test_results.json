@@ -1,0 +1,121 @@
+{
+  "summary": {
+    "total_tests": 15,
+    "passed_tests": 13,
+    "failed_tests": 2,
+    "success_rate": 86.66666666666667,
+    "timestamp": "2026-01-09T08:48:15.139344"
+  },
+  "test_results": [
+    {
+      "test_name": "POST /api/brokers/rate",
+      "success": true,
+      "details": "Successfully created broker rating",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.535008"
+    },
+    {
+      "test_name": "POST /api/emergency/sos",
+      "success": false,
+      "details": "Failed to create emergency SOS",
+      "response_data": {
+        "status_code": 520,
+        "text": "Internal Server Error"
+      },
+      "timestamp": "2026-01-09T08:48:14.576022"
+    },
+    {
+      "test_name": "POST /api/emergency/contacts",
+      "success": true,
+      "details": "Successfully created emergency contact",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.615074"
+    },
+    {
+      "test_name": "GET /api/emergency/contacts/{email}",
+      "success": true,
+      "details": "Retrieved 4 emergency contacts",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.654925"
+    },
+    {
+      "test_name": "POST /api/documents/scan",
+      "success": true,
+      "details": "Successfully scanned document",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.695991"
+    },
+    {
+      "test_name": "GET /api/documents/{email}",
+      "success": true,
+      "details": "Retrieved 2 documents",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.732749"
+    },
+    {
+      "test_name": "POST /api/fuel/prices/report",
+      "success": true,
+      "details": "Successfully reported fuel prices",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.771654"
+    },
+    {
+      "test_name": "GET /api/fuel/prices",
+      "success": true,
+      "details": "Retrieved 7 fuel prices",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.809902"
+    },
+    {
+      "test_name": "GET /api/fuel/prices/cheapest",
+      "success": true,
+      "details": "Retrieved 7 cheapest fuel prices",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.842511"
+    },
+    {
+      "test_name": "GET /api/fuel/average",
+      "success": true,
+      "details": "Retrieved 4 state averages",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.919700"
+    },
+    {
+      "test_name": "POST /api/subscriptions/activate",
+      "success": false,
+      "details": "Failed to activate subscription",
+      "response_data": {
+        "detail": "Plan not found"
+      },
+      "timestamp": "2026-01-09T08:48:14.955560"
+    },
+    {
+      "test_name": "POST /api/convoy/posts",
+      "success": true,
+      "details": "Successfully created convoy post",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:14.991892"
+    },
+    {
+      "test_name": "GET /api/convoy/posts",
+      "success": true,
+      "details": "Retrieved 2 convoy posts",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:15.072741"
+    },
+    {
+      "test_name": "POST /api/compliance",
+      "success": true,
+      "details": "Successfully created compliance record",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:15.105279"
+    },
+    {
+      "test_name": "POST /api/detention",
+      "success": true,
+      "details": "Successfully created detention claim",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:48:15.139022"
+    }
+  ]
+}
