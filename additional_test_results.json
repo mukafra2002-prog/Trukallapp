@@ -1,0 +1,225 @@
+{
+  "summary": {
+    "total_tests": 14,
+    "passed_tests": 8,
+    "failed_tests": 6,
+    "success_rate": 57.14285714285714,
+    "timestamp": "2026-01-09T08:46:24.438192"
+  },
+  "test_results": [
+    {
+      "test_name": "Create Broker Rating",
+      "success": false,
+      "details": "Failed to create broker rating",
+      "response_data": {
+        "detail": "Not Found"
+      },
+      "timestamp": "2026-01-09T08:46:23.932290"
+    },
+    {
+      "test_name": "Create DOT Compliance Record",
+      "success": true,
+      "details": "Successfully created compliance record",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:46:23.978557"
+    },
+    {
+      "test_name": "Create Detention Claim",
+      "success": true,
+      "details": "Successfully created detention claim",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:46:24.024477"
+    },
+    {
+      "test_name": "Create Convoy Post",
+      "success": true,
+      "details": "Successfully created convoy post",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:46:24.068222"
+    },
+    {
+      "test_name": "Activate Subscription",
+      "success": false,
+      "details": "Failed to activate subscription",
+      "response_data": {
+        "detail": "Plan not found"
+      },
+      "timestamp": "2026-01-09T08:46:24.104731"
+    },
+    {
+      "test_name": "Get Emergency Contacts",
+      "success": true,
+      "details": "Retrieved emergency contacts",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:46:24.145165"
+    },
+    {
+      "test_name": "Create Emergency Contact",
+      "success": false,
+      "details": "Failed to create emergency contact",
+      "response_data": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "name"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "phone"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "relationship"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          }
+        ]
+      },
+      "timestamp": "2026-01-09T08:46:24.179904"
+    },
+    {
+      "test_name": "Create Emergency SOS",
+      "success": false,
+      "details": "Failed to create emergency SOS",
+      "response_data": {
+        "status_code": 520,
+        "text": "Internal Server Error"
+      },
+      "timestamp": "2026-01-09T08:46:24.222320"
+    },
+    {
+      "test_name": "Get Driver Documents",
+      "success": true,
+      "details": "Retrieved driver documents",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:46:24.261509"
+    },
+    {
+      "test_name": "Scan Document",
+      "success": false,
+      "details": "Failed to scan document",
+      "response_data": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "doc_type"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "title"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          }
+        ]
+      },
+      "timestamp": "2026-01-09T08:46:24.293934"
+    },
+    {
+      "test_name": "Get Fuel Prices",
+      "success": true,
+      "details": "Retrieved fuel prices",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:46:24.330153"
+    },
+    {
+      "test_name": "Get Cheapest Fuel Prices",
+      "success": true,
+      "details": "Retrieved cheapest fuel prices",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:46:24.367514"
+    },
+    {
+      "test_name": "Get Average Fuel Price",
+      "success": true,
+      "details": "Retrieved average fuel price",
+      "response_data": null,
+      "timestamp": "2026-01-09T08:46:24.406594"
+    },
+    {
+      "test_name": "Report Fuel Prices",
+      "success": false,
+      "details": "Failed to report fuel prices",
+      "response_data": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "station_name"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "chain"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "city"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "state"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "query",
+              "diesel_price"
+            ],
+            "msg": "Field required",
+            "input": null,
+            "url": "https://errors.pydantic.dev/2.12/v/missing"
+          }
+        ]
+      },
+      "timestamp": "2026-01-09T08:46:24.437941"
+    }
+  ]
+}
