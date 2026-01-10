@@ -3034,6 +3034,394 @@ async def get_all_users(admin_email: str):
     
     return users
 
+# ============== ROUTE PLANNER ==============
+
+@api_router.post("/routes/plan")
+async def plan_truck_route(route_data: RouteRequest, driver_email: str):
+    """Plan a truck-safe route with restrictions"""
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate approximate distance (simplified)
+    lat_diff = abs(route_data.destination_lat - route_data.origin_lat)
+    lng_diff = abs(route_data.destination_lng - route_data.origin_lng)
+    distance = ((lat_diff * 69) ** 2 + (lng_diff * 69) ** 2) ** 0.5
+    
+    # Estimate duration (avg 55 mph for trucks)
+    duration = (distance / 55) * 60  # minutes
+    
+    # Generate mock fuel stops every 400 miles
+    fuel_stops = []
+    for i in range(1, int(distance // 400) + 1):
+        fuel_stops.append({
+            "mile": i * 400,
+            "name": f"Truck Stop #{i}",
+            "fuel_price": round(3.50 + (i * 0.1), 2)
+        })
+    
+    # Generate rest stops (every 500 miles for HOS compliance)
+    rest_stops = []
+    for i in range(1, int(distance // 500) + 1):
+        rest_stops.append({
+            "mile": i * 500,
+            "name": f"Rest Area #{i}",
+            "amenities": ["restrooms", "parking", "food"]
+        })
+    
+    # Check for restrictions
+    restrictions = []
+    if route_data.truck_height > 13.5:
+        restrictions.append("Low bridge warning on I-95 (13.5ft clearance)")
+    if route_data.truck_weight > 80000:
+        restrictions.append("Weight restriction on SR-50 (80,000 lbs max)")
+    if route_data.hazmat:
+        restrictions.append("Hazmat restriction through downtown areas")
+    
+    route = TruckRoute(
+        driver_email=driver_email,
+        **route_data.model_dump(),
+        total_distance=round(distance, 1),
+        total_duration=round(duration, 0),
+        fuel_stops=fuel_stops,
+        rest_stops=rest_stops,
+        restrictions=restrictions
+    )
+    
+    route_doc = route.model_dump()
+    route_doc['created_at'] = route_doc['created_at'].isoformat()
+    await db.routes.insert_one(route_doc)
+    
+    return route
+
+@api_router.get("/routes/history/{driver_email}")
+async def get_route_history(driver_email: str, limit: int = 10):
+    """Get driver's route planning history"""
+    routes = await db.routes.find(
+        {"driver_email": driver_email},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    return routes
+
+# ============== ANALYTICS DASHBOARD ==============
+
+@api_router.get("/analytics/{driver_email}")
+async def get_driver_analytics(driver_email: str, period: str = "month"):
+    """Get driver's earnings and performance analytics"""
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate date range
+    now = datetime.now(timezone.utc)
+    if period == "week":
+        start_date = now - timedelta(days=7)
+    elif period == "month":
+        start_date = now - timedelta(days=30)
+    elif period == "year":
+        start_date = now - timedelta(days=365)
+    else:
+        start_date = now - timedelta(days=30)
+    
+    # Get earnings entries
+    earnings = await db.earnings.find({
+        "driver_email": driver_email,
+        "date": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}).to_list(1000)
+    
+    # Get expenses
+    expenses = await db.expenses.find({
+        "user_email": driver_email,
+        "date": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}).to_list(1000)
+    
+    # Calculate totals
+    total_earnings = sum(e.get('amount', 0) for e in earnings)
+    total_expenses = sum(e.get('amount', 0) for e in expenses)
+    total_loads = len([e for e in earnings if e.get('source') == 'load'])
+    
+    # Calculate expenses by category
+    fuel_expenses = sum(e.get('amount', 0) for e in expenses if e.get('category') == 'fuel')
+    parking_expenses = sum(e.get('amount', 0) for e in expenses if e.get('category') == 'parking')
+    maintenance_expenses = sum(e.get('amount', 0) for e in expenses if e.get('category') == 'maintenance')
+    
+    # Get total miles from loads
+    total_miles = sum(e.get('miles', 0) for e in earnings)
+    if total_miles == 0:
+        total_miles = total_loads * 500  # Estimate 500 miles per load
+    
+    # Calculate earnings by day (last 7 days)
+    earnings_by_day = []
+    for i in range(7):
+        day = now - timedelta(days=i)
+        day_earnings = sum(
+            e.get('amount', 0) for e in earnings 
+            if e.get('date', '').startswith(day.strftime('%Y-%m-%d'))
+        )
+        earnings_by_day.append({
+            "date": day.strftime('%Y-%m-%d'),
+            "day": day.strftime('%a'),
+            "amount": day_earnings
+        })
+    
+    analytics = DriverAnalytics(
+        driver_email=driver_email,
+        period=period,
+        total_earnings=total_earnings,
+        total_miles=total_miles,
+        total_loads=total_loads,
+        total_expenses=total_expenses,
+        net_profit=total_earnings - total_expenses,
+        avg_rate_per_mile=round(total_earnings / total_miles, 2) if total_miles > 0 else 0,
+        fuel_expenses=fuel_expenses,
+        parking_expenses=parking_expenses,
+        maintenance_expenses=maintenance_expenses,
+        earnings_by_day=earnings_by_day[::-1]  # Reverse to show oldest first
+    )
+    
+    return analytics
+
+@api_router.post("/analytics/earnings")
+async def add_earnings_entry(entry: EarningsEntry, driver_email: str):
+    """Add an earnings entry"""
+    entry.driver_email = driver_email
+    entry_doc = entry.model_dump()
+    entry_doc['date'] = entry_doc['date'].isoformat()
+    await db.earnings.insert_one(entry_doc)
+    return {"message": "Earnings entry added", "id": entry.id}
+
+# ============== DIRECT MESSAGING ==============
+
+@api_router.get("/messages/conversations/{driver_email}")
+async def get_conversations(driver_email: str):
+    """Get all conversations for a driver"""
+    # Get all messages where user is sender or recipient
+    sent = await db.direct_messages.find(
+        {"sender_email": driver_email},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    received = await db.direct_messages.find(
+        {"recipient_email": driver_email},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    # Group by conversation partner
+    conversations = {}
+    for msg in sent + received:
+        partner = msg['recipient_email'] if msg['sender_email'] == driver_email else msg['sender_email']
+        if partner not in conversations:
+            conversations[partner] = {
+                "partner_email": partner,
+                "partner_name": msg.get('sender_name') if msg['sender_email'] != driver_email else "Unknown",
+                "last_message": msg['message'][:50],
+                "last_message_time": msg['created_at'],
+                "unread_count": 0
+            }
+        # Update with latest message
+        if msg['created_at'] > conversations[partner]['last_message_time']:
+            conversations[partner]['last_message'] = msg['message'][:50]
+            conversations[partner]['last_message_time'] = msg['created_at']
+        # Count unread
+        if msg['recipient_email'] == driver_email and not msg.get('is_read'):
+            conversations[partner]['unread_count'] += 1
+    
+    return list(conversations.values())
+
+@api_router.get("/messages/{driver_email}/{partner_email}")
+async def get_direct_messages(driver_email: str, partner_email: str, limit: int = 50):
+    """Get messages between two drivers"""
+    messages = await db.direct_messages.find({
+        "$or": [
+            {"sender_email": driver_email, "recipient_email": partner_email},
+            {"sender_email": partner_email, "recipient_email": driver_email}
+        ]
+    }, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    # Mark messages as read
+    await db.direct_messages.update_many(
+        {"sender_email": partner_email, "recipient_email": driver_email, "is_read": False},
+        {"$set": {"is_read": True}}
+    )
+    
+    return messages[::-1]  # Return oldest first
+
+@api_router.post("/messages/send")
+async def send_direct_message(msg_data: DirectMessageCreate, driver_email: str):
+    """Send a direct message to another driver"""
+    sender = await db.users.find_one({"email": driver_email})
+    if not sender:
+        raise HTTPException(status_code=404, detail="Sender not found")
+    
+    recipient = await db.users.find_one({"email": msg_data.recipient_email})
+    if not recipient:
+        raise HTTPException(status_code=404, detail="Recipient not found")
+    
+    message = DirectMessage(
+        sender_email=driver_email,
+        sender_name=sender['name'],
+        recipient_email=msg_data.recipient_email,
+        message=msg_data.message,
+        message_type=msg_data.message_type,
+        attachment_url=msg_data.attachment_url
+    )
+    
+    msg_doc = message.model_dump()
+    msg_doc['created_at'] = msg_doc['created_at'].isoformat()
+    await db.direct_messages.insert_one(msg_doc)
+    
+    # Create notification for recipient
+    notification = Notification(
+        recipient_email=msg_data.recipient_email,
+        sender_email=driver_email,
+        sender_name=sender['name'],
+        type="direct_message",
+        title="💬 New Message",
+        message=f"{sender['name']}: {msg_data.message[:50]}{'...' if len(msg_data.message) > 50 else ''}",
+        data={"sender_email": driver_email}
+    )
+    notif_doc = notification.model_dump()
+    notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+    await db.notifications.insert_one(notif_doc)
+    
+    return message
+
+# ============== PHOTO REVIEWS ==============
+
+@api_router.post("/reviews/photo")
+async def create_photo_review(review_data: PhotoReviewCreate, driver_email: str):
+    """Create a review with photos"""
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    spot = await db.parking_spots.find_one({"id": review_data.spot_id})
+    if not spot:
+        raise HTTPException(status_code=404, detail="Parking spot not found")
+    
+    review = PhotoReview(
+        spot_id=review_data.spot_id,
+        driver_email=driver_email,
+        driver_name=user['name'],
+        rating=review_data.rating,
+        comment=review_data.comment,
+        photos=review_data.photos,
+        cleanliness=review_data.cleanliness,
+        safety=review_data.safety,
+        amenities=review_data.amenities
+    )
+    
+    review_doc = review.model_dump()
+    review_doc['created_at'] = review_doc['created_at'].isoformat()
+    await db.photo_reviews.insert_one(review_doc)
+    
+    # Award points for review with photos
+    points = 10 + (len(review_data.photos) * 5)  # 10 base + 5 per photo
+    await db.users.update_one(
+        {"email": driver_email},
+        {"$inc": {"reward_points": points}}
+    )
+    
+    return {"message": f"Review submitted! +{points} points earned", "review_id": review.id}
+
+@api_router.get("/reviews/photo/{spot_id}")
+async def get_photo_reviews(spot_id: str, limit: int = 20):
+    """Get photo reviews for a parking spot"""
+    reviews = await db.photo_reviews.find(
+        {"spot_id": spot_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    return reviews
+
+@api_router.post("/reviews/{review_id}/helpful")
+async def mark_review_helpful(review_id: str, driver_email: str):
+    """Mark a review as helpful"""
+    result = await db.photo_reviews.update_one(
+        {"id": review_id},
+        {"$inc": {"helpful_count": 1}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return {"message": "Marked as helpful"}
+
+# ============== PUSH NOTIFICATIONS ==============
+
+@api_router.post("/push/subscribe")
+async def subscribe_push_notifications(subscription: PushSubscription, driver_email: str):
+    """Subscribe to push notifications"""
+    subscription.driver_email = driver_email
+    
+    # Remove existing subscription for this user
+    await db.push_subscriptions.delete_many({"driver_email": driver_email})
+    
+    sub_doc = subscription.model_dump()
+    sub_doc['created_at'] = sub_doc['created_at'].isoformat()
+    await db.push_subscriptions.insert_one(sub_doc)
+    
+    return {"message": "Subscribed to push notifications"}
+
+@api_router.delete("/push/unsubscribe/{driver_email}")
+async def unsubscribe_push_notifications(driver_email: str):
+    """Unsubscribe from push notifications"""
+    await db.push_subscriptions.delete_many({"driver_email": driver_email})
+    return {"message": "Unsubscribed from push notifications"}
+
+@api_router.get("/push/vapid-key")
+async def get_vapid_public_key():
+    """Get VAPID public key for push notifications"""
+    # This is a placeholder - in production, generate proper VAPID keys
+    return {
+        "publicKey": "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U"
+    }
+
+# ============== VOICE SEARCH (simplified) ==============
+
+@api_router.post("/voice/search")
+async def voice_search(query: str, driver_email: str):
+    """Process voice search query"""
+    query_lower = query.lower()
+    
+    results = {
+        "query": query,
+        "intent": "unknown",
+        "results": []
+    }
+    
+    # Detect intent
+    if any(word in query_lower for word in ["parking", "park", "stop", "rest"]):
+        results["intent"] = "find_parking"
+        # Search parking spots
+        spots = await db.parking_spots.find({}, {"_id": 0}).limit(5).to_list(5)
+        results["results"] = spots
+        results["response"] = f"Found {len(spots)} parking spots nearby"
+        
+    elif any(word in query_lower for word in ["fuel", "gas", "diesel"]):
+        results["intent"] = "find_fuel"
+        prices = await db.fuel_prices.find({}, {"_id": 0}).sort("price", 1).limit(5).to_list(5)
+        results["results"] = prices
+        results["response"] = f"Found {len(prices)} fuel stations with good prices"
+        
+    elif any(word in query_lower for word in ["load", "job", "haul"]):
+        results["intent"] = "find_loads"
+        loads = await db.loads.find({"status": "available"}, {"_id": 0}).limit(5).to_list(5)
+        results["results"] = loads
+        results["response"] = f"Found {len(loads)} available loads"
+        
+    elif any(word in query_lower for word in ["weather", "alert", "warning"]):
+        results["intent"] = "check_weather"
+        alerts = await db.weather_alerts.find({"active": True}, {"_id": 0}).limit(5).to_list(5)
+        results["results"] = alerts
+        results["response"] = f"There are {len(alerts)} active weather alerts"
+        
+    elif any(word in query_lower for word in ["sos", "emergency", "help"]):
+        results["intent"] = "emergency"
+        results["response"] = "Activating Emergency SOS. Your contacts will be notified."
+        
+    else:
+        results["response"] = "I didn't understand. Try: 'Find parking', 'Find fuel', 'Find loads', or 'Check weather'"
+    
+    return results
+
 # ============== SUBSCRIPTION PLANS ==============
 
 class SubscriptionPlan(BaseModel):
