@@ -1623,6 +1623,67 @@ async def stop_sharing_location(share_id: str, driver_email: str):
     
     return {"message": "Location sharing stopped"}
 
+# ============== NOTIFICATIONS ==============
+
+@api_router.get("/notifications/{driver_email}")
+async def get_notifications(driver_email: str, unread_only: bool = False, limit: int = 50):
+    """Get notifications for a driver"""
+    query = {"recipient_email": driver_email}
+    if unread_only:
+        query["is_read"] = False
+    
+    notifications = await db.notifications.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    return notifications
+
+@api_router.get("/notifications/{driver_email}/count")
+async def get_unread_notification_count(driver_email: str):
+    """Get count of unread notifications"""
+    count = await db.notifications.count_documents({
+        "recipient_email": driver_email,
+        "is_read": False
+    })
+    return {"unread_count": count}
+
+@api_router.put("/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, driver_email: str):
+    """Mark a notification as read"""
+    result = await db.notifications.update_one(
+        {"id": notification_id, "recipient_email": driver_email},
+        {"$set": {"is_read": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification marked as read"}
+
+@api_router.put("/notifications/{driver_email}/read-all")
+async def mark_all_notifications_read(driver_email: str):
+    """Mark all notifications as read"""
+    result = await db.notifications.update_many(
+        {"recipient_email": driver_email, "is_read": False},
+        {"$set": {"is_read": True}}
+    )
+    
+    return {"message": f"Marked {result.modified_count} notifications as read"}
+
+@api_router.delete("/notifications/{notification_id}")
+async def delete_notification(notification_id: str, driver_email: str):
+    """Delete a notification"""
+    result = await db.notifications.delete_one({
+        "id": notification_id,
+        "recipient_email": driver_email
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification deleted"}
+
 # ============== DRIVER CHAT ==============
 
 @api_router.get("/chat/{location_name}")
