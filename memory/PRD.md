@@ -89,6 +89,8 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - Fixed HOS endpoint missing field handling
 - Integrated SpotReviews component into ParkingDetails page
 - Fixed yellow accent color issue on parking details page
+- **Added Partner/Parking Owner Subscription Plans** (Starter $0, Business $29.99, Enterprise $99.99)
+- **Added Share Location Feature** for convoy members
 - All backend tests passing (26/26 - 100%)
 - All frontend flows working
 
