@@ -69,6 +69,7 @@ function App() {
             <Route path="/subscription-success" element={<SubscriptionSuccess />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-center" expand={false} richColors />
