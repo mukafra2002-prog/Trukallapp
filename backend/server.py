@@ -1273,58 +1273,33 @@ async def get_hos_status(driver_email: str):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Calculate hours since last reset
-    last_reset = datetime.fromisoformat(user['hos_last_reset'])
-    hours_since_reset = (datetime.now(timezone.utc) - last_reset).total_seconds() / 3600
+    # Handle case where HOS fields don't exist yet
+    hos_last_reset = user.get('hos_last_reset')
+    hos_hours_remaining = user.get('hos_hours_remaining', 11.0)
     
-    hours_remaining = max(0, user['hos_hours_remaining'] - hours_since_reset)
-    
-    return {
-        "hours_remaining": round(hours_remaining, 1),
-        "last_reset": user['hos_last_reset'],
-        "status": "good" if hours_remaining > 2 else "warning" if hours_remaining > 0 else "violation"
-    }
-
-@api_router.post("/hos/{driver_email}/reset")
-async def reset_hos(driver_email: str):
-    result = await db.users.update_one(
-        {"email": driver_email},
-        {
-            "$set": {
-                "hos_hours_remaining": 11.0,
-                "hos_last_reset": datetime.now(timezone.utc).isoformat()
-            }
+    if not hos_last_reset:
+        # Initialize HOS for user if not set
+        now = datetime.now(timezone.utc)
+        hos_last_reset = now.isoformat()
+        await db.users.update_one(
+            {"email": driver_email},
+            {"$set": {"hos_last_reset": hos_last_reset, "hos_hours_remaining": 11.0}}
+        )
+        return {
+            "hours_remaining": 11.0,
+            "last_reset": hos_last_reset,
+            "status": "good"
         }
-    )
-    
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Award 50 points for completing a rest period
-    await db.users.update_one(
-        {"email": driver_email},
-        {"$inc": {"reward_points": 50}}
-    )
-    
-    return {"message": "HOS reset successful. Awarded 50 points for rest compliance."}
-
-# ============== HOS (HOURS OF SERVICE) ==============
-
-@api_router.get("/hos/{driver_email}")
-async def get_hos_status(driver_email: str):
-    user = await db.users.find_one({"email": driver_email})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
     
     # Calculate hours since last reset
-    last_reset = datetime.fromisoformat(user['hos_last_reset'])
+    last_reset = datetime.fromisoformat(hos_last_reset)
     hours_since_reset = (datetime.now(timezone.utc) - last_reset).total_seconds() / 3600
     
-    hours_remaining = max(0, user['hos_hours_remaining'] - hours_since_reset)
+    hours_remaining = max(0, hos_hours_remaining - hours_since_reset)
     
     return {
         "hours_remaining": round(hours_remaining, 1),
-        "last_reset": user['hos_last_reset'],
+        "last_reset": hos_last_reset,
         "status": "good" if hours_remaining > 2 else "warning" if hours_remaining > 0 else "violation"
     }
 
