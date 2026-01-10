@@ -561,6 +561,7 @@ export default function ConvoyFinder() {
               )}
             </CardContent>
           </Card>
+          )}
         </div>
       </div>
     </div>
