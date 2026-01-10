@@ -11,6 +11,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell, TrendingUp, ShowerHead, Building2, Star, ThumbsUp, ThumbsDown, AlertOctagon, Store, Users, Calculator, FileText, CreditCard, Crown, Check, Truck, Calendar, Radio, Eye, Send, Zap, Phone, AlertCircle, Camera, FolderOpen, Trash2, Plus } from "lucide-react";
 import ConvoyFinder from "@/components/ConvoyFinder";
+import NotificationBell from "@/components/NotificationBell";
 
 const mapContainerStyle = {
   width: '100%',
