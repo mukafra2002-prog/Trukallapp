@@ -347,6 +347,54 @@ class DriverChatCreate(BaseModel):
     message: str
     message_type: str = "chat"
 
+# ============== WEATHER ALERT MODELS ==============
+
+class WeatherAlert(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    alert_type: str  # "severe_weather", "road_hazard", "ice_warning", "flood", "high_winds"
+    severity: str  # "low", "medium", "high", "critical"
+    title: str
+    description: str
+    location: str  # City/State or coordinates description
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    radius_miles: int = 50  # Affected radius
+    active: bool = True
+    reported_by: Optional[str] = None
+    expires_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class WeatherAlertCreate(BaseModel):
+    alert_type: str
+    severity: str
+    title: str
+    description: str
+    location: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    radius_miles: int = 50
+    expires_hours: int = 24  # Hours until expiration
+
+# ============== CONVOY CHAT MODELS ==============
+
+class ConvoyMessage(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    convoy_id: str
+    sender_email: str
+    sender_name: str
+    message: str
+    message_type: str = "text"  # "text", "location", "photo", "alert"
+    attachment_url: Optional[str] = None
+    is_read_by: List[str] = []  # List of emails who read this
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ConvoyMessageCreate(BaseModel):
+    message: str
+    message_type: str = "text"
+    attachment_url: Optional[str] = None
+
 class TripCalculation(BaseModel):
     load_id: str
     load_rate: float
