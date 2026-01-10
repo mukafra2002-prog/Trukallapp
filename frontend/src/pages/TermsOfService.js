@@ -145,7 +145,7 @@ export default function TermsOfService() {
               For questions about these Terms, please contact us at:
             </p>
             <ul className="list-none mb-4">
-              <li><strong>Email:</strong> legal@trukall.com</li>
+              <li><strong>Email:</strong> support@yourdomain.com</li>
               <li><strong>Address:</strong> TrukAll Inc., 123 Trucker Way, Dallas, TX 75001</li>
             </ul>
           </CardContent>
