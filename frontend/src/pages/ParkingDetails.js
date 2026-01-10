@@ -114,9 +114,9 @@ export default function ParkingDetails() {
   const totalPrice = spot.is_free ? 0 : spot.price_per_night * (days > 0 ? days : 1);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-slate-50 pb-24">
       {/* Header */}
-      <header className="bg-card border-b border-white/10 p-4">
+      <header className="bg-white border-b border-slate-200 p-4">
         <div className="max-w-7xl mx-auto">
           <Button variant="outline" onClick={() => navigate(-1)} data-testid="back-btn">
             <ArrowLeft className="w-4 h-4 mr-2" />
