@@ -460,17 +460,32 @@ export default function ConvoyFinder() {
                             <Calendar className="w-3 h-3" />
                             {new Date(convoy.departure_date).toLocaleString()}
                           </div>
-                          {convoy.status === 'open' && user?.email !== convoy.driver_email && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleJoinConvoy(convoy.id)}
-                              data-testid={`join-convoy-${convoy.id}`}
-                            >
-                              <Users className="w-3 h-3 mr-1" />
-                              Join
-                            </Button>
-                          )}
+                          <div className="flex gap-2">
+                            {/* Chat button - show for members and leader */}
+                            {(convoy.driver_email === user?.email || convoy.interested_drivers?.includes(user?.email)) && (
+                              <Button
+                                size="sm"
+                                variant="default"
+                                className="bg-blue-600 hover:bg-blue-700"
+                                onClick={() => setActiveConvoyChat(convoy)}
+                                data-testid={`chat-convoy-${convoy.id}`}
+                              >
+                                <MessageCircle className="w-3 h-3 mr-1" />
+                                Chat
+                              </Button>
+                            )}
+                            {convoy.status === 'open' && user?.email !== convoy.driver_email && !convoy.interested_drivers?.includes(user?.email) && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleJoinConvoy(convoy.id)}
+                                data-testid={`join-convoy-${convoy.id}`}
+                              >
+                                <Users className="w-3 h-3 mr-1" />
+                                Join
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -481,8 +496,15 @@ export default function ConvoyFinder() {
           </Card>
         </div>
 
-        {/* Live Chat */}
+        {/* Convoy Chat or Live Chat */}
         <div className="space-y-4">
+          {activeConvoyChat ? (
+            <ConvoyChat 
+              convoyId={activeConvoyChat.id} 
+              convoyInfo={activeConvoyChat}
+              onBack={() => setActiveConvoyChat(null)}
+            />
+          ) : (
           <Card className="h-[600px] flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
