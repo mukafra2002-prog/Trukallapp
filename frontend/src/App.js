@@ -66,6 +66,8 @@ function App() {
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-cancelled" element={<PaymentCancelled />} />
             <Route path="/subscription-success" element={<SubscriptionSuccess />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-center" expand={false} richColors />
