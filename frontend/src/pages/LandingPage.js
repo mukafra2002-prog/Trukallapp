@@ -593,7 +593,23 @@ export default function LandingPage() {
                       <option value="partner">Parking Lot Owner</option>
                     </select>
                   </div>
-                  <Button type="submit" className="w-full btn-primary" disabled={loading} data-testid="modal-signup-submit">
+                  <div className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      id="agree-terms"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-1 h-4 w-4 rounded border-gray-300"
+                      data-testid="agree-terms-checkbox"
+                    />
+                    <label htmlFor="agree-terms" className="text-sm text-gray-600">
+                      I agree to the{' '}
+                      <a href="/terms" target="_blank" className="text-blue-600 hover:underline">Terms of Service</a>
+                      {' '}and{' '}
+                      <a href="/privacy" target="_blank" className="text-blue-600 hover:underline">Privacy Policy</a>
+                    </label>
+                  </div>
+                  <Button type="submit" className="w-full btn-primary" disabled={loading || !agreedToTerms} data-testid="modal-signup-submit">
                     {loading ? 'Creating Account...' : 'Create Free Account'}
                   </Button>
                   <p className="text-center text-sm text-gray-600">
