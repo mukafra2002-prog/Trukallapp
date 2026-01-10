@@ -6,27 +6,41 @@
 
 @layer base {
   :root {
-    --background: 248 250 252;
-    --foreground: 15 23 42;
-    --card: 255 255 255;
-    --card-foreground: 15 23 42;
-    --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
-    --primary: 37 99 235;
-    --primary-foreground: 255 255 255;
-    --secondary: 16 185 129;
-    --secondary-foreground: 255 255 255;
-    --muted: 241 245 249;
-    --muted-foreground: 71 85 105;
-    --accent: 241 245 249;
-    --accent-foreground: 15 23 42;
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
-    --border: 226 232 240;
-    --input: 226 232 240;
-    --ring: 37 99 235;
-    --radius: 0.75rem;
+    --background: 248 250 252 !important;
+    --foreground: 15 23 42 !important;
+    --card: 255 255 255 !important;
+    --card-foreground: 15 23 42 !important;
+    --popover: 255 255 255 !important;
+    --popover-foreground: 15 23 42 !important;
+    --primary: 37 99 235 !important;
+    --primary-foreground: 255 255 255 !important;
+    --secondary: 16 185 129 !important;
+    --secondary-foreground: 255 255 255 !important;
+    --muted: 241 245 249 !important;
+    --muted-foreground: 71 85 105 !important;
+    --accent: 241 245 249 !important;
+    --accent-foreground: 15 23 42 !important;
+    --destructive: 239 68 68 !important;
+    --destructive-foreground: 255 255 255 !important;
+    --border: 226 232 240 !important;
+    --input: 226 232 240 !important;
+    --ring: 37 99 235 !important;
+    --radius: 0.75rem !important;
   }
+}
+
+/* Override any yellow accent colors */
+.bg-accent {
+  background-color: rgb(241 245 249) !important;
+}
+
+.text-primary {
+  color: rgb(37 99 235) !important;
+}
+
+/* Fix loading spinner colors */
+.animate-spin {
+  color: rgb(37 99 235) !important;
 }
 
 @layer base {
