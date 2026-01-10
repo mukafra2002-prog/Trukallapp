@@ -788,7 +788,21 @@ export default function DriverDashboard() {
             <Fuel className="w-4 h-4 mr-2" />
             Fuel Prices
           </Button>
+          <Button
+            variant={activeTab === "weather" ? "default" : "outline"}
+            onClick={() => setActiveTab("weather")}
+            className={`touch-target ${activeTab === "weather" ? "bg-cyan-600 hover:bg-cyan-700" : "border-cyan-300 text-cyan-700"}`}
+            data-testid="tab-weather"
+          >
+            <CloudRain className="w-4 h-4 mr-2" />
+            Weather Alerts
+          </Button>
         </div>
+
+        {/* Weather Alerts Tab */}
+        {activeTab === "weather" && (
+          <WeatherAlerts />
+        )}
 
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
