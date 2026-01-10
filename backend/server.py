@@ -3111,6 +3111,10 @@ async def create_subscription_checkout(plan_id: str, user_email: str, request: R
     
     # For paid plans, create Stripe checkout
     origin = str(request.base_url).rstrip('/')
+    # Use frontend URL for success/cancel redirects
+    frontend_url = origin.replace('/api', '').replace(':8001', ':3000')
+    if 'preview.emergentagent.com' in origin or 'preview.emerg' in origin:
+        frontend_url = origin.replace('/api', '')  # Same URL in preview
     
     stripe_key = os.environ.get('STRIPE_API_KEY', 'sk_test_emergent')
     webhook_url = f"{origin}/api/webhook/stripe"
@@ -3119,8 +3123,8 @@ async def create_subscription_checkout(plan_id: str, user_email: str, request: R
     checkout_request = CheckoutSessionRequest(
         amount=plan["price"],
         currency="usd",
-        success_url=f"{origin}/subscription-success?session_id={{{{CHECKOUT_SESSION_ID}}}}&plan_id={plan_id}",
-        cancel_url=f"{origin}/subscription-cancelled",
+        success_url=f"{frontend_url}/subscription-success?session_id={{{{CHECKOUT_SESSION_ID}}}}&plan_id={plan_id}&user_email={user_email}",
+        cancel_url=f"{frontend_url}/driver",
         metadata={
             "user_email": user_email,
             "plan_id": plan_id,
