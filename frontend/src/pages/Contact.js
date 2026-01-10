@@ -199,6 +199,7 @@ export default function Contact() {
                         placeholder="How can we help you?"
                         rows={6}
                         required
+                        className="bg-white border-slate-300"
                         data-testid="contact-message"
                       />
                     </div>
