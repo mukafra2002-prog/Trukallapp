@@ -1474,6 +1474,118 @@ async def join_convoy(post_id: str, driver_email: str):
     
     return {"message": "Joined convoy successfully"}
 
+# ============== SHARE LOCATION ==============
+
+class SharedLocation(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    driver_name: str
+    latitude: float
+    longitude: float
+    address: Optional[str] = None
+    message: Optional[str] = None
+    convoy_id: Optional[str] = None  # If sharing with specific convoy
+    shared_with: List[str] = []  # List of emails to share with
+    expires_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ShareLocationRequest(BaseModel):
+    latitude: float
+    longitude: float
+    address: Optional[str] = None
+    message: Optional[str] = None
+    convoy_id: Optional[str] = None
+    share_with_emails: Optional[List[str]] = []
+    duration_minutes: Optional[int] = 60  # Default 1 hour
+
+@api_router.post("/location/share")
+async def share_location(location_data: ShareLocationRequest, driver_email: str):
+    """Share current location with convoy members or specific drivers"""
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate expiration time
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=location_data.duration_minutes or 60)
+    
+    # If sharing with convoy, get convoy members
+    shared_with = location_data.share_with_emails or []
+    if location_data.convoy_id:
+        convoy = await db.convoy_posts.find_one({"id": location_data.convoy_id})
+        if convoy:
+            shared_with.extend(convoy.get('interested_drivers', []))
+            shared_with.append(convoy.get('leader_email', ''))
+    
+    # Remove duplicates and self
+    shared_with = list(set([e for e in shared_with if e and e != driver_email]))
+    
+    shared_location = SharedLocation(
+        driver_email=driver_email,
+        driver_name=user['name'],
+        latitude=location_data.latitude,
+        longitude=location_data.longitude,
+        address=location_data.address,
+        message=location_data.message,
+        convoy_id=location_data.convoy_id,
+        shared_with=shared_with,
+        expires_at=expires_at
+    )
+    
+    loc_doc = shared_location.model_dump()
+    loc_doc['created_at'] = loc_doc['created_at'].isoformat()
+    loc_doc['expires_at'] = loc_doc['expires_at'].isoformat() if loc_doc['expires_at'] else None
+    
+    await db.shared_locations.insert_one(loc_doc)
+    
+    logger.info(f"📍 Location shared by {user['name']} with {len(shared_with)} drivers")
+    
+    return {
+        "message": f"Location shared with {len(shared_with)} drivers!",
+        "share_id": shared_location.id,
+        "expires_at": expires_at.isoformat(),
+        "recipients": len(shared_with)
+    }
+
+@api_router.get("/location/shared-with-me/{driver_email}")
+async def get_shared_locations(driver_email: str):
+    """Get locations shared with this driver"""
+    now = datetime.now(timezone.utc)
+    
+    # Find non-expired locations shared with this driver
+    locations = await db.shared_locations.find({
+        "shared_with": driver_email,
+        "$or": [
+            {"expires_at": {"$gt": now.isoformat()}},
+            {"expires_at": None}
+        ]
+    }, {"_id": 0}).sort("created_at", -1).to_list(50)
+    
+    return locations
+
+@api_router.get("/location/my-shares/{driver_email}")
+async def get_my_shared_locations(driver_email: str):
+    """Get locations I have shared"""
+    locations = await db.shared_locations.find(
+        {"driver_email": driver_email},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(20)
+    
+    return locations
+
+@api_router.delete("/location/share/{share_id}")
+async def stop_sharing_location(share_id: str, driver_email: str):
+    """Stop sharing a location"""
+    result = await db.shared_locations.delete_one({
+        "id": share_id,
+        "driver_email": driver_email
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Shared location not found")
+    
+    return {"message": "Location sharing stopped"}
+
 # ============== DRIVER CHAT ==============
 
 @api_router.get("/chat/{location_name}")
