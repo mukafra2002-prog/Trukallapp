@@ -63,6 +63,7 @@ function App() {
             <Route path="/spot/:spotId" element={<ParkingDetails />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-cancelled" element={<PaymentCancelled />} />
+            <Route path="/subscription-success" element={<SubscriptionSuccess />} />
           </Routes>
         </BrowserRouter>
         <Toaster position="top-center" expand={false} richColors />
