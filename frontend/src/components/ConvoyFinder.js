@@ -10,6 +10,7 @@ import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
 import { Users, MapPin, Calendar, ArrowRight, Plus, MessageCircle, Share2, Navigation, Clock } from "lucide-react";
+import ConvoyChat from "./ConvoyChat";
 
 export default function ConvoyFinder() {
   const { user } = useContext(AuthContext);
@@ -22,6 +23,7 @@ export default function ConvoyFinder() {
   const [sharedLocations, setSharedLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sharingLocation, setSharingLocation] = useState(false);
+  const [activeConvoyChat, setActiveConvoyChat] = useState(null); // For convoy chat
   
   const [shareData, setShareData] = useState({
     message: "",
