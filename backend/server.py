@@ -2450,13 +2450,14 @@ class UserSubscription(BaseModel):
 class SubscriptionCreate(BaseModel):
     plan_id: str
 
-# Define subscription plans
+# Define subscription plans - Driver Plans
 SUBSCRIPTION_PLANS = [
     {
         "id": "free",
         "name": "Free",
         "price": 0,
         "interval": "month",
+        "type": "driver",
         "features": [
             "Basic parking search",
             "View 5 parking spots/day",
@@ -2470,6 +2471,7 @@ SUBSCRIPTION_PLANS = [
         "name": "Pro Driver",
         "price": 9.99,
         "interval": "month",
+        "type": "driver",
         "features": [
             "Unlimited parking search",
             "Real-time availability alerts",
@@ -2487,6 +2489,7 @@ SUBSCRIPTION_PLANS = [
         "name": "Premium Fleet",
         "price": 24.99,
         "interval": "month",
+        "type": "driver",
         "features": [
             "Everything in Pro",
             "DOT compliance tracking",
@@ -2502,9 +2505,68 @@ SUBSCRIPTION_PLANS = [
     }
 ]
 
+# Partner/Parking Owner Plans
+PARTNER_PLANS = [
+    {
+        "id": "partner-starter",
+        "name": "Starter",
+        "price": 0,
+        "interval": "month",
+        "type": "partner",
+        "features": [
+            "List up to 1 parking location",
+            "Basic booking management",
+            "Customer reviews",
+            "Email notifications"
+        ],
+        "is_popular": False
+    },
+    {
+        "id": "partner-business",
+        "name": "Business",
+        "price": 29.99,
+        "interval": "month",
+        "type": "partner",
+        "features": [
+            "List up to 5 parking locations",
+            "Advanced booking management",
+            "Priority listing in search",
+            "Real-time availability updates",
+            "Revenue analytics dashboard",
+            "Customer messaging",
+            "Promotional tools",
+            "Standard support"
+        ],
+        "is_popular": True
+    },
+    {
+        "id": "partner-enterprise",
+        "name": "Enterprise",
+        "price": 99.99,
+        "interval": "month",
+        "type": "partner",
+        "features": [
+            "Unlimited parking locations",
+            "Everything in Business",
+            "Featured placement in search",
+            "API access for integrations",
+            "Custom branding",
+            "Multi-user access",
+            "Advanced reporting & analytics",
+            "Dedicated account manager",
+            "24/7 priority support"
+        ],
+        "is_popular": False
+    }
+]
+
 @api_router.get("/subscriptions/plans")
-async def get_subscription_plans():
-    return {"plans": SUBSCRIPTION_PLANS}
+async def get_subscription_plans(plan_type: Optional[str] = None):
+    if plan_type == "partner":
+        return {"plans": PARTNER_PLANS}
+    elif plan_type == "driver":
+        return {"plans": SUBSCRIPTION_PLANS}
+    return {"plans": SUBSCRIPTION_PLANS, "partner_plans": PARTNER_PLANS}
 
 @api_router.get("/subscriptions/user/{user_email}")
 async def get_user_subscription(user_email: str):
