@@ -25,6 +25,7 @@ export default function LandingPage() {
     role: "driver",
     phone: ""
   });
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   
   // Password reset states
   const [resetEmail, setResetEmail] = useState("");
