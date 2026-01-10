@@ -266,6 +266,21 @@ class DashboardStats(BaseModel):
     total_revenue: float
     active_spots: int
 
+# ============== NOTIFICATION MODEL ==============
+
+class Notification(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    recipient_email: str
+    sender_email: Optional[str] = None
+    sender_name: Optional[str] = None
+    type: str  # "location_share", "convoy_join", "sos_alert", "booking", "system"
+    title: str
+    message: str
+    data: Optional[dict] = None  # Extra data like coordinates, convoy_id, etc.
+    is_read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # NEW MODELS FOR CRITICAL FEATURES
 
 class SpotReview(BaseModel):
