@@ -1553,13 +1553,35 @@ async def share_location(location_data: ShareLocationRequest, driver_email: str)
     
     await db.shared_locations.insert_one(loc_doc)
     
+    # Create notifications for all recipients
+    for recipient_email in shared_with:
+        notification = Notification(
+            recipient_email=recipient_email,
+            sender_email=driver_email,
+            sender_name=user['name'],
+            type="location_share",
+            title="📍 Location Shared",
+            message=f"{user['name']} shared their location with you" + (f": {location_data.message}" if location_data.message else ""),
+            data={
+                "share_id": shared_location.id,
+                "latitude": location_data.latitude,
+                "longitude": location_data.longitude,
+                "address": location_data.address,
+                "expires_at": expires_at.isoformat()
+            }
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+    
     logger.info(f"📍 Location shared by {user['name']} with {len(shared_with)} drivers")
     
     return {
         "message": f"Location shared with {len(shared_with)} drivers!",
         "share_id": shared_location.id,
         "expires_at": expires_at.isoformat(),
-        "recipients": len(shared_with)
+        "recipients": len(shared_with),
+        "notifications_sent": len(shared_with)
     }
 
 @api_router.get("/location/shared-with-me/{driver_email}")
