@@ -1019,8 +1019,32 @@ export default function DriverDashboard() {
                 <CardDescription className="text-slate-600">Click on any spot to view details and book</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="map-container bg-slate-800 rounded-lg flex items-center justify-center" data-testid="map-container">
-                  <p className="text-slate-400">Map view with {spots.length} parking spots</p>
+                <div className="map-container rounded-lg overflow-hidden" data-testid="map-container">
+                  {isLoaded ? (
+                    <GoogleMap
+                      mapContainerStyle={mapContainerStyle}
+                      center={defaultCenter}
+                      zoom={4}
+                      options={{
+                        styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }],
+                        streetViewControl: false,
+                        mapTypeControl: false
+                      }}
+                    >
+                      {spots.map((spot) => (
+                        <Marker
+                          key={spot.id}
+                          position={{ lat: spot.latitude, lng: spot.longitude }}
+                          title={spot.name}
+                          onClick={() => navigate(`/spot/${spot.id}`)}
+                        />
+                      ))}
+                    </GoogleMap>
+                  ) : (
+                    <div className="bg-slate-800 flex items-center justify-center" style={mapContainerStyle}>
+                      <p className="text-slate-400">Loading map...</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

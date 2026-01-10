@@ -1652,10 +1652,19 @@ async def get_compliance_status(driver_email: str):
     if compliance.get('created_at') and isinstance(compliance['created_at'], str):
         compliance['created_at'] = datetime.fromisoformat(compliance['created_at'])
     
-    # Calculate days until expiration
+    # Calculate days until expiration - ensure timezone-aware comparison
     now = datetime.now(timezone.utc)
-    cdl_days = (compliance['cdl_expiry'] - now).days
-    medical_days = (compliance['medical_card_expiry'] - now).days
+    cdl_expiry = compliance['cdl_expiry']
+    medical_expiry = compliance['medical_card_expiry']
+    
+    # Make sure dates are timezone-aware
+    if cdl_expiry.tzinfo is None:
+        cdl_expiry = cdl_expiry.replace(tzinfo=timezone.utc)
+    if medical_expiry.tzinfo is None:
+        medical_expiry = medical_expiry.replace(tzinfo=timezone.utc)
+    
+    cdl_days = (cdl_expiry - now).days
+    medical_days = (medical_expiry - now).days
     
     alerts = []
     if cdl_days < 30:
