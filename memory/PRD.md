@@ -61,7 +61,9 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 ### Subscription & Payments
 - [x] Driver subscription plans (Free, Pro, Premium)
 - [x] Partner subscription plans (Starter, Business, Enterprise)
-- [x] Stripe integration ready
+- [x] **Stripe checkout integration** (test mode ready)
+- [x] Subscription success page
+- [x] Payment webhook handling
 
 ### Document Management
 - [x] Document scanner/uploader
