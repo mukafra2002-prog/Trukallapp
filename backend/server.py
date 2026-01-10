@@ -407,6 +407,122 @@ class ConvoyMessageCreate(BaseModel):
     message_type: str = "text"
     attachment_url: Optional[str] = None
 
+# ============== NEW FEATURE MODELS ==============
+
+# 1. Route Planner Model
+class TruckRoute(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    origin: str
+    origin_lat: float
+    origin_lng: float
+    destination: str
+    destination_lat: float
+    destination_lng: float
+    truck_height: float = 13.6  # feet
+    truck_weight: float = 80000  # lbs
+    hazmat: bool = False
+    avoid_tolls: bool = False
+    total_distance: float = 0
+    total_duration: float = 0  # minutes
+    fuel_stops: List[dict] = []
+    rest_stops: List[dict] = []
+    restrictions: List[str] = []  # low bridges, weight limits, etc.
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class RouteRequest(BaseModel):
+    origin: str
+    origin_lat: float
+    origin_lng: float
+    destination: str
+    destination_lat: float
+    destination_lng: float
+    truck_height: float = 13.6
+    truck_weight: float = 80000
+    hazmat: bool = False
+    avoid_tolls: bool = False
+
+# 2. Analytics/Earnings Model
+class DriverAnalytics(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    driver_email: str
+    period: str  # "week", "month", "year"
+    total_earnings: float = 0
+    total_miles: float = 0
+    total_loads: int = 0
+    total_expenses: float = 0
+    net_profit: float = 0
+    avg_rate_per_mile: float = 0
+    fuel_expenses: float = 0
+    parking_expenses: float = 0
+    maintenance_expenses: float = 0
+    top_routes: List[dict] = []
+    earnings_by_day: List[dict] = []
+
+class EarningsEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    amount: float
+    source: str  # "load", "bonus", "detention", "other"
+    description: str
+    load_id: Optional[str] = None
+    date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# 3. Direct Messaging Model
+class DirectMessage(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sender_email: str
+    sender_name: str
+    recipient_email: str
+    message: str
+    message_type: str = "text"  # "text", "image", "location"
+    attachment_url: Optional[str] = None
+    is_read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DirectMessageCreate(BaseModel):
+    recipient_email: str
+    message: str
+    message_type: str = "text"
+    attachment_url: Optional[str] = None
+
+# 4. Photo Reviews Model (extends existing reviews)
+class PhotoReview(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    spot_id: str
+    driver_email: str
+    driver_name: str
+    rating: int  # 1-5
+    comment: str
+    photos: List[str] = []  # List of photo URLs
+    cleanliness: int = 0  # 1-5
+    safety: int = 0  # 1-5
+    amenities: int = 0  # 1-5
+    helpful_count: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PhotoReviewCreate(BaseModel):
+    spot_id: str
+    rating: int
+    comment: str
+    photos: List[str] = []
+    cleanliness: int = 3
+    safety: int = 3
+    amenities: int = 3
+
+# 5. Push Notification Subscription
+class PushSubscription(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    driver_email: str
+    endpoint: str
+    keys: dict  # p256dh and auth keys
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class TripCalculation(BaseModel):
     load_id: str
     load_rate: float
