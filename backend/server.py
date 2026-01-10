@@ -25,6 +25,12 @@ db = client[os.environ['DB_NAME']]
 # Create the main app
 app = FastAPI(title="TrukAll - Complete Truck Driver Solution")
 
+# Health check endpoint (required for deployment)
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for deployment monitoring"""
+    return {"status": "healthy", "service": "trukall-backend"}
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
