@@ -735,6 +735,15 @@ export default function DriverDashboard() {
             Convoy
           </Button>
           <Button
+            variant={activeTab === "loads" ? "default" : "outline"}
+            onClick={() => setActiveTab("loads")}
+            className={`touch-target ${activeTab === "loads" ? "bg-green-600 hover:bg-green-700" : "border-green-300 text-green-700"}`}
+            data-testid="tab-loads"
+          >
+            <Truck className="w-4 h-4 mr-2" />
+            Load Board
+          </Button>
+          <Button
             variant={activeTab === "calculator" ? "default" : "outline"}
             onClick={() => setActiveTab("calculator")}
             className={`touch-target ${activeTab === "calculator" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
