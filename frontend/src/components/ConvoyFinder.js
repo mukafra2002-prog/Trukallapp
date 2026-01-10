@@ -195,6 +195,120 @@ export default function ConvoyFinder() {
 
   return (
     <div className="space-y-6">
+      {/* Share Location Card */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <Share2 className="w-5 h-5" />
+                Share Your Location
+              </CardTitle>
+              <CardDescription className="text-blue-600">Let convoy members know where you are</CardDescription>
+            </div>
+            <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+              <DialogTrigger asChild>
+                <Button className="bg-blue-600 hover:bg-blue-700" data-testid="share-location-btn">
+                  <Navigation className="w-4 h-4 mr-2" />
+                  Share Now
+                </Button>
+              </DialogTrigger>
+              <DialogContent data-testid="share-location-dialog">
+                <DialogHeader>
+                  <DialogTitle>Share Your Location</DialogTitle>
+                  <DialogDescription>Share your current location with convoy members</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Share with Convoy (optional)</Label>
+                    <select
+                      value={shareData.convoy_id}
+                      onChange={(e) => setShareData({ ...shareData, convoy_id: e.target.value })}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      data-testid="share-convoy-select"
+                    >
+                      <option value="">All my convoy members</option>
+                      {convoys.filter(c => c.driver_email === user?.email || c.interested_drivers?.includes(user?.email)).map(convoy => (
+                        <option key={convoy.id} value={convoy.id}>
+                          {convoy.origin_city} → {convoy.destination_city} ({convoy.current_drivers} drivers)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <Label>Message (optional)</Label>
+                    <Input
+                      value={shareData.message}
+                      onChange={(e) => setShareData({ ...shareData, message: e.target.value })}
+                      placeholder="Taking a break at rest stop..."
+                      data-testid="share-message"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label>Share Duration</Label>
+                    <select
+                      value={shareData.duration_minutes}
+                      onChange={(e) => setShareData({ ...shareData, duration_minutes: parseInt(e.target.value) })}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      data-testid="share-duration"
+                    >
+                      <option value={30}>30 minutes</option>
+                      <option value={60}>1 hour</option>
+                      <option value={120}>2 hours</option>
+                      <option value={240}>4 hours</option>
+                      <option value={480}>8 hours</option>
+                    </select>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleShareLocation} 
+                    className="w-full btn-primary"
+                    disabled={sharingLocation}
+                    data-testid="confirm-share-btn"
+                  >
+                    {sharingLocation ? "Getting Location..." : "Share My Location"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardHeader>
+        
+        {/* Shared Locations from Others */}
+        {sharedLocations.length > 0 && (
+          <CardContent>
+            <p className="text-sm font-medium text-blue-800 mb-2">📍 Drivers sharing location with you:</p>
+            <div className="space-y-2">
+              {sharedLocations.map((loc) => (
+                <div key={loc.id} className="flex items-center justify-between bg-white rounded-lg p-3 border border-blue-100" data-testid={`shared-loc-${loc.id}`}>
+                  <div>
+                    <p className="font-medium text-sm">{loc.driver_name}</p>
+                    <p className="text-xs text-slate-600">{loc.message || "Sharing location"}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      <Clock className="w-3 h-3 mr-1" />
+                      {new Date(loc.expires_at).toLocaleTimeString()}
+                    </Badge>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => window.open(`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`, '_blank')}
+                      data-testid={`view-loc-${loc.id}`}
+                    >
+                      <MapPin className="w-3 h-3 mr-1" />
+                      View
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Convoy Posts */}
         <div className="space-y-4">
