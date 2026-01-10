@@ -390,7 +390,20 @@ export default function LandingPage() {
             <span className="text-2xl font-black">TrukAll</span>
           </div>
           <p className="text-gray-400 mb-4">The Complete Truck Driver Solution</p>
-          <p className="text-gray-500 text-sm">© 2024 TrukAll. All rights reserved.</p>
+          <div className="flex items-center justify-center gap-6 mb-6">
+            <a href="/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">
+              Privacy Policy
+            </a>
+            <span className="text-gray-600">|</span>
+            <a href="/terms" className="text-gray-400 hover:text-white transition-colors text-sm">
+              Terms of Service
+            </a>
+            <span className="text-gray-600">|</span>
+            <a href="mailto:support@trukall.com" className="text-gray-400 hover:text-white transition-colors text-sm">
+              Contact Us
+            </a>
+          </div>
+          <p className="text-gray-500 text-sm">© 2026 TrukAll. All rights reserved.</p>
         </div>
       </footer>
 
