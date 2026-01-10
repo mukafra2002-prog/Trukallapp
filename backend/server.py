@@ -1249,28 +1249,8 @@ async def complete_maintenance(reminder_id: str):
     
     return {"message": "Maintenance marked as completed"}
 
-# ============== EMERGENCY SOS ==============
-
-@api_router.post("/emergency/sos", response_model=EmergencySOS)
-async def create_emergency_sos(sos_data: EmergencySOSCreate, driver_email: str):
-    user = await db.users.find_one({"email": driver_email})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    sos = EmergencySOS(
-        driver_email=user['email'],
-        driver_name=user['name'],
-        driver_phone=user.get('phone', 'N/A'),
-        **sos_data.model_dump()
-    )
-    
-    sos_doc = sos.model_dump()
-    sos_doc['created_at'] = sos_doc['created_at'].isoformat()
-    
-    await db.emergency_sos.insert_one(sos_doc)
-    logger.critical(f"EMERGENCY SOS: {user['name']} at ({sos.latitude}, {sos.longitude}) - {sos.emergency_type}")
-    
-    return sos
+# Note: Main Emergency SOS endpoint is defined later in the file (around line 2062)
+# This section only contains the active emergencies lookup
 
 @api_router.get("/emergency/sos/active")
 async def get_active_emergencies():

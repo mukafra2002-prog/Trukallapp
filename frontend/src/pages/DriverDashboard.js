@@ -87,7 +87,7 @@ export default function DriverDashboard() {
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: '' // Will use mock data for MVP
+    googleMapsApiKey: 'AIzaSyAcI3b6EZ-4MHb03_8NyLSP2TKLcsQDEbI'
   });
 
   useEffect(() => {
