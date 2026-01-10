@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
-import { Users, MapPin, Calendar, ArrowRight, Plus, MessageCircle } from "lucide-react";
+import { Users, MapPin, Calendar, ArrowRight, Plus, MessageCircle, Share2, Navigation, Clock } from "lucide-react";
 
 export default function ConvoyFinder() {
   const { user } = useContext(AuthContext);
@@ -18,7 +18,16 @@ export default function ConvoyFinder() {
   const [selectedLocation, setSelectedLocation] = useState("General");
   const [newMessage, setNewMessage] = useState("");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [sharedLocations, setSharedLocations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sharingLocation, setSharingLocation] = useState(false);
+  
+  const [shareData, setShareData] = useState({
+    message: "",
+    duration_minutes: 60,
+    convoy_id: ""
+  });
   
   const [newConvoy, setNewConvoy] = useState({
     origin_city: "",
