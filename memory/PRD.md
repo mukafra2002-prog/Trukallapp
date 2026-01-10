@@ -69,6 +69,12 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - [x] Document scanner/uploader
 - [x] Document categorization (BOL, POD, etc.)
 
+### Legal & Compliance Pages
+- [x] **Privacy Policy** page (/privacy)
+- [x] **Terms of Service** page (/terms)
+- [x] Terms agreement checkbox on signup
+- [x] Footer links to all legal pages
+
 ## Test Credentials
 - **Driver**: driver@test.com / password123
 - **Partner**: partner@test.com / password123
