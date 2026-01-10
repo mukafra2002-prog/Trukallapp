@@ -73,12 +73,14 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - `/api/parking-spots` - Parking CRUD
 - `/api/spots/live-updates` - Real-time parking data
 - `/api/emergency/sos` - Emergency SOS
-- `/api/subscriptions/plans` - Subscription management
+- `/api/subscriptions/plans` - Subscription management (supports `?plan_type=partner` for partner plans)
 - `/api/compliance/{email}` - DOT compliance
 - `/api/fuel-prices` - Fuel prices
 - `/api/loads` - Load board
 - `/api/reviews` - Parking reviews
 - `/api/brokers` - Broker ratings
+- `/api/location/share` - Share location with convoy members (NEW)
+- `/api/location/shared-with-me/{email}` - Get locations shared with you (NEW)
 
 ## Recent Updates (January 2026)
 
