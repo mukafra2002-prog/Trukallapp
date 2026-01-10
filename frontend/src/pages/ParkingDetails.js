@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
-import { ArrowLeft, MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, Calendar } from "lucide-react";
+import { ArrowLeft, MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, Calendar, Star } from "lucide-react";
+import SpotReviews from "@/components/SpotReviews";
 
 export default function ParkingDetails() {
   const { spotId } = useParams();
@@ -267,6 +268,20 @@ export default function ParkingDetails() {
             </CardContent>
           </Card>
         )}
+
+        {/* Community Reviews */}
+        <Card data-testid="reviews-section">
+          <CardHeader>
+            <CardTitle className="text-2xl flex items-center gap-2">
+              <Star className="w-6 h-6 text-primary" />
+              Driver Reviews
+            </CardTitle>
+            <CardDescription>See what other drivers say about this location</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SpotReviews spotId={spotId} spotName={spot.name} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
