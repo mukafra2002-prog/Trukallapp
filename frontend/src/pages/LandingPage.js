@@ -50,6 +50,10 @@ export default function LandingPage() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    if (!agreedToTerms) {
+      toast.error("Please agree to the Terms of Service and Privacy Policy");
+      return;
+    }
     setLoading(true);
     try {
       const response = await axios.post(`${API}/auth/register`, signupData);
