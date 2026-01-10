@@ -15,6 +15,7 @@ import PaymentCancelled from "./pages/PaymentCancelled";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Contact from "./pages/Contact";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
