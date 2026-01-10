@@ -9,13 +9,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
-import { Plus, LogOut, Edit, DollarSign, MapPin } from "lucide-react";
+import { Plus, LogOut, Edit, DollarSign, MapPin, Crown, Check, Star } from "lucide-react";
 
 export default function PartnerDashboard() {
   const { user, logout } = useContext(AuthContext);
   const [spots, setSpots] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [partnerPlans, setPartnerPlans] = useState([]);
+  const [activeTab, setActiveTab] = useState("spots"); // spots, plans
   
   const [newSpot, setNewSpot] = useState({
     name: "",
