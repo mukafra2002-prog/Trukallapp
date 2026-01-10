@@ -1555,7 +1555,8 @@ async def share_location(location_data: ShareLocationRequest, driver_email: str)
         convoy = await db.convoy_posts.find_one({"id": location_data.convoy_id})
         if convoy:
             shared_with.extend(convoy.get('interested_drivers', []))
-            shared_with.append(convoy.get('leader_email', ''))
+            # Add convoy leader (driver_email field)
+            shared_with.append(convoy.get('driver_email', ''))
     
     # Remove duplicates and self
     shared_with = list(set([e for e in shared_with if e and e != driver_email]))
