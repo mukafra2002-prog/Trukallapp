@@ -1474,9 +1474,17 @@ async def join_convoy(post_id: str, driver_email: str):
     if post['current_drivers'] >= post['max_drivers']:
         raise HTTPException(status_code=400, detail="Convoy is full")
     
+    # Check if already joined
+    interested = post.get('interested_drivers', [])
+    if driver_email in interested or driver_email == post['driver_email']:
+        raise HTTPException(status_code=400, detail="Already in this convoy")
+    
     result = await db.convoy_posts.update_one(
         {"id": post_id},
-        {"$inc": {"current_drivers": 1}}
+        {
+            "$inc": {"current_drivers": 1},
+            "$push": {"interested_drivers": driver_email}
+        }
     )
     
     # Check if now full
@@ -1486,6 +1494,23 @@ async def join_convoy(post_id: str, driver_email: str):
             {"id": post_id},
             {"$set": {"status": "full"}}
         )
+    
+    # Notify convoy leader
+    leader = await db.users.find_one({"email": post['driver_email']})
+    joiner = await db.users.find_one({"email": driver_email})
+    if leader and joiner:
+        notification = Notification(
+            recipient_email=post['driver_email'],
+            sender_email=driver_email,
+            sender_name=joiner['name'],
+            type="convoy_join",
+            title="🚛 New Convoy Member!",
+            message=f"{joiner['name']} joined your convoy to {post['destination_city']}, {post['destination_state']}",
+            data={"convoy_id": post_id}
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
     
     return {"message": "Joined convoy successfully"}
 
