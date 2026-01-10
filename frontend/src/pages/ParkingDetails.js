@@ -146,20 +146,20 @@ export default function ParkingDetails() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Pricing */}
-            <div className="bg-accent p-6 rounded-xl">
+            <div className="bg-blue-50 p-6 rounded-xl">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-lg text-muted-foreground">Price per Night</span>
-                <span className="text-4xl font-black mono text-primary">
+                <span className="text-lg text-slate-600">Price per Night</span>
+                <span className="text-4xl font-black mono text-blue-600">
                   {spot.is_free ? "FREE" : `$${spot.price_per_night}`}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Available Spaces</p>
+                  <p className="text-slate-600">Available Spaces</p>
                   <p className="text-2xl font-bold mono">{spot.available_spaces}/{spot.total_spaces}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Security Level</p>
+                  <p className="text-slate-600">Security Level</p>
                   <p className="text-2xl font-bold uppercase">{spot.security_level}</p>
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default function ParkingDetails() {
             {spot.description && (
               <div>
                 <h3 className="text-xl font-bold mb-2">About This Location</h3>
-                <p className="text-muted-foreground">{spot.description}</p>
+                <p className="text-slate-600">{spot.description}</p>
               </div>
             )}
 
@@ -178,7 +178,7 @@ export default function ParkingDetails() {
               <h3 className="text-xl font-bold mb-4">Amenities</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {spot.amenities.map((amenity) => (
-                  <div key={amenity} className="amenity-badge bg-accent text-foreground">
+                  <div key={amenity} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium bg-slate-100 text-slate-700">
                     {getAmenityIcon(amenity)}
                     <span className="capitalize">{amenity}</span>
                   </div>
@@ -192,15 +192,15 @@ export default function ParkingDetails() {
                 <h3 className="text-xl font-bold mb-4">Fuel Prices</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {spot.fuel_price_diesel && (
-                    <div className="bg-accent p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-1">Diesel</p>
-                      <p className="fuel-price text-primary">${spot.fuel_price_diesel}</p>
+                    <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                      <p className="text-sm text-slate-600 mb-1">Diesel</p>
+                      <p className="fuel-price text-green-600">${spot.fuel_price_diesel}</p>
                     </div>
                   )}
                   {spot.fuel_price_unleaded && (
-                    <div className="bg-accent p-4 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-1">Unleaded</p>
-                      <p className="fuel-price text-primary">${spot.fuel_price_unleaded}</p>
+                    <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                      <p className="text-sm text-slate-600 mb-1">Unleaded</p>
+                      <p className="fuel-price text-green-600">${spot.fuel_price_unleaded}</p>
                     </div>
                   )}
                 </div>
