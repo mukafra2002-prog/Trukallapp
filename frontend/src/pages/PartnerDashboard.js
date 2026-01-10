@@ -40,6 +40,7 @@ export default function PartnerDashboard() {
 
   useEffect(() => {
     fetchSpots();
+    fetchPartnerPlans();
   }, []);
 
   const fetchSpots = async () => {
@@ -50,6 +51,15 @@ export default function PartnerDashboard() {
       toast.error("Failed to load your parking spots");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPartnerPlans = async () => {
+    try {
+      const response = await axios.get(`${API}/subscriptions/plans?plan_type=partner`);
+      setPartnerPlans(response.data.plans || []);
+    } catch (error) {
+      console.error("Failed to load partner plans");
     }
   };
 
