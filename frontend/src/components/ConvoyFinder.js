@@ -42,9 +42,13 @@ export default function ConvoyFinder() {
   useEffect(() => {
     fetchConvoys();
     fetchChatMessages();
+    fetchSharedLocations();
     
     // Poll for new messages every 5 seconds
-    const interval = setInterval(fetchChatMessages, 5000);
+    const interval = setInterval(() => {
+      fetchChatMessages();
+      fetchSharedLocations();
+    }, 5000);
     return () => clearInterval(interval);
   }, [selectedLocation]);
 
@@ -57,6 +61,64 @@ export default function ConvoyFinder() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchSharedLocations = async () => {
+    if (!user) return;
+    try {
+      const response = await axios.get(`${API}/location/shared-with-me/${user.email}`);
+      setSharedLocations(response.data);
+    } catch (error) {
+      console.error("Failed to load shared locations");
+    }
+  };
+
+  const handleShareLocation = async () => {
+    if (!user) {
+      toast.error("Please login to share location");
+      return;
+    }
+
+    setSharingLocation(true);
+    
+    // Get current location
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      setSharingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const locationData = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            message: shareData.message || "Sharing my location with convoy",
+            duration_minutes: shareData.duration_minutes,
+            convoy_id: shareData.convoy_id || null
+          };
+
+          const response = await axios.post(
+            `${API}/location/share?driver_email=${user.email}`,
+            locationData
+          );
+          
+          toast.success(response.data.message);
+          setShowShareDialog(false);
+          setShareData({ message: "", duration_minutes: 60, convoy_id: "" });
+        } catch (error) {
+          toast.error("Failed to share location");
+        } finally {
+          setSharingLocation(false);
+        }
+      },
+      (error) => {
+        toast.error("Unable to get your location. Please enable location services.");
+        setSharingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   };
 
   const fetchChatMessages = async () => {
