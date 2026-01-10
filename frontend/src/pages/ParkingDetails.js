@@ -243,14 +243,14 @@ export default function ParkingDetails() {
                   </div>
                 </div>
 
-                <div className="bg-accent p-6 rounded-xl">
+                <div className="bg-blue-50 p-6 rounded-xl">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-lg">Nights</span>
                     <span className="text-2xl font-bold mono">{days > 0 ? days : 1}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-lg">Total Price</span>
-                    <span className="text-4xl font-black mono text-primary">
+                    <span className="text-4xl font-black mono text-blue-600">
                       {totalPrice === 0 ? "FREE" : `$${totalPrice.toFixed(2)}`}
                     </span>
                   </div>
