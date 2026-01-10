@@ -25,12 +25,14 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - [x] Parking search by city
 - [x] Booking/reservation system
 - [x] Reward points system
+- [x] Notification bell with real-time alerts
 
 ### Safety Features
 - [x] Emergency SOS button with contacts notification
 - [x] Fatigue monitor
 - [x] Wake-up timer/alarm
 - [x] DOT Compliance tracker
+- [x] **Weather & Road Alerts** (NEW)
 
 ### Financial Tools
 - [x] Load board for finding jobs
@@ -47,7 +49,9 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 ### Community Features
 - [x] Community reviews for parking spots
 - [x] Convoy finder
+- [x] **Convoy Chat** (NEW) - Direct messaging within convoys
 - [x] Driver leaderboard
+- [x] Share location with convoy members
 
 ### Admin Features
 - [x] Admin dashboard
@@ -55,7 +59,8 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - [x] System statistics
 
 ### Subscription & Payments
-- [x] Subscription plans (Free, Pro, Premium)
+- [x] Driver subscription plans (Free, Pro, Premium)
+- [x] Partner subscription plans (Starter, Business, Enterprise)
 - [x] Stripe integration ready
 
 ### Document Management
