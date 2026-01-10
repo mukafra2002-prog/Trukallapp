@@ -404,7 +404,7 @@ export default function LandingPage() {
               Terms of Service
             </a>
             <span className="text-gray-600">|</span>
-            <a href="mailto:support@yourdomain.com" className="text-gray-400 hover:text-white transition-colors text-sm">
+            <a href="/contact" className="text-gray-400 hover:text-white transition-colors text-sm">
               Contact Us
             </a>
           </div>
