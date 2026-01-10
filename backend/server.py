@@ -1791,6 +1791,203 @@ async def post_chat_message(chat_data: DriverChatCreate, driver_email: str):
     await db.driver_chat.insert_one(chat_doc)
     return chat
 
+# ============== WEATHER ALERTS ==============
+
+@api_router.get("/weather/alerts")
+async def get_weather_alerts(
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    radius_miles: int = 100,
+    active_only: bool = True
+):
+    """Get weather alerts, optionally filtered by location"""
+    query = {}
+    if active_only:
+        query["active"] = True
+        # Also filter out expired alerts
+        query["$or"] = [
+            {"expires_at": None},
+            {"expires_at": {"$gt": datetime.now(timezone.utc).isoformat()}}
+        ]
+    
+    alerts = await db.weather_alerts.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # If location provided, filter by proximity (simple distance check)
+    if latitude and longitude:
+        filtered_alerts = []
+        for alert in alerts:
+            if alert.get('latitude') and alert.get('longitude'):
+                # Simple distance calculation (not exact, but good enough for alerts)
+                lat_diff = abs(alert['latitude'] - latitude)
+                lng_diff = abs(alert['longitude'] - longitude)
+                # Rough conversion: 1 degree ≈ 69 miles
+                distance = ((lat_diff * 69) ** 2 + (lng_diff * 69) ** 2) ** 0.5
+                if distance <= radius_miles:
+                    alert['distance_miles'] = round(distance, 1)
+                    filtered_alerts.append(alert)
+            else:
+                # Include alerts without specific coordinates
+                filtered_alerts.append(alert)
+        return filtered_alerts
+    
+    return alerts
+
+@api_router.get("/weather/alerts/nearby")
+async def get_nearby_weather_alerts(latitude: float, longitude: float, radius_miles: int = 100):
+    """Get weather alerts near a specific location"""
+    return await get_weather_alerts(latitude=latitude, longitude=longitude, radius_miles=radius_miles)
+
+@api_router.post("/weather/alerts")
+async def create_weather_alert(alert_data: WeatherAlertCreate, driver_email: Optional[str] = None):
+    """Create a new weather alert (can be driver-reported or system)"""
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=alert_data.expires_hours)
+    
+    alert = WeatherAlert(
+        alert_type=alert_data.alert_type,
+        severity=alert_data.severity,
+        title=alert_data.title,
+        description=alert_data.description,
+        location=alert_data.location,
+        latitude=alert_data.latitude,
+        longitude=alert_data.longitude,
+        radius_miles=alert_data.radius_miles,
+        reported_by=driver_email,
+        expires_at=expires_at
+    )
+    
+    alert_doc = alert.model_dump()
+    alert_doc['created_at'] = alert_doc['created_at'].isoformat()
+    alert_doc['expires_at'] = alert_doc['expires_at'].isoformat() if alert_doc['expires_at'] else None
+    
+    await db.weather_alerts.insert_one(alert_doc)
+    
+    # Create notifications for drivers in the area (simplified - notify all drivers)
+    if alert.severity in ["high", "critical"]:
+        drivers = await db.users.find({"role": "driver"}, {"email": 1, "_id": 0}).to_list(1000)
+        for driver in drivers:
+            notification = Notification(
+                recipient_email=driver['email'],
+                type="weather_alert",
+                title=f"⚠️ {alert.severity.upper()}: {alert.title}",
+                message=f"{alert.location} - {alert.description}",
+                data={
+                    "alert_id": alert.id,
+                    "severity": alert.severity,
+                    "latitude": alert.latitude,
+                    "longitude": alert.longitude
+                }
+            )
+            notif_doc = notification.model_dump()
+            notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+            await db.notifications.insert_one(notif_doc)
+    
+    logger.info(f"⚠️ Weather Alert created: {alert.title} at {alert.location}")
+    return alert
+
+@api_router.put("/weather/alerts/{alert_id}/deactivate")
+async def deactivate_weather_alert(alert_id: str):
+    """Deactivate a weather alert"""
+    result = await db.weather_alerts.update_one(
+        {"id": alert_id},
+        {"$set": {"active": False}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return {"message": "Alert deactivated"}
+
+# ============== CONVOY CHAT ==============
+
+@api_router.get("/convoy/{convoy_id}/messages")
+async def get_convoy_messages(convoy_id: str, limit: int = 100):
+    """Get messages for a specific convoy"""
+    # Verify convoy exists
+    convoy = await db.convoy_posts.find_one({"id": convoy_id})
+    if not convoy:
+        raise HTTPException(status_code=404, detail="Convoy not found")
+    
+    messages = await db.convoy_messages.find(
+        {"convoy_id": convoy_id},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    return messages[::-1]  # Reverse to show oldest first
+
+@api_router.post("/convoy/{convoy_id}/messages")
+async def send_convoy_message(convoy_id: str, message_data: ConvoyMessageCreate, driver_email: str):
+    """Send a message to convoy chat"""
+    # Verify convoy exists
+    convoy = await db.convoy_posts.find_one({"id": convoy_id})
+    if not convoy:
+        raise HTTPException(status_code=404, detail="Convoy not found")
+    
+    # Verify user is part of this convoy
+    is_leader = convoy.get('driver_email') == driver_email
+    is_member = driver_email in convoy.get('interested_drivers', [])
+    
+    if not is_leader and not is_member:
+        raise HTTPException(status_code=403, detail="You are not a member of this convoy")
+    
+    user = await db.users.find_one({"email": driver_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    message = ConvoyMessage(
+        convoy_id=convoy_id,
+        sender_email=driver_email,
+        sender_name=user['name'],
+        message=message_data.message,
+        message_type=message_data.message_type,
+        attachment_url=message_data.attachment_url,
+        is_read_by=[driver_email]  # Sender has read it
+    )
+    
+    msg_doc = message.model_dump()
+    msg_doc['created_at'] = msg_doc['created_at'].isoformat()
+    
+    await db.convoy_messages.insert_one(msg_doc)
+    
+    # Notify other convoy members
+    all_members = [convoy.get('driver_email')] + convoy.get('interested_drivers', [])
+    for member_email in all_members:
+        if member_email and member_email != driver_email:
+            notification = Notification(
+                recipient_email=member_email,
+                sender_email=driver_email,
+                sender_name=user['name'],
+                type="convoy_message",
+                title="💬 New Convoy Message",
+                message=f"{user['name']}: {message_data.message[:50]}{'...' if len(message_data.message) > 50 else ''}",
+                data={
+                    "convoy_id": convoy_id,
+                    "message_id": message.id
+                }
+            )
+            notif_doc = notification.model_dump()
+            notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+            await db.notifications.insert_one(notif_doc)
+    
+    return message
+
+@api_router.put("/convoy/{convoy_id}/messages/{message_id}/read")
+async def mark_convoy_message_read(convoy_id: str, message_id: str, driver_email: str):
+    """Mark a convoy message as read by this user"""
+    result = await db.convoy_messages.update_one(
+        {"id": message_id, "convoy_id": convoy_id},
+        {"$addToSet": {"is_read_by": driver_email}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    return {"message": "Message marked as read"}
+
+@api_router.get("/convoy/{convoy_id}/messages/unread-count")
+async def get_convoy_unread_count(convoy_id: str, driver_email: str):
+    """Get count of unread messages in a convoy"""
+    count = await db.convoy_messages.count_documents({
+        "convoy_id": convoy_id,
+        "is_read_by": {"$ne": driver_email}
+    })
+    return {"unread_count": count}
+
 # ============== TRIP PROFIT CALCULATOR ==============
 
 @api_router.post("/calculator/trip-profit")
