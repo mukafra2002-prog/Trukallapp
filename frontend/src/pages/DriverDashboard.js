@@ -89,7 +89,7 @@ export default function DriverDashboard() {
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: 'AIzaSyAcI3b6EZ-4MHb03_8NyLSP2TKLcsQDEbI'
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'AIzaSyAcI3b6EZ-4MHb03_8NyLSP2TKLcsQDEbI'
   });
 
   useEffect(() => {
