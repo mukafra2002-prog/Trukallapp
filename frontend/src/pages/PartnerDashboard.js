@@ -150,8 +150,82 @@ export default function PartnerDashboard() {
           </Card>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6">
+          <Button
+            variant={activeTab === "spots" ? "default" : "outline"}
+            onClick={() => setActiveTab("spots")}
+            className={activeTab === "spots" ? "bg-blue-600 hover:bg-blue-700" : ""}
+            data-testid="tab-spots"
+          >
+            <MapPin className="w-4 h-4 mr-2" />
+            My Spots
+          </Button>
+          <Button
+            variant={activeTab === "plans" ? "default" : "outline"}
+            onClick={() => setActiveTab("plans")}
+            className={activeTab === "plans" ? "bg-blue-600 hover:bg-blue-700" : ""}
+            data-testid="tab-plans"
+          >
+            <Crown className="w-4 h-4 mr-2" />
+            Upgrade Plan
+          </Button>
+        </div>
+
+        {/* Partner Plans */}
+        {activeTab === "plans" && (
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold mb-4">Partner Subscription Plans</h3>
+            <p className="text-muted-foreground mb-6">Choose the right plan for your parking business</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {partnerPlans.map((plan) => (
+                <Card 
+                  key={plan.id} 
+                  className={`relative ${plan.is_popular ? 'border-blue-500 border-2 shadow-lg' : ''}`}
+                  data-testid={`plan-${plan.id}`}
+                >
+                  {plan.is_popular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-blue-600 text-white">
+                        <Star className="w-3 h-3 mr-1" />
+                        Most Popular
+                      </Badge>
+                    </div>
+                  )}
+                  <CardHeader className="text-center pt-8">
+                    <CardTitle className="text-xl">{plan.name}</CardTitle>
+                    <div className="mt-4">
+                      <span className="text-4xl font-black">${plan.price}</span>
+                      <span className="text-muted-foreground">/{plan.interval}</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-3 mb-6">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm">
+                          <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      className={`w-full ${plan.is_popular ? 'btn-primary' : ''}`}
+                      variant={plan.is_popular ? "default" : "outline"}
+                      data-testid={`select-plan-${plan.id}`}
+                    >
+                      {plan.price === 0 ? "Current Plan" : "Upgrade Now"}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Add Spot Button */}
-        <div className="mb-6">
+        {activeTab === "spots" && (
+          <>
+          <div className="mb-6">
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <DialogTrigger asChild>
               <Button className="btn-primary" data-testid="add-spot-btn">
