@@ -5614,6 +5614,327 @@ async def delete_hos_log(log_id: str, user_email: str):
         raise HTTPException(status_code=404, detail="Log not found")
     return {"message": "Log deleted"}
 
+# ============== FORGOT PASSWORD ==============
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(email: str):
+    """Request password reset"""
+    user = await db.users.find_one({"email": email})
+    if not user:
+        # Don't reveal if email exists
+        return {"message": "If email exists, reset link will be sent"}
+    
+    # Generate reset token
+    reset_token = str(uuid.uuid4())
+    expires = datetime.now(timezone.utc) + timedelta(hours=1)
+    
+    await db.password_resets.insert_one({
+        "email": email,
+        "token": reset_token,
+        "expires": expires.isoformat(),
+        "used": False
+    })
+    
+    # In production, send email here
+    logger.info(f"Password reset requested for {email}, token: {reset_token}")
+    
+    return {
+        "message": "If email exists, reset link will be sent",
+        "debug_token": reset_token  # Remove in production
+    }
+
+@api_router.post("/auth/reset-password")
+async def reset_password(token: str, new_password: str):
+    """Reset password with token"""
+    reset = await db.password_resets.find_one({
+        "token": token,
+        "used": False
+    })
+    
+    if not reset:
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+    
+    expires = datetime.fromisoformat(reset['expires'].replace('Z', '+00:00')) if isinstance(reset['expires'], str) else reset['expires']
+    if datetime.now(timezone.utc) > expires:
+        raise HTTPException(status_code=400, detail="Token expired")
+    
+    # Hash new password
+    hashed = hashlib.sha256(new_password.encode()).hexdigest()
+    
+    await db.users.update_one(
+        {"email": reset['email']},
+        {"$set": {"hashed_password": hashed}}
+    )
+    
+    await db.password_resets.update_one(
+        {"token": token},
+        {"$set": {"used": True}}
+    )
+    
+    return {"message": "Password reset successfully"}
+
+# ============== DEMO ACCOUNT ==============
+
+DEMO_ACCOUNT = {
+    "email": "demo@trukall.app",
+    "password": "demo123",
+    "name": "Demo Driver",
+    "role": "driver"
+}
+
+@api_router.post("/auth/demo-login")
+async def demo_login():
+    """Login with demo account"""
+    # Check if demo account exists
+    demo_user = await db.users.find_one({"email": DEMO_ACCOUNT["email"]})
+    
+    if not demo_user:
+        # Create demo account
+        hashed = hashlib.sha256(DEMO_ACCOUNT["password"].encode()).hexdigest()
+        demo_user = {
+            "email": DEMO_ACCOUNT["email"],
+            "hashed_password": hashed,
+            "name": DEMO_ACCOUNT["name"],
+            "role": DEMO_ACCOUNT["role"],
+            "reward_points": 500,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "is_demo": True
+        }
+        await db.users.insert_one(demo_user)
+    
+    token = jwt.encode(
+        {"email": DEMO_ACCOUNT["email"], "role": "driver", "exp": datetime.now(timezone.utc) + timedelta(hours=24)},
+        SECRET_KEY,
+        algorithm="HS256"
+    )
+    
+    return {
+        "token": token,
+        "user": {
+            "email": DEMO_ACCOUNT["email"],
+            "name": DEMO_ACCOUNT["name"],
+            "role": "driver",
+            "reward_points": 500,
+            "is_demo": True
+        },
+        "message": "Demo login successful! Explore all features."
+    }
+
+# ============== APP STATS & LAUNCH CONFIG ==============
+
+LAUNCH_CONFIG = {
+    "launch_offer_active": True,
+    "launch_offer_text": "🚀 Launch Special: Free Pro for 30 days!",
+    "launch_offer_slots": 500,
+    "boosted_referral_active": True,
+    "boosted_referral_points": 1000,  # Instead of 500
+    "boosted_referral_new_user": 500,  # Instead of 250
+}
+
+@api_router.get("/app/stats")
+async def get_app_stats():
+    """Get app statistics for social proof"""
+    user_count = await db.users.count_documents({})
+    review_count = await db.reviews.count_documents({})
+    spot_count = await db.parking_spots.count_documents({})
+    load_count = await db.loads.count_documents({})
+    
+    # Round up for social proof
+    display_users = max(100, ((user_count // 100) + 1) * 100) if user_count < 1000 else user_count
+    
+    return {
+        "users": user_count,
+        "display_users": display_users,
+        "reviews": review_count,
+        "parking_spots": spot_count,
+        "loads": load_count,
+        "launch_config": LAUNCH_CONFIG
+    }
+
+@api_router.get("/app/launch-config")
+async def get_launch_config():
+    """Get launch configuration"""
+    claimed = await db.users.count_documents({"launch_offer_claimed": True})
+    remaining = max(0, LAUNCH_CONFIG["launch_offer_slots"] - claimed)
+    
+    return {
+        **LAUNCH_CONFIG,
+        "slots_claimed": claimed,
+        "slots_remaining": remaining
+    }
+
+# ============== SEED DATA ==============
+
+SEED_TRUCK_STOPS = [
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Atlanta", "state": "GA", "lat": 33.7490, "lng": -84.3880, "capacity": 150, "amenities": ["fuel", "showers", "food", "wifi", "scales"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Dallas", "state": "TX", "lat": 32.7767, "lng": -96.7970, "capacity": 200, "amenities": ["fuel", "showers", "food", "wifi", "def"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "Oklahoma City", "state": "OK", "lat": 35.4676, "lng": -97.5164, "capacity": 175, "amenities": ["fuel", "showers", "food", "wifi", "tire_care"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Nashville", "state": "TN", "lat": 36.1627, "lng": -86.7816, "capacity": 180, "amenities": ["fuel", "showers", "food", "wifi", "truck_wash"]},
+    {"name": "Petro Stopping Center", "chain": "Petro", "city": "Chicago", "state": "IL", "lat": 41.8781, "lng": -87.6298, "capacity": 160, "amenities": ["fuel", "showers", "food", "wifi", "iron_skillet"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Los Angeles", "state": "CA", "lat": 34.0522, "lng": -118.2437, "capacity": 140, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Phoenix", "state": "AZ", "lat": 33.4484, "lng": -112.0740, "capacity": 190, "amenities": ["fuel", "showers", "food", "wifi", "def", "scales"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "Denver", "state": "CO", "lat": 39.7392, "lng": -104.9903, "capacity": 165, "amenities": ["fuel", "showers", "food", "wifi", "godfather_pizza"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Memphis", "state": "TN", "lat": 35.1495, "lng": -90.0490, "capacity": 155, "amenities": ["fuel", "showers", "food", "wifi", "truck_service"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Indianapolis", "state": "IN", "lat": 39.7684, "lng": -86.1581, "capacity": 145, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Kansas City", "state": "MO", "lat": 39.0997, "lng": -94.5786, "capacity": 185, "amenities": ["fuel", "showers", "food", "wifi", "def"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "Houston", "state": "TX", "lat": 29.7604, "lng": -95.3698, "capacity": 200, "amenities": ["fuel", "showers", "food", "wifi", "chester_chicken"]},
+    {"name": "TA Express", "chain": "TA", "city": "San Antonio", "state": "TX", "lat": 29.4241, "lng": -98.4936, "capacity": 120, "amenities": ["fuel", "showers", "food"]},
+    {"name": "Petro Stopping Center", "chain": "Petro", "city": "St. Louis", "state": "MO", "lat": 38.6270, "lng": -90.1994, "capacity": 170, "amenities": ["fuel", "showers", "food", "wifi", "iron_skillet"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Charlotte", "state": "NC", "lat": 35.2271, "lng": -80.8431, "capacity": 135, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Jacksonville", "state": "FL", "lat": 30.3322, "lng": -81.6557, "capacity": 175, "amenities": ["fuel", "showers", "food", "wifi", "def"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "Columbus", "state": "OH", "lat": 39.9612, "lng": -82.9988, "capacity": 160, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Louisville", "state": "KY", "lat": 38.2527, "lng": -85.7585, "capacity": 150, "amenities": ["fuel", "showers", "food", "wifi", "truck_wash"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Baltimore", "state": "MD", "lat": 39.2904, "lng": -76.6122, "capacity": 130, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Las Vegas", "state": "NV", "lat": 36.1699, "lng": -115.1398, "capacity": 195, "amenities": ["fuel", "showers", "food", "wifi", "def", "scales"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "Albuquerque", "state": "NM", "lat": 35.0844, "lng": -106.6504, "capacity": 155, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Little Rock", "state": "AR", "lat": 34.7465, "lng": -92.2896, "capacity": 140, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Petro Stopping Center", "chain": "Petro", "city": "Birmingham", "state": "AL", "lat": 33.5207, "lng": -86.8025, "capacity": 165, "amenities": ["fuel", "showers", "food", "wifi", "iron_skillet"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Salt Lake City", "state": "UT", "lat": 40.7608, "lng": -111.8910, "capacity": 145, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Portland", "state": "OR", "lat": 45.5152, "lng": -122.6784, "capacity": 170, "amenities": ["fuel", "showers", "food", "wifi", "def"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "Seattle", "state": "WA", "lat": 47.6062, "lng": -122.3321, "capacity": 150, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Minneapolis", "state": "MN", "lat": 44.9778, "lng": -93.2650, "capacity": 175, "amenities": ["fuel", "showers", "food", "wifi", "truck_service"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Detroit", "state": "MI", "lat": 42.3314, "lng": -83.0458, "capacity": 140, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Omaha", "state": "NE", "lat": 41.2565, "lng": -95.9345, "capacity": 180, "amenities": ["fuel", "showers", "food", "wifi", "def"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "Tulsa", "state": "OK", "lat": 36.1540, "lng": -95.9928, "capacity": 160, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Richmond", "state": "VA", "lat": 37.5407, "lng": -77.4360, "capacity": 135, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Petro Stopping Center", "chain": "Petro", "city": "Knoxville", "state": "TN", "lat": 35.9606, "lng": -83.9207, "capacity": 155, "amenities": ["fuel", "showers", "food", "wifi", "iron_skillet"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Raleigh", "state": "NC", "lat": 35.7796, "lng": -78.6382, "capacity": 130, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Boise", "state": "ID", "lat": 43.6150, "lng": -116.2023, "capacity": 165, "amenities": ["fuel", "showers", "food", "wifi", "def"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "El Paso", "state": "TX", "lat": 31.7619, "lng": -106.4850, "capacity": 145, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Fresno", "state": "CA", "lat": 36.7378, "lng": -119.7871, "capacity": 170, "amenities": ["fuel", "showers", "food", "wifi", "truck_wash"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Bakersfield", "state": "CA", "lat": 35.3733, "lng": -119.0187, "capacity": 155, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Sacramento", "state": "CA", "lat": 38.5816, "lng": -121.4944, "capacity": 185, "amenities": ["fuel", "showers", "food", "wifi", "def", "scales"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "San Diego", "state": "CA", "lat": 32.7157, "lng": -117.1611, "capacity": 140, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Tucson", "state": "AZ", "lat": 32.2226, "lng": -110.9747, "capacity": 160, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Petro Stopping Center", "chain": "Petro", "city": "Amarillo", "state": "TX", "lat": 35.2220, "lng": -101.8313, "capacity": 175, "amenities": ["fuel", "showers", "food", "wifi", "iron_skillet"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Lubbock", "state": "TX", "lat": 33.5779, "lng": -101.8552, "capacity": 135, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Wichita", "state": "KS", "lat": 37.6872, "lng": -97.3301, "capacity": 170, "amenities": ["fuel", "showers", "food", "wifi", "def"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "Des Moines", "state": "IA", "lat": 41.5868, "lng": -93.6250, "capacity": 150, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Springfield", "state": "MO", "lat": 37.2090, "lng": -93.2923, "capacity": 145, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Pilot Travel Center", "chain": "Pilot", "city": "Jackson", "state": "MS", "lat": 32.2988, "lng": -90.1848, "capacity": 140, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Flying J Travel Center", "chain": "Flying J", "city": "Mobile", "state": "AL", "lat": 30.6954, "lng": -88.0399, "capacity": 165, "amenities": ["fuel", "showers", "food", "wifi", "def"]},
+    {"name": "Love's Travel Stop", "chain": "Love's", "city": "New Orleans", "state": "LA", "lat": 29.9511, "lng": -90.0715, "capacity": 155, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "TA Travel Center", "chain": "TA", "city": "Shreveport", "state": "LA", "lat": 32.5252, "lng": -93.7502, "capacity": 150, "amenities": ["fuel", "showers", "food", "wifi"]},
+    {"name": "Petro Stopping Center", "chain": "Petro", "city": "Baton Rouge", "state": "LA", "lat": 30.4515, "lng": -91.1871, "capacity": 160, "amenities": ["fuel", "showers", "food", "wifi", "iron_skillet"]},
+]
+
+SEED_LOADS = [
+    {"origin": "Atlanta, GA", "destination": "Dallas, TX", "weight": 42000, "rate": 3200, "miles": 780, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Chicago, IL", "destination": "Los Angeles, CA", "weight": 38000, "rate": 5500, "miles": 2015, "equipment": "Reefer", "pickup": "Tomorrow"},
+    {"origin": "Houston, TX", "destination": "Miami, FL", "weight": 44000, "rate": 2800, "miles": 1190, "equipment": "Flatbed", "pickup": "ASAP"},
+    {"origin": "Phoenix, AZ", "destination": "Denver, CO", "weight": 35000, "rate": 1800, "miles": 600, "equipment": "Dry Van", "pickup": "2 Days"},
+    {"origin": "Seattle, WA", "destination": "Portland, OR", "weight": 40000, "rate": 650, "miles": 175, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Nashville, TN", "destination": "Memphis, TN", "weight": 36000, "rate": 550, "miles": 210, "equipment": "Reefer", "pickup": "Tomorrow"},
+    {"origin": "Las Vegas, NV", "destination": "Salt Lake City, UT", "weight": 41000, "rate": 1400, "miles": 420, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Kansas City, MO", "destination": "St. Louis, MO", "weight": 39000, "rate": 600, "miles": 250, "equipment": "Flatbed", "pickup": "Tomorrow"},
+    {"origin": "Indianapolis, IN", "destination": "Columbus, OH", "weight": 43000, "rate": 480, "miles": 175, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Charlotte, NC", "destination": "Raleigh, NC", "weight": 37000, "rate": 380, "miles": 165, "equipment": "Reefer", "pickup": "2 Days"},
+    {"origin": "Detroit, MI", "destination": "Cleveland, OH", "weight": 40000, "rate": 520, "miles": 170, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Minneapolis, MN", "destination": "Milwaukee, WI", "weight": 38000, "rate": 680, "miles": 340, "equipment": "Reefer", "pickup": "Tomorrow"},
+    {"origin": "San Antonio, TX", "destination": "Austin, TX", "weight": 42000, "rate": 320, "miles": 80, "equipment": "Flatbed", "pickup": "ASAP"},
+    {"origin": "Jacksonville, FL", "destination": "Tampa, FL", "weight": 35000, "rate": 480, "miles": 200, "equipment": "Dry Van", "pickup": "Tomorrow"},
+    {"origin": "Oklahoma City, OK", "destination": "Tulsa, OK", "weight": 39000, "rate": 350, "miles": 105, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Omaha, NE", "destination": "Lincoln, NE", "weight": 41000, "rate": 280, "miles": 55, "equipment": "Reefer", "pickup": "2 Days"},
+    {"origin": "Albuquerque, NM", "destination": "El Paso, TX", "weight": 36000, "rate": 720, "miles": 265, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Louisville, KY", "destination": "Lexington, KY", "weight": 38000, "rate": 320, "miles": 80, "equipment": "Flatbed", "pickup": "Tomorrow"},
+    {"origin": "Richmond, VA", "destination": "Norfolk, VA", "weight": 40000, "rate": 380, "miles": 95, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Boise, ID", "destination": "Spokane, WA", "weight": 37000, "rate": 850, "miles": 290, "equipment": "Reefer", "pickup": "2 Days"},
+    {"origin": "New York, NY", "destination": "Boston, MA", "weight": 35000, "rate": 680, "miles": 215, "equipment": "Dry Van", "pickup": "ASAP"},
+    {"origin": "Philadelphia, PA", "destination": "Pittsburgh, PA", "weight": 42000, "rate": 750, "miles": 305, "equipment": "Flatbed", "pickup": "Tomorrow"},
+]
+
+SEED_COMMUNITY_POSTS = [
+    {"category": "tips", "title": "Best fuel stops on I-40", "content": "Hey drivers! Just wanted to share my favorite fuel stops along I-40. The Love's in Amarillo has great prices and clean showers. Flying J in OKC is also solid. What are your favorites?", "author": "RoadWarrior_Mike"},
+    {"category": "routes", "title": "Avoiding Chicago traffic - my strategy", "content": "After 15 years of trucking, I've figured out the best times to hit Chicago. Early morning (3-5am) or late night (10pm+). I-294 tolls are worth it during rush hour. Share your tips!", "author": "ChicagoHauler"},
+    {"category": "parking", "title": "Hidden gem rest area in Tennessee", "content": "Found an amazing rest area on I-40 near Cookeville. Usually has spots even at night, clean facilities, and there's a small diner within walking distance. Mile marker 287.", "author": "NightOwlTrucker"},
+    {"category": "deals", "title": "Free shower hack at Pilot/Flying J", "content": "Pro tip: Download the myRewards app and you get a free shower for every 100 gallons. Stack your points across both chains! Also, they often have bonus point days.", "author": "SaverDriver"},
+    {"category": "questions", "title": "New driver - best ELD recommendations?", "content": "Just got my CDL and starting with a small fleet. Looking for ELD recommendations that are reliable and easy to use. What do you all recommend? Budget is around $200-300.", "author": "NewbieNate"},
+    {"category": "general", "title": "Dealing with dispatcher issues", "content": "How do you all handle dispatchers who consistently give unrealistic delivery times? Looking for advice on professional ways to push back. Been in this industry 5 years.", "author": "FrustratedFred"},
+    {"category": "tips", "title": "Cold weather starting tips", "content": "Winter is coming! Here are my tips for cold weather: 1) Block heater is your friend 2) Keep fuel tank above half 3) Check air dryer daily 4) Anti-gel additive works. Stay safe out there!", "author": "WinterTrucker"},
+    {"category": "parking", "title": "Walmart parking - which ones allow trucks?", "content": "Made a list of Walmarts that still allow overnight truck parking. Will update as I find more. Note: Always check with security first. List in comments below.", "author": "WalmartMapper"},
+    {"category": "routes", "title": "Mountain driving tips for new drivers", "content": "Heading through the Rockies for the first time? Key tips: Use lower gears going down, jake brake is your friend, watch tire temps, and pull over if brakes smell. Take your time!", "author": "MountainMaster"},
+    {"category": "deals", "title": "TA Rewards program changes", "content": "Just got an email about TA changing their rewards program. Looks like they're matching Love's now. 1 point per gallon, free shower at 50 gallons. Not bad!", "author": "RewardsHunter"},
+]
+
+@api_router.post("/admin/seed-data")
+async def seed_data():
+    """Seed the database with sample data for launch"""
+    results = {"parking_spots": 0, "loads": 0, "community_posts": 0}
+    
+    # Seed parking spots
+    for stop in SEED_TRUCK_STOPS:
+        existing = await db.parking_spots.find_one({"name": stop["name"], "city": stop["city"]})
+        if not existing:
+            spot = {
+                "id": str(uuid.uuid4()),
+                "name": stop["name"],
+                "chain": stop["chain"],
+                "city": stop["city"],
+                "state": stop["state"],
+                "address": f"{stop['city']}, {stop['state']}",
+                "latitude": stop["lat"],
+                "longitude": stop["lng"],
+                "total_spaces": stop["capacity"],
+                "available_spaces": int(stop["capacity"] * 0.6),  # 60% available
+                "amenities": stop["amenities"],
+                "price_per_night": 0 if stop["chain"] in ["Pilot", "Flying J", "Love's"] else 15,
+                "rating": round(3.5 + (hash(stop["name"]) % 15) / 10, 1),
+                "review_count": hash(stop["name"]) % 50 + 5,
+                "is_verified": True,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.parking_spots.insert_one(spot)
+            results["parking_spots"] += 1
+    
+    # Seed loads
+    for load in SEED_LOADS:
+        existing = await db.loads.find_one({"origin": load["origin"], "destination": load["destination"], "rate": load["rate"]})
+        if not existing:
+            load_doc = {
+                "id": str(uuid.uuid4()),
+                "origin": load["origin"],
+                "destination": load["destination"],
+                "weight": load["weight"],
+                "rate": load["rate"],
+                "rate_per_mile": round(load["rate"] / load["miles"], 2),
+                "miles": load["miles"],
+                "equipment_type": load["equipment"],
+                "pickup_date": load["pickup"],
+                "delivery_date": "Flexible",
+                "broker": f"TrukAll Verified #{hash(load['origin']) % 1000}",
+                "broker_rating": round(3.8 + (hash(load["origin"]) % 12) / 10, 1),
+                "status": "available",
+                "posted_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.loads.insert_one(load_doc)
+            results["loads"] += 1
+    
+    # Seed community posts
+    for post in SEED_COMMUNITY_POSTS:
+        existing = await db.community_posts.find_one({"title": post["title"]})
+        if not existing:
+            post_doc = {
+                "id": str(uuid.uuid4()),
+                "author_email": f"{post['author'].lower()}@trukall.app",
+                "author_name": post["author"],
+                "category": post["category"],
+                "title": post["title"],
+                "content": post["content"],
+                "images": [],
+                "likes": hash(post["title"]) % 30 + 5,
+                "liked_by": [],
+                "comments_count": hash(post["title"]) % 10,
+                "is_pinned": False,
+                "is_featured": post["category"] == "tips",
+                "tags": [],
+                "created_at": (datetime.now(timezone.utc) - timedelta(days=hash(post["title"]) % 14)).isoformat()
+            }
+            await db.community_posts.insert_one(post_doc)
+            results["community_posts"] += 1
+    
+    logger.info(f"Seed data created: {results}")
+    return {"message": "Seed data created!", "results": results}
+
 # Include the router in the main app
 app.include_router(api_router)
 
