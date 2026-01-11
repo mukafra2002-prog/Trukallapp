@@ -52,16 +52,18 @@ class TestRoutePlanner:
     def test_plan_route(self):
         """Test POST /api/routes/plan"""
         route_data = {
-            "origin": "Dallas, TX",
+            "origin_address": "Dallas, TX",
             "origin_lat": 32.7767,
             "origin_lng": -96.7970,
-            "destination": "Atlanta, GA",
+            "destination_address": "Atlanta, GA",
             "destination_lat": 33.7490,
             "destination_lng": -84.3880,
-            "truck_height": 13.6,
-            "truck_weight": 80000,
+            "truck_type": "semi",
+            "truck_height_ft": 13.6,
+            "truck_weight_lbs": 80000,
             "hazmat": False,
-            "avoid_tolls": False
+            "avoid_tolls": False,
+            "include_parking_stops": True
         }
         response = requests.post(
             f"{BASE_URL}/api/routes/plan?driver_email={DRIVER_EMAIL}",
@@ -69,23 +71,25 @@ class TestRoutePlanner:
         )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert "total_distance" in data
-        assert "total_duration" in data
-        print(f"✓ Route planned: {data['total_distance']} miles, {data['total_duration']} minutes")
+        assert "total_distance_miles" in data
+        assert "estimated_drive_time_hours" in data
+        print(f"✓ Route planned: {data['total_distance_miles']} miles, {data['estimated_drive_time_hours']} hours")
     
     def test_plan_route_with_hazmat(self):
         """Test POST /api/routes/plan with hazmat flag"""
         route_data = {
-            "origin": "Los Angeles, CA",
+            "origin_address": "Los Angeles, CA",
             "origin_lat": 34.0522,
             "origin_lng": -118.2437,
-            "destination": "Phoenix, AZ",
+            "destination_address": "Phoenix, AZ",
             "destination_lat": 33.4484,
             "destination_lng": -112.0740,
-            "truck_height": 13.6,
-            "truck_weight": 80000,
+            "truck_type": "semi",
+            "truck_height_ft": 13.6,
+            "truck_weight_lbs": 80000,
             "hazmat": True,
-            "avoid_tolls": True
+            "avoid_tolls": True,
+            "include_parking_stops": True
         }
         response = requests.post(
             f"{BASE_URL}/api/routes/plan?driver_email={DRIVER_EMAIL}",
@@ -93,8 +97,8 @@ class TestRoutePlanner:
         )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert "restrictions" in data
-        print(f"✓ Hazmat route planned with {len(data.get('restrictions', []))} restrictions")
+        assert "warnings" in data
+        print(f"✓ Hazmat route planned with {len(data.get('warnings', []))} warnings")
     
     def test_get_route_history(self):
         """Test GET /api/routes/history/{email}"""
