@@ -1,0 +1,145 @@
+{
+  "hero": {
+    "badge": "Confiado por mais de 10.000 Caminhoneiros",
+    "title": "Nunca Mais Chegue a um",
+    "titleHighlight": "Estacionamento Lotado",
+    "titleEnd": "",
+    "subtitle": "Encontre estacionamento seguro em segundos, ganhe dinheiro com quadro de cargas, rastreie despesas e junte-se a comboios. Tudo que um caminhoneiro precisa.",
+    "cta": "Comece Grátis Hoje",
+    "secondary": "Veja Como Funciona",
+    "trust1": "100% Grátis Para Sempre",
+    "trust2": "Sem Cartão de Crédito",
+    "trust3": "Funciona no iPhone e Android"
+  },
+  "stats": {
+    "drivers": "Motoristas Ativos",
+    "saved": "Economizado Por Ano",
+    "updates": "Atualizações em Tempo Real",
+    "rating": "Avaliação dos Motoristas"
+  },
+  "features": {
+    "title": "Resolvemos",
+    "titleHighlight": "Todos os Problemas",
+    "subtitle": "Pare de perder dinheiro, tempo e sono. TrukAll resolve os 10 principais problemas dos caminhoneiros.",
+    "parking": {
+      "title": "Reserve Estacionamento 24h Antes",
+      "desc": "Nunca mais chegue a um estacionamento lotado. Reserve sua vaga antes de sair.",
+      "benefit": "Economize $4.600/ano"
+    },
+    "loadBoard": {
+      "title": "Quadro de Cargas + Calculadora",
+      "desc": "Encontre cargas que pagam bem e saiba se são lucrativas antes de aceitar.",
+      "benefit": "Ganhe mais por milha"
+    },
+    "convoy": {
+      "title": "Buscador de Comboio + Chat",
+      "desc": "Encontre motoristas na sua rota. Viaje junto para segurança e companhia.",
+      "benefit": "Viagens mais seguras"
+    },
+    "emergency": {
+      "title": "SOS de Emergência + GPS",
+      "desc": "Botão de emergência de um toque envia sua localização para ajuda instantânea.",
+      "benefit": "Recurso salva-vidas"
+    },
+    "reviews": {
+      "title": "Avaliações Verificadas",
+      "desc": "Avaliações reais de motoristas reais. Saiba o que é bom antes de ir.",
+      "benefit": "Confiança da comunidade"
+    },
+    "rewards": {
+      "title": "Sistema de Recompensas",
+      "desc": "Ganhe pontos por reservas, avaliações e direção segura. Troque por prêmios.",
+      "benefit": "Ganhe para usar"
+    }
+  },
+  "killerFeatures": {
+    "title": "Veja Nossos",
+    "titleHighlight": "Recursos Matadores",
+    "subtitle": "Esses recursos destacam o TrukAll de todos os outros apps de caminhão",
+    "hos": {
+      "title": "Rastreador de Horas de Serviço",
+      "desc": "Nunca mais receba uma violação do DOT. Rastreie horas de direção e limites semanais.",
+      "stat": "$16.000",
+      "statLabel": "multa média evitada"
+    },
+    "weight": {
+      "title": "Calculadora de Peso Inteligente",
+      "desc": "Saiba o peso exato dos eixos antes da balança. Salve vários perfis de caminhão.",
+      "stat": "100%",
+      "statLabel": "precisão na balança"
+    },
+    "qr": {
+      "title": "Scanner de Código QR",
+      "desc": "Escaneie códigos QR em paradas para check-in instantâneo. Compartilhe seu código de indicação.",
+      "stat": "500+",
+      "statLabel": "pontos de bônus"
+    },
+    "realtime": {
+      "title": "Disponibilidade em Tempo Real",
+      "desc": "Veja atualizações ao vivo de outros motoristas. Saiba quão lotado está cada lugar.",
+      "stat": "30seg",
+      "statLabel": "frequência de atualização"
+    }
+  },
+  "testimonials": {
+    "title": "O Que Motoristas",
+    "titleHighlight": "Estão Dizendo",
+    "reviews": [
+      {
+        "name": "Carlos Silva",
+        "location": "São Paulo, Brasil",
+        "text": "Este app salvou minha carreira! Nunca mais peguei uma multa de HOS desde que comecei a usar.",
+        "rating": 5
+      },
+      {
+        "name": "João Santos",
+        "location": "Rio de Janeiro",
+        "text": "A calculadora de peso é perfeita. Economizei milhares em multas de excesso de peso.",
+        "rating": 5
+      }
+    ]
+  },
+  "cta": {
+    "title": "Junte-se a 10.000+ Motoristas",
+    "subtitle": "Comece a encontrar estacionamento seguro e ganhar mais hoje.",
+    "button": "Comece Grátis Agora"
+  },
+  "nav": {
+    "login": "Entrar",
+    "signup": "Cadastre-se Grátis",
+    "logout": "Sair"
+  },
+  "auth": {
+    "welcome": "Bem-vindo de Volta",
+    "createAccount": "Criar Conta Grátis",
+    "loginDesc": "Entre na sua conta TrukAll",
+    "signupDesc": "Junte-se a 10.000+ motoristas",
+    "email": "Email",
+    "password": "Senha",
+    "name": "Nome Completo",
+    "role": "Eu sou",
+    "driver": "Caminhoneiro",
+    "partner": "Dono de Estacionamento",
+    "forgotPassword": "Esqueceu a senha?",
+    "loginBtn": "ENTRAR",
+    "signupBtn": "Criar Conta Grátis",
+    "demoBtn": "Experimentar Demo",
+    "noAccount": "Não tem conta?",
+    "hasAccount": "Já tem conta?",
+    "signupFree": "Cadastre-se grátis",
+    "agreeTerms": "Eu concordo com os",
+    "terms": "Termos de Serviço",
+    "privacy": "Política de Privacidade",
+    "and": "e"
+  },
+  "dashboard": {
+    "points": "Seus Pontos",
+    "howToEarn": "Como ganhar?",
+    "fatigue": "Status de Fadiga",
+    "allGood": "TUDO BEM",
+    "takeBreak": "FAÇA UMA PAUSA!",
+    "wakeUp": "Alarme de Despertar",
+    "notSet": "Não definido"
+  },
+  "language": "Idioma"
+}

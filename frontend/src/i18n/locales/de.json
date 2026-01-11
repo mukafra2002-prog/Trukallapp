@@ -1,0 +1,145 @@
+{
+  "hero": {
+    "badge": "Über 10.000 LKW-Fahrer vertrauen uns",
+    "title": "Fahre nie wieder zu einem",
+    "titleHighlight": "Vollen Parkplatz",
+    "titleEnd": "",
+    "subtitle": "Finde sicheres Parken in Sekunden, verdiene Geld mit Frachtbörse, verfolge Ausgaben und schließe dich Konvois an.",
+    "cta": "Heute Kostenlos Starten",
+    "secondary": "Siehe Wie Es Funktioniert",
+    "trust1": "100% Für Immer Kostenlos",
+    "trust2": "Keine Kreditkarte Erforderlich",
+    "trust3": "Funktioniert auf iPhone & Android"
+  },
+  "stats": {
+    "drivers": "Aktive Fahrer",
+    "saved": "Pro Jahr Gespart",
+    "updates": "Echtzeit-Updates",
+    "rating": "Fahrerbewertung"
+  },
+  "features": {
+    "title": "Wir Lösen",
+    "titleHighlight": "Jedes Problem",
+    "subtitle": "Hör auf Geld, Zeit und Schlaf zu verlieren. TrukAll löst die 10 größten Probleme der LKW-Fahrer.",
+    "parking": {
+      "title": "Parkplatz 24h Vorher Reservieren",
+      "desc": "Fahre nie wieder zu einem vollen Parkplatz. Reserviere deinen Platz vor der Abfahrt.",
+      "benefit": "Spare $4.600/Jahr"
+    },
+    "loadBoard": {
+      "title": "Frachtbörse + Rechner",
+      "desc": "Finde zahlende Frachten und wisse ob sie profitabel sind bevor du akzeptierst.",
+      "benefit": "Verdiene mehr pro Meile"
+    },
+    "convoy": {
+      "title": "Konvoi-Finder + Chat",
+      "desc": "Finde Fahrer auf deiner Route. Fahrt zusammen für Sicherheit und Gesellschaft.",
+      "benefit": "Sicherere Langstrecken"
+    },
+    "emergency": {
+      "title": "Notfall-SOS + GPS",
+      "desc": "Ein-Tipp-Notfallknopf sendet deinen Standort für sofortige Hilfe.",
+      "benefit": "Lebensrettende Funktion"
+    },
+    "reviews": {
+      "title": "Verifizierte Fahrer-Bewertungen",
+      "desc": "Echte Bewertungen von echten Fahrern. Wisse was gut ist bevor du fährst.",
+      "benefit": "Community-gestütztes Vertrauen"
+    },
+    "rewards": {
+      "title": "Belohnungs- & Punktesystem",
+      "desc": "Verdiene Punkte für Buchungen, Bewertungen und sicheres Fahren.",
+      "benefit": "Werde fürs Nutzen bezahlt"
+    }
+  },
+  "killerFeatures": {
+    "title": "Sieh Unsere",
+    "titleHighlight": "Killer-Funktionen",
+    "subtitle": "Diese Funktionen heben TrukAll von jeder anderen LKW-App ab",
+    "hos": {
+      "title": "Lenkzeit-Tracker",
+      "desc": "Nie wieder DOT-Verstöße. Verfolge Fahrzeit, Dienstfenster und Wochenlimits.",
+      "stat": "$16.000",
+      "statLabel": "durchschn. Strafe vermieden"
+    },
+    "weight": {
+      "title": "Intelligenter Gewichts-Rechner",
+      "desc": "Kenne dein genaues Achsgewicht vor der Waage. Speichere mehrere LKW-Profile.",
+      "stat": "100%",
+      "statLabel": "Waagen-Genauigkeit"
+    },
+    "qr": {
+      "title": "QR-Code Scanner",
+      "desc": "Scanne QR-Codes an Raststätten für sofortiges Check-in. Teile deinen Empfehlungscode.",
+      "stat": "500+",
+      "statLabel": "Bonuspunkte"
+    },
+    "realtime": {
+      "title": "Echtzeit-Verfügbarkeit",
+      "desc": "Sieh Live-Updates von anderen Fahrern. Wisse wie voll jeder Parkplatz ist.",
+      "stat": "30Sek",
+      "statLabel": "Update-Frequenz"
+    }
+  },
+  "testimonials": {
+    "title": "Was Fahrer",
+    "titleHighlight": "Sagen",
+    "reviews": [
+      {
+        "name": "Hans Müller",
+        "location": "Berlin, Deutschland",
+        "text": "Diese App hat meine Karriere gerettet! Seit ich sie nutze, habe ich keine Lenkzeitstrafe mehr bekommen.",
+        "rating": 5
+      },
+      {
+        "name": "Klaus Schmidt",
+        "location": "München",
+        "text": "Der Gewichtsrechner ist perfekt. Ich habe Tausende an Überladungsstrafen gespart.",
+        "rating": 5
+      }
+    ]
+  },
+  "cta": {
+    "title": "Schließe dich 10.000+ Fahrern an",
+    "subtitle": "Beginne heute sicheres Parken zu finden und mehr zu verdienen.",
+    "button": "Jetzt Kostenlos Starten"
+  },
+  "nav": {
+    "login": "Anmelden",
+    "signup": "Kostenlos Registrieren",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "welcome": "Willkommen Zurück",
+    "createAccount": "Kostenloses Konto Erstellen",
+    "loginDesc": "Melde dich bei deinem TrukAll-Konto an",
+    "signupDesc": "Schließe dich 10.000+ Fahrern an",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "name": "Vollständiger Name",
+    "role": "Ich bin",
+    "driver": "LKW-Fahrer",
+    "partner": "Parkplatz-Besitzer",
+    "forgotPassword": "Passwort vergessen?",
+    "loginBtn": "ANMELDEN",
+    "signupBtn": "Kostenloses Konto Erstellen",
+    "demoBtn": "Demo Testen",
+    "noAccount": "Kein Konto?",
+    "hasAccount": "Bereits ein Konto?",
+    "signupFree": "Kostenlos registrieren",
+    "agreeTerms": "Ich stimme den",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzrichtlinie",
+    "and": "und"
+  },
+  "dashboard": {
+    "points": "Deine Punkte",
+    "howToEarn": "Wie verdienen?",
+    "fatigue": "Müdigkeitsstatus",
+    "allGood": "ALLES GUT",
+    "takeBreak": "MACH PAUSE!",
+    "wakeUp": "Weck-Alarm",
+    "notSet": "Nicht eingestellt"
+  },
+  "language": "Sprache"
+}
