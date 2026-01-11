@@ -97,6 +97,18 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 
 ## Recent Updates (January 2026)
 
+### Session: January 11, 2026 (6 NEW FEATURES ADDED)
+- **Analytics Dashboard** - Track earnings, expenses, miles, loads with Week/Month/Year views
+- **Truck Route Planner** - Plan routes with truck-specific restrictions (height, weight, hazmat, tolls)
+- **Voice Commands** - Hands-free voice search using Web Speech API
+- **Photo Reviews** - Add photos to parking spot reviews with star ratings
+- **In-App Messaging** - Direct messaging between drivers with conversation list
+- **Push Notifications** - Backend API ready (VAPID keys), frontend service worker integration
+- Fixed RoutePlanner API field names to match backend (origin_address, truck_height_ft, etc.)
+- Fixed PhotoReviews API paths (/api/reviews/photo)
+- All 17 new backend tests passing (100%)
+- All 5 frontend feature tabs working and tested
+
 ### Session: January 10, 2026
 - Fixed Emergency SOS API (removed duplicate endpoint conflict)
 - Integrated Google Maps with API key
@@ -114,17 +126,16 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - **APP IS LAUNCH READY**
 
 ## Known Issues
-- Google Maps shows "development purposes only" watermark (needs billing enabled)
-- React key warning in Trip Calculator (minor cosmetic)
+- Google Maps shows deprecation warning for google.maps.Marker (minor, not blocking)
+- Voice Commands requires browser microphone permission
+- Push Notifications requires browser notification permission
 
 ## Future Enhancements (Backlog)
 1. Convert PWA to native app (Capacitor/React Native)
 2. AI-powered smart alerts system
 3. Integrated fuel card
-4. Voice-activated assistant
-5. Enhanced route planner with truck restrictions
-6. Refactor server.py into modular routers
-7. Refactor DriverDashboard.js into smaller components
+4. Refactor server.py into modular routers (urgent - file is very large)
+5. Refactor DriverDashboard.js into smaller components (urgent - file is very large)
 
 ## File Structure
 ```
