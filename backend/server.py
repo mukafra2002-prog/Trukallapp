@@ -5545,61 +5545,76 @@ async def delete_hos_log(log_id: str, user_email: str):
 
 # ============== FORGOT PASSWORD ==============
 
+# Pydantic models for password reset
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    reset_code: str
+    new_password: str
+
 @api_router.post("/auth/forgot-password")
-async def forgot_password(email: str):
-    """Request password reset"""
-    user = await db.users.find_one({"email": email})
+async def forgot_password(request: ForgotPasswordRequest):
+    """Request password reset - sends 6-digit code"""
+    user = await db.users.find_one({"email": request.email})
     if not user:
-        # Don't reveal if email exists
-        return {"message": "If email exists, reset link will be sent"}
+        # Don't reveal if email exists - still return success
+        return {"message": "If email exists, reset code will be sent"}
     
-    # Generate reset token
-    reset_token = str(uuid.uuid4())
+    # Generate 6-digit reset code (easier for users to enter)
+    reset_code = str(random.randint(100000, 999999))
     expires = datetime.now(timezone.utc) + timedelta(hours=1)
     
+    # Delete any existing reset codes for this email
+    await db.password_resets.delete_many({"email": request.email})
+    
     await db.password_resets.insert_one({
-        "email": email,
-        "token": reset_token,
+        "email": request.email,
+        "reset_code": reset_code,
         "expires": expires.isoformat(),
         "used": False
     })
     
     # In production, send email here
-    logger.info(f"Password reset requested for {email}, token: {reset_token}")
+    logger.info(f"Password reset requested for {request.email}, code: {reset_code}")
     
+    # For testing, return the code (MOCKED - remove in production)
     return {
-        "message": "If email exists, reset link will be sent",
-        "debug_token": reset_token  # Remove in production
+        "message": "Reset code sent! Check your email.",
+        "reset_code": reset_code  # MOCKED for testing - shows in UI toast
     }
 
 @api_router.post("/auth/reset-password")
-async def reset_password(token: str, new_password: str):
-    """Reset password with token"""
+async def reset_password(request: ResetPasswordRequest):
+    """Reset password with 6-digit code"""
     reset = await db.password_resets.find_one({
-        "token": token,
+        "email": request.email,
+        "reset_code": request.reset_code,
         "used": False
     })
     
     if not reset:
-        raise HTTPException(status_code=400, detail="Invalid or expired token")
+        raise HTTPException(status_code=400, detail="Invalid or expired reset code")
     
     expires = datetime.fromisoformat(reset['expires'].replace('Z', '+00:00')) if isinstance(reset['expires'], str) else reset['expires']
     if datetime.now(timezone.utc) > expires:
-        raise HTTPException(status_code=400, detail="Token expired")
+        raise HTTPException(status_code=400, detail="Reset code expired")
     
-    # Hash new password
-    hashed = hashlib.sha256(new_password.encode()).hexdigest()
+    # Hash new password using bcrypt (same as registration)
+    hashed = hash_password(request.new_password)
     
     await db.users.update_one(
-        {"email": reset['email']},
-        {"$set": {"hashed_password": hashed}}
+        {"email": request.email},
+        {"$set": {"password_hash": hashed}}
     )
     
     await db.password_resets.update_one(
-        {"token": token},
+        {"email": request.email, "reset_code": request.reset_code},
         {"$set": {"used": True}}
     )
     
+    logger.info(f"Password reset successful for {request.email}")
     return {"message": "Password reset successfully"}
 
 # ============== DEMO ACCOUNT ==============
