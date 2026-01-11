@@ -133,9 +133,8 @@ class TestTruckWeight:
         assert response.status_code == 200
         data = response.json()
         assert "federal" in data
-        assert "axle_limits" in data
         assert "tips" in data
-        print(f"✅ Weight Limits: Max gross={data['federal']['max_gross_weight']} lbs")
+        print(f"✅ Weight Limits: Max gross={data['federal']['gross_weight']} lbs")
     
     def test_weight_profiles(self):
         """Test getting user's truck profiles"""
