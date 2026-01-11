@@ -1,0 +1,88 @@
+{
+  "summary": "TrukAll Pre-Launch Features Testing - Iteration 8. All NEW features working: Demo Account login, Forgot Password flow (FIXED), QR Code Scanner tab, Onboarding Tutorial. Backend: 11/12 tests passed (92%). Frontend: All pre-launch features verified working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/loads",
+        "issue": "Returns 500 due to invalid date format 'ASAP' in database - pre-existing data issue",
+        "priority": "LOW"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Google Maps",
+        "issues": ["Shows deprecation warning for google.maps.Marker - expected, not blocking"]
+      }
+    ]
+  },
+  "passed_tests": [
+    "Backend - Demo Login Endpoint (creates/returns demo@trukall.app user)",
+    "Backend - Demo Login Idempotent (works multiple times)",
+    "Backend - Forgot Password for Existing User (returns reset_code)",
+    "Backend - Forgot Password for Non-existent User (secure - doesn't reveal)",
+    "Backend - Reset Password with Valid Code",
+    "Backend - Reset Password with Invalid Code (rejected)",
+    "Backend - Regular Driver Login (driver@test.com / password123)",
+    "Backend - Invalid Login Rejection",
+    "Backend - API Health Check",
+    "Backend - Parking Spots Endpoint",
+    "Backend - Live Updates Endpoint",
+    "Frontend - Demo Login Button Present and Working",
+    "Frontend - Demo Login Redirects to Dashboard",
+    "Frontend - Onboarding Tutorial Shows (6 steps)",
+    "Frontend - Onboarding Skip Works",
+    "Frontend - Forgot Password Link Present",
+    "Frontend - Forgot Password Form (Step 1 - Email)",
+    "Frontend - Forgot Password Form (Step 2 - Reset Code + New Password)",
+    "Frontend - Reset Code Shown in Toast (MOCKED for testing)",
+    "Frontend - QR Code Tab Present in Dashboard",
+    "Frontend - Scan QR Code Button Present",
+    "Frontend - My QR Code Button Present",
+    "Frontend - QR Code Canvas Renders",
+    "Frontend - Referral Code Displayed (TRUKDEMO)",
+    "Frontend - Core Tabs Still Working (Map, HOS, Weight, Achievements, SOS)"
+  ],
+  "test_report_links": [
+    "/app/tests/test_prelaunch_features.py",
+    "/app/test_reports/pytest/pytest_results_iteration8.xml"
+  ],
+  "action_items": [
+    "OPTIONAL: Fix /api/loads endpoint to handle 'ASAP' date format in database"
+  ],
+  "critical_code_review_comments": [
+    "FIXED: Forgot Password API - Changed from query params to JSON body to match frontend",
+    "FIXED: Forgot Password API - Now returns 'reset_code' (6-digit) instead of 'debug_token' (UUID)",
+    "FIXED: Reset Password API - Now uses bcrypt hash_password() instead of sha256 for consistency",
+    "FIXED: Reset Password API - Now accepts JSON body with email, reset_code, new_password",
+    "All pre-launch features implemented and working correctly"
+  ],
+  "updated_files": [
+    "/app/backend/server.py - Fixed forgot-password and reset-password endpoints to accept JSON body",
+    "/app/tests/test_prelaunch_features.py - Created test suite for pre-launch features"
+  ],
+  "success_rate": {
+    "backend": "92% (11/12 tests passed - 1 pre-existing data issue)",
+    "frontend": "100% (all pre-launch features working)"
+  },
+  "test_credentials": {
+    "driver": "driver@test.com / password123",
+    "demo": "Click 'Try Demo Account' button - auto creates demo@trukall.app"
+  },
+  "seed_data_creation": "Demo account auto-created on first demo login",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "mocked_apis": {
+    "has_mocked_apis": true,
+    "mocked_apis_list": [
+      "Email service for forgot password (shows reset code in UI toast for testing)",
+      "Voice Commands (Web Speech API - browser only)",
+      "Push Notifications (placeholder)"
+    ]
+  },
+  "context_for_next_testing_agent": "Pre-launch features all working: 1) Demo Account - click 'Try Demo Account' button, creates demo@trukall.app user with 500 points. 2) Forgot Password - enter email, get 6-digit code shown in toast (MOCKED), enter code + new password to reset. 3) QR Code Scanner tab - has Scan QR and My QR Code buttons, renders QR code with referral code. 4) Onboarding Tutorial - 6-step welcome tutorial shows for new users, can be skipped. Fixed API mismatch where frontend sent JSON body but backend expected query params. The /api/loads endpoint has a pre-existing data issue with 'ASAP' date format."
+}
