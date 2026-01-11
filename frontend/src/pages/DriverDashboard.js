@@ -1071,6 +1071,37 @@ export default function DriverDashboard() {
           <HOSTracker />
         )}
 
+        {/* QR Scanner Tab */}
+        {activeTab === "qr" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <QrCode className="w-6 h-6 text-indigo-600" />
+                  QR Code Scanner
+                </CardTitle>
+                <CardDescription>
+                  Scan QR codes at truck stops or share your referral code
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <QRScanner 
+                  referralCode={user?.referral_code || `TRUK${user?.email?.slice(0,4).toUpperCase() || 'USER'}`}
+                  onScan={(result) => {
+                    toast.success(`Scanned: ${result}`);
+                    // Handle different QR code types
+                    if (result.includes('ref=')) {
+                      toast.info("Referral code detected!");
+                    } else if (result.includes('spot=')) {
+                      toast.info("Parking spot QR detected!");
+                    }
+                  }}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
