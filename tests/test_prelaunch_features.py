@@ -53,10 +53,10 @@ class TestForgotPassword:
     
     def test_forgot_password_existing_user(self):
         """Test forgot password for existing user"""
-        # Use existing test user
+        # Use existing test user - send JSON body
         response = requests.post(
             f"{BASE_URL}/api/auth/forgot-password",
-            params={"email": "driver@test.com"}
+            json={"email": "driver@test.com"}
         )
         print(f"Forgot password response: {response.status_code}")
         print(f"Response body: {response.json()}")
@@ -64,11 +64,10 @@ class TestForgotPassword:
         assert response.status_code == 200
         data = response.json()
         
-        # Should return message (and debug_token in test mode)
+        # Should return message and reset_code in test mode
         assert "message" in data
-        # In test mode, debug_token should be present
-        if "debug_token" in data:
-            print(f"✅ Reset token generated: {data['debug_token'][:8]}...")
+        if "reset_code" in data:
+            print(f"✅ Reset code generated: {data['reset_code']}")
         else:
             print("✅ Forgot password request processed")
     
@@ -76,7 +75,7 @@ class TestForgotPassword:
         """Test forgot password for non-existent user (should not reveal)"""
         response = requests.post(
             f"{BASE_URL}/api/auth/forgot-password",
-            params={"email": "nonexistent@test.com"}
+            json={"email": "nonexistent@test.com"}
         )
         print(f"Forgot password (nonexistent) response: {response.status_code}")
         
@@ -85,21 +84,22 @@ class TestForgotPassword:
         print("✅ Non-existent email handled securely")
     
     def test_reset_password_with_token(self):
-        """Test password reset with valid token"""
-        # First get a reset token
+        """Test password reset with valid reset code"""
+        # First get a reset code
         forgot_response = requests.post(
             f"{BASE_URL}/api/auth/forgot-password",
-            params={"email": "driver@test.com"}
+            json={"email": "driver@test.com"}
         )
         
-        if forgot_response.status_code == 200 and "debug_token" in forgot_response.json():
-            token = forgot_response.json()["debug_token"]
+        if forgot_response.status_code == 200 and "reset_code" in forgot_response.json():
+            reset_code = forgot_response.json()["reset_code"]
             
-            # Now reset password
+            # Now reset password using JSON body
             reset_response = requests.post(
                 f"{BASE_URL}/api/auth/reset-password",
-                params={
-                    "token": token,
+                json={
+                    "email": "driver@test.com",
+                    "reset_code": reset_code,
                     "new_password": "password123"  # Reset to original
                 }
             )
@@ -108,22 +108,23 @@ class TestForgotPassword:
             assert reset_response.status_code == 200
             print("✅ Password reset successful")
         else:
-            print("⚠️ Debug token not available, skipping reset test")
+            print("⚠️ Reset code not available, skipping reset test")
     
     def test_reset_password_invalid_token(self):
-        """Test password reset with invalid token"""
+        """Test password reset with invalid reset code"""
         response = requests.post(
             f"{BASE_URL}/api/auth/reset-password",
-            params={
-                "token": "invalid-token-12345",
+            json={
+                "email": "driver@test.com",
+                "reset_code": "000000",  # Invalid code
                 "new_password": "newpassword123"
             }
         )
-        print(f"Reset with invalid token: {response.status_code}")
+        print(f"Reset with invalid code: {response.status_code}")
         
         # Should fail with 400
         assert response.status_code == 400
-        print("✅ Invalid token rejected correctly")
+        print("✅ Invalid reset code rejected correctly")
 
 
 class TestRegularLogin:
