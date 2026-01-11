@@ -1024,6 +1024,11 @@ export default function DriverDashboard() {
           <MentorSystem />
         )}
 
+        {/* Truck Weight Tab */}
+        {activeTab === "weight" && (
+          <TruckWeight />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
