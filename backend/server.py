@@ -1401,7 +1401,8 @@ async def get_expense_summary(driver_email: str):
 
 # ============== MAINTENANCE REMINDERS ==============
 
-@api_router.get("/maintenance/{driver_email}", response_model=List[MaintenanceReminder])
+# Old maintenance reminders - renamed to avoid route conflicts with new maintenance tracker
+@api_router.get("/maintenance-reminders/{driver_email}", response_model=List[MaintenanceReminder])
 async def get_maintenance_reminders(driver_email: str):
     reminders = await db.maintenance_reminders.find(
         {"driver_email": driver_email, "is_completed": False},
@@ -1414,7 +1415,7 @@ async def get_maintenance_reminders(driver_email: str):
     
     return reminders
 
-@api_router.post("/maintenance", response_model=MaintenanceReminder)
+@api_router.post("/maintenance-reminders", response_model=MaintenanceReminder)
 async def create_maintenance_reminder(reminder_data: MaintenanceReminderCreate, driver_email: str):
     reminder = MaintenanceReminder(
         driver_email=driver_email,
@@ -1428,8 +1429,8 @@ async def create_maintenance_reminder(reminder_data: MaintenanceReminderCreate, 
     logger.info(f"Maintenance reminder created: {reminder.maintenance_type}")
     return reminder
 
-@api_router.put("/maintenance/{reminder_id}/complete")
-async def complete_maintenance(reminder_id: str):
+@api_router.put("/maintenance-reminders/{reminder_id}/complete")
+async def complete_maintenance_reminder(reminder_id: str):
     result = await db.maintenance_reminders.update_one(
         {"id": reminder_id},
         {"$set": {"is_completed": True}}
