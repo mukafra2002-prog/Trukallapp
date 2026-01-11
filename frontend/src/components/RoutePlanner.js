@@ -51,9 +51,9 @@ export default function RoutePlanner() {
   };
 
   const popularRoutes = [
-    { origin: "Dallas, TX", destination: "Atlanta, GA", origin_lat: 32.7767, origin_lng: -96.7970, dest_lat: 33.7490, dest_lng: -84.3880 },
-    { origin: "Los Angeles, CA", destination: "Phoenix, AZ", origin_lat: 34.0522, origin_lng: -118.2437, dest_lat: 33.4484, dest_lng: -112.0740 },
-    { origin: "Chicago, IL", destination: "Detroit, MI", origin_lat: 41.8781, origin_lng: -87.6298, dest_lat: 42.3314, dest_lng: -83.0458 },
+    { origin_address: "Dallas, TX", destination_address: "Atlanta, GA", origin_lat: 32.7767, origin_lng: -96.7970, dest_lat: 33.7490, dest_lng: -84.3880 },
+    { origin_address: "Los Angeles, CA", destination_address: "Phoenix, AZ", origin_lat: 34.0522, origin_lng: -118.2437, dest_lat: 33.4484, dest_lng: -112.0740 },
+    { origin_address: "Chicago, IL", destination_address: "Detroit, MI", origin_lat: 41.8781, origin_lng: -87.6298, dest_lat: 42.3314, dest_lng: -83.0458 },
   ];
 
   return (
