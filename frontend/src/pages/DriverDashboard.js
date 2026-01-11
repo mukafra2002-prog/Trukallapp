@@ -860,6 +860,42 @@ export default function DriverDashboard() {
             <MessageCircle className="w-4 h-4 mr-2" />
             Messages
           </Button>
+          <Button
+            variant={activeTab === "community" ? "default" : "outline"}
+            onClick={() => setActiveTab("community")}
+            className={`touch-target ${activeTab === "community" ? "bg-violet-600 hover:bg-violet-700" : "border-violet-300 text-violet-700"}`}
+            data-testid="tab-community"
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Community
+          </Button>
+          <Button
+            variant={activeTab === "referral" ? "default" : "outline"}
+            onClick={() => setActiveTab("referral")}
+            className={`touch-target ${activeTab === "referral" ? "bg-amber-600 hover:bg-amber-700" : "border-amber-300 text-amber-700"}`}
+            data-testid="tab-referral"
+          >
+            <Gift className="w-4 h-4 mr-2" />
+            Refer & Earn
+          </Button>
+          <Button
+            variant={activeTab === "feedback" ? "default" : "outline"}
+            onClick={() => setActiveTab("feedback")}
+            className={`touch-target ${activeTab === "feedback" ? "bg-emerald-600 hover:bg-emerald-700" : "border-emerald-300 text-emerald-700"}`}
+            data-testid="tab-feedback"
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Feedback
+          </Button>
+          <Button
+            variant={activeTab === "connect" ? "default" : "outline"}
+            onClick={() => setActiveTab("connect")}
+            className={`touch-target ${activeTab === "connect" ? "bg-sky-600 hover:bg-sky-700" : "border-sky-300 text-sky-700"}`}
+            data-testid="tab-connect"
+          >
+            <Globe className="w-4 h-4 mr-2" />
+            Connect
+          </Button>
         </div>
 
         {/* Weather Alerts Tab */}
