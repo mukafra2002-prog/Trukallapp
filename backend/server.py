@@ -215,18 +215,22 @@ class Load(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class LoadCreate(BaseModel):
-    origin_city: str
-    origin_state: str
-    destination_city: str
-    destination_state: str
-    pickup_date: datetime
-    delivery_date: datetime
-    weight: int
-    distance: int
-    rate: float
-    equipment_type: str
-    contact_name: str
-    contact_phone: str
+    origin_city: Optional[str] = None
+    origin_state: Optional[str] = None
+    destination_city: Optional[str] = None
+    destination_state: Optional[str] = None
+    origin: Optional[str] = None
+    destination: Optional[str] = None
+    pickup_date: Optional[datetime] = None
+    delivery_date: Optional[datetime] = None
+    weight: int = 40000
+    distance: Optional[int] = None
+    miles: Optional[int] = None
+    rate: float = 0
+    equipment_type: Optional[str] = None
+    equipment: Optional[str] = None
+    contact_name: Optional[str] = "Broker"
+    contact_phone: Optional[str] = "1-800-TRUKALL"
 
 class Expense(BaseModel):
     model_config = ConfigDict(extra="ignore")
