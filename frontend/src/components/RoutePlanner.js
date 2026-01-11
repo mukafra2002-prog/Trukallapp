@@ -30,7 +30,7 @@ export default function RoutePlanner() {
   });
 
   const planRoute = async () => {
-    if (!formData.origin || !formData.destination) {
+    if (!formData.origin_address || !formData.destination_address) {
       toast.error("Please enter origin and destination");
       return;
     }
