@@ -4195,6 +4195,738 @@ async def get_app_config():
         }
     }
 
+# ============== GAMIFICATION SYSTEM ==============
+
+# Badge definitions
+BADGE_DEFINITIONS = {
+    # Review badges
+    "first_review": {"name": "First Review", "description": "Wrote your first review", "icon": "⭐", "points": 50, "category": "reviews"},
+    "reviewer_5": {"name": "Active Reviewer", "description": "Wrote 5 reviews", "icon": "📝", "points": 100, "category": "reviews"},
+    "reviewer_25": {"name": "Top Reviewer", "description": "Wrote 25 reviews", "icon": "🏆", "points": 250, "category": "reviews"},
+    "reviewer_100": {"name": "Review Legend", "description": "Wrote 100 reviews", "icon": "👑", "points": 500, "category": "reviews"},
+    
+    # Referral badges
+    "first_referral": {"name": "First Referral", "description": "Referred your first driver", "icon": "🤝", "points": 100, "category": "referrals"},
+    "referrer_5": {"name": "Team Builder", "description": "Referred 5 drivers", "icon": "👥", "points": 250, "category": "referrals"},
+    "referrer_25": {"name": "Community Champion", "description": "Referred 25 drivers", "icon": "🌟", "points": 500, "category": "referrals"},
+    
+    # Community badges
+    "first_post": {"name": "First Post", "description": "Made your first community post", "icon": "💬", "points": 50, "category": "community"},
+    "helpful_5": {"name": "Helpful Driver", "description": "Got 5 helpful votes", "icon": "👍", "points": 100, "category": "community"},
+    "helpful_50": {"name": "Road Helper", "description": "Got 50 helpful votes", "icon": "🦸", "points": 300, "category": "community"},
+    
+    # Streak badges
+    "streak_7": {"name": "Week Warrior", "description": "7-day login streak", "icon": "🔥", "points": 100, "category": "streaks"},
+    "streak_30": {"name": "Monthly Master", "description": "30-day login streak", "icon": "💪", "points": 300, "category": "streaks"},
+    "streak_100": {"name": "Road Legend", "description": "100-day login streak", "icon": "🏅", "points": 1000, "category": "streaks"},
+    
+    # Miles badges
+    "miles_1000": {"name": "Road Starter", "description": "Logged 1,000 miles", "icon": "🛣️", "points": 100, "category": "miles"},
+    "miles_10000": {"name": "Long Hauler", "description": "Logged 10,000 miles", "icon": "🚛", "points": 300, "category": "miles"},
+    "miles_100000": {"name": "Million Miler", "description": "Logged 100,000 miles", "icon": "🌎", "points": 1000, "category": "miles"},
+    
+    # Special badges
+    "early_adopter": {"name": "Early Adopter", "description": "Joined in the first month", "icon": "🚀", "points": 200, "category": "special"},
+    "feedback_hero": {"name": "Feedback Hero", "description": "Submitted 10 feedback reports", "icon": "💡", "points": 150, "category": "special"},
+    "mentor": {"name": "Mentor", "description": "Helped 5 new drivers", "icon": "🎓", "points": 300, "category": "special"},
+}
+
+# Challenge definitions
+DAILY_CHALLENGES = [
+    {"id": "review_spot", "name": "Review a Spot", "description": "Write a review for any parking spot", "points": 25, "type": "review"},
+    {"id": "help_driver", "name": "Help a Driver", "description": "Answer a question in the community", "points": 30, "type": "comment"},
+    {"id": "update_location", "name": "Share Location", "description": "Update a parking spot's availability", "points": 20, "type": "live_update"},
+    {"id": "check_in", "name": "Daily Check-in", "description": "Open the app and check in", "points": 10, "type": "checkin"},
+]
+
+WEEKLY_CHALLENGES = [
+    {"id": "weekly_reviews", "name": "Review Master", "description": "Write 5 reviews this week", "points": 100, "target": 5, "type": "review"},
+    {"id": "weekly_helpful", "name": "Community Helper", "description": "Get 10 helpful votes this week", "points": 150, "target": 10, "type": "helpful"},
+    {"id": "weekly_posts", "name": "Active Poster", "description": "Create 3 community posts", "points": 75, "target": 3, "type": "post"},
+    {"id": "weekly_referral", "name": "Spread the Word", "description": "Refer 1 new driver", "points": 200, "target": 1, "type": "referral"},
+]
+
+class UserBadge(BaseModel):
+    badge_id: str
+    earned_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class UserStreak(BaseModel):
+    current_streak: int = 0
+    longest_streak: int = 0
+    last_checkin: Optional[datetime] = None
+
+class ChallengeProgress(BaseModel):
+    challenge_id: str
+    progress: int = 0
+    target: int
+    completed: bool = False
+    completed_at: Optional[datetime] = None
+
+@api_router.get("/gamification/badges")
+async def get_all_badges():
+    """Get all available badges"""
+    badges = []
+    for badge_id, badge in BADGE_DEFINITIONS.items():
+        badges.append({"id": badge_id, **badge})
+    return badges
+
+@api_router.get("/gamification/user/{user_email}")
+async def get_user_gamification(user_email: str):
+    """Get user's gamification data (badges, streaks, challenges)"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Get user's badges
+    user_badges = await db.user_badges.find({"user_email": user_email}, {"_id": 0}).to_list(100)
+    
+    # Get streak data
+    streak_data = await db.user_streaks.find_one({"user_email": user_email}, {"_id": 0})
+    if not streak_data:
+        streak_data = {"current_streak": 0, "longest_streak": 0}
+    
+    # Get challenge progress
+    today = datetime.now(timezone.utc).date().isoformat()
+    week_start = (datetime.now(timezone.utc) - timedelta(days=datetime.now(timezone.utc).weekday())).date().isoformat()
+    
+    daily_progress = await db.challenge_progress.find(
+        {"user_email": user_email, "date": today, "type": "daily"},
+        {"_id": 0}
+    ).to_list(10)
+    
+    weekly_progress = await db.challenge_progress.find(
+        {"user_email": user_email, "week": week_start, "type": "weekly"},
+        {"_id": 0}
+    ).to_list(10)
+    
+    # Calculate level based on total points
+    total_points = user.get('reward_points', 0)
+    level = 1 + (total_points // 500)  # Level up every 500 points
+    level_progress = (total_points % 500) / 500 * 100
+    
+    return {
+        "badges": user_badges,
+        "total_badges": len(user_badges),
+        "streak": streak_data,
+        "daily_challenges": daily_progress,
+        "weekly_challenges": weekly_progress,
+        "level": level,
+        "level_progress": level_progress,
+        "total_points": total_points
+    }
+
+@api_router.post("/gamification/checkin")
+async def daily_checkin(user_email: str):
+    """Daily check-in to maintain streak"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    today = datetime.now(timezone.utc).date()
+    streak_data = await db.user_streaks.find_one({"user_email": user_email})
+    
+    points_earned = 10
+    streak_bonus = 0
+    new_badges = []
+    
+    if streak_data:
+        last_checkin = streak_data.get('last_checkin')
+        if last_checkin:
+            last_date = datetime.fromisoformat(last_checkin).date() if isinstance(last_checkin, str) else last_checkin.date()
+            
+            if last_date == today:
+                return {"message": "Already checked in today", "points_earned": 0}
+            elif last_date == today - timedelta(days=1):
+                # Continue streak
+                new_streak = streak_data['current_streak'] + 1
+                streak_bonus = min(new_streak * 5, 50)  # Max 50 bonus points
+            else:
+                # Streak broken
+                new_streak = 1
+        else:
+            new_streak = 1
+        
+        longest = max(streak_data.get('longest_streak', 0), new_streak)
+        
+        await db.user_streaks.update_one(
+            {"user_email": user_email},
+            {"$set": {
+                "current_streak": new_streak,
+                "longest_streak": longest,
+                "last_checkin": today.isoformat()
+            }}
+        )
+    else:
+        new_streak = 1
+        await db.user_streaks.insert_one({
+            "user_email": user_email,
+            "current_streak": 1,
+            "longest_streak": 1,
+            "last_checkin": today.isoformat()
+        })
+    
+    # Check for streak badges
+    streak_badges = {"streak_7": 7, "streak_30": 30, "streak_100": 100}
+    for badge_id, required in streak_badges.items():
+        if new_streak >= required:
+            existing = await db.user_badges.find_one({"user_email": user_email, "badge_id": badge_id})
+            if not existing:
+                await db.user_badges.insert_one({
+                    "user_email": user_email,
+                    "badge_id": badge_id,
+                    "earned_at": datetime.now(timezone.utc).isoformat()
+                })
+                new_badges.append(BADGE_DEFINITIONS[badge_id])
+                points_earned += BADGE_DEFINITIONS[badge_id]['points']
+    
+    # Award points
+    total_points = points_earned + streak_bonus
+    await db.users.update_one(
+        {"email": user_email},
+        {"$inc": {"reward_points": total_points}}
+    )
+    
+    return {
+        "message": "Checked in!",
+        "current_streak": new_streak,
+        "points_earned": total_points,
+        "streak_bonus": streak_bonus,
+        "new_badges": new_badges
+    }
+
+@api_router.get("/gamification/leaderboard")
+async def get_leaderboard(category: str = "points", limit: int = 10):
+    """Get leaderboard by category (points, reviews, referrals, streak)"""
+    if category == "points":
+        users = await db.users.find(
+            {},
+            {"_id": 0, "name": 1, "email": 1, "reward_points": 1}
+        ).sort("reward_points", -1).limit(limit).to_list(limit)
+        
+        for i, user in enumerate(users):
+            user['rank'] = i + 1
+            user['value'] = user.get('reward_points', 0)
+            user['email'] = user['email'][:3] + "***"  # Privacy
+        return users
+    
+    elif category == "streak":
+        streaks = await db.user_streaks.find(
+            {},
+            {"_id": 0}
+        ).sort("current_streak", -1).limit(limit).to_list(limit)
+        
+        result = []
+        for i, s in enumerate(streaks):
+            user = await db.users.find_one({"email": s['user_email']}, {"name": 1})
+            result.append({
+                "rank": i + 1,
+                "name": user.get('name', 'Driver') if user else 'Driver',
+                "value": s['current_streak'],
+                "email": s['user_email'][:3] + "***"
+            })
+        return result
+    
+    elif category == "reviews":
+        pipeline = [
+            {"$group": {"_id": "$driver_email", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": limit}
+        ]
+        reviews = await db.reviews.aggregate(pipeline).to_list(limit)
+        
+        result = []
+        for i, r in enumerate(reviews):
+            user = await db.users.find_one({"email": r['_id']}, {"name": 1})
+            result.append({
+                "rank": i + 1,
+                "name": user.get('name', 'Driver') if user else 'Driver',
+                "value": r['count'],
+                "email": r['_id'][:3] + "***"
+            })
+        return result
+    
+    return []
+
+@api_router.get("/gamification/challenges")
+async def get_available_challenges():
+    """Get daily and weekly challenges"""
+    return {
+        "daily": DAILY_CHALLENGES,
+        "weekly": WEEKLY_CHALLENGES
+    }
+
+# ============== DRIVER SPOTLIGHT ==============
+
+@api_router.get("/spotlight/weekly")
+async def get_weekly_spotlight():
+    """Get featured drivers of the week"""
+    # Top reviewer this week
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    
+    pipeline = [
+        {"$match": {"created_at": {"$gte": week_ago}}},
+        {"$group": {"_id": "$driver_email", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 1}
+    ]
+    
+    top_reviewer = await db.reviews.aggregate(pipeline).to_list(1)
+    
+    # Most helpful (most likes on posts)
+    pipeline_helpful = [
+        {"$match": {"created_at": {"$gte": week_ago}}},
+        {"$group": {"_id": "$author_email", "total_likes": {"$sum": "$likes"}}},
+        {"$sort": {"total_likes": -1}},
+        {"$limit": 1}
+    ]
+    
+    most_helpful = await db.community_posts.aggregate(pipeline_helpful).to_list(1)
+    
+    # Longest current streak
+    top_streak = await db.user_streaks.find_one(
+        {},
+        {"_id": 0},
+        sort=[("current_streak", -1)]
+    )
+    
+    spotlights = []
+    
+    if top_reviewer:
+        user = await db.users.find_one({"email": top_reviewer[0]['_id']}, {"name": 1, "reward_points": 1})
+        if user:
+            spotlights.append({
+                "category": "Top Reviewer",
+                "icon": "⭐",
+                "name": user.get('name', 'Driver'),
+                "stat": f"{top_reviewer[0]['count']} reviews this week",
+                "points": user.get('reward_points', 0)
+            })
+    
+    if most_helpful and most_helpful[0].get('total_likes', 0) > 0:
+        user = await db.users.find_one({"email": most_helpful[0]['_id']}, {"name": 1, "reward_points": 1})
+        if user:
+            spotlights.append({
+                "category": "Most Helpful",
+                "icon": "🤝",
+                "name": user.get('name', 'Driver'),
+                "stat": f"{most_helpful[0]['total_likes']} likes received",
+                "points": user.get('reward_points', 0)
+            })
+    
+    if top_streak:
+        user = await db.users.find_one({"email": top_streak['user_email']}, {"name": 1, "reward_points": 1})
+        if user:
+            spotlights.append({
+                "category": "Streak Champion",
+                "icon": "🔥",
+                "name": user.get('name', 'Driver'),
+                "stat": f"{top_streak['current_streak']}-day streak",
+                "points": user.get('reward_points', 0)
+            })
+    
+    return spotlights
+
+# ============== MENTOR SYSTEM ==============
+
+class MentorProfile(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    mentor_email: str
+    mentor_name: str
+    years_experience: int
+    specialties: List[str] = []  # "long_haul", "flatbed", "hazmat", "regional", etc.
+    bio: str
+    availability: str = "available"  # "available", "busy", "unavailable"
+    rating: float = 5.0
+    total_mentees: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MentorRequest(BaseModel):
+    mentee_email: str
+    mentor_email: str
+    message: str
+    status: str = "pending"  # "pending", "accepted", "declined", "completed"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.post("/mentors/register")
+async def register_as_mentor(
+    years_experience: int,
+    specialties: List[str],
+    bio: str,
+    user_email: str
+):
+    """Register as a mentor"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    existing = await db.mentors.find_one({"mentor_email": user_email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Already registered as mentor")
+    
+    mentor = MentorProfile(
+        mentor_email=user_email,
+        mentor_name=user['name'],
+        years_experience=years_experience,
+        specialties=specialties,
+        bio=bio
+    )
+    
+    mentor_doc = mentor.model_dump()
+    mentor_doc['created_at'] = mentor_doc['created_at'].isoformat()
+    
+    await db.mentors.insert_one(mentor_doc)
+    
+    # Award mentor badge
+    await db.user_badges.insert_one({
+        "user_email": user_email,
+        "badge_id": "mentor",
+        "earned_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    await db.users.update_one(
+        {"email": user_email},
+        {"$inc": {"reward_points": 100}}
+    )
+    
+    return {"message": "Registered as mentor!", "points_earned": 100}
+
+@api_router.get("/mentors")
+async def get_available_mentors(specialty: Optional[str] = None):
+    """Get available mentors"""
+    query = {"availability": "available"}
+    if specialty:
+        query['specialties'] = specialty
+    
+    mentors = await db.mentors.find(query, {"_id": 0}).sort("rating", -1).to_list(20)
+    return mentors
+
+@api_router.post("/mentors/request")
+async def request_mentor(mentor_email: str, message: str, user_email: str):
+    """Request a mentor"""
+    mentor = await db.mentors.find_one({"mentor_email": mentor_email})
+    if not mentor:
+        raise HTTPException(status_code=404, detail="Mentor not found")
+    
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    request = {
+        "id": str(uuid.uuid4()),
+        "mentee_email": user_email,
+        "mentee_name": user['name'],
+        "mentor_email": mentor_email,
+        "message": message,
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.mentor_requests.insert_one(request)
+    
+    # Notify mentor
+    notification = Notification(
+        recipient_email=mentor_email,
+        type="mentor_request",
+        title="New Mentee Request!",
+        message=f"{user['name']} wants you as their mentor",
+        data={"request_id": request['id'], "mentee_email": user_email}
+    )
+    notif_doc = notification.model_dump()
+    notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+    await db.notifications.insert_one(notif_doc)
+    
+    return {"message": "Request sent!", "request_id": request['id']}
+
+@api_router.get("/mentors/requests/{user_email}")
+async def get_mentor_requests(user_email: str, role: str = "mentee"):
+    """Get mentor requests (as mentee or mentor)"""
+    if role == "mentor":
+        requests = await db.mentor_requests.find(
+            {"mentor_email": user_email},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(50)
+    else:
+        requests = await db.mentor_requests.find(
+            {"mentee_email": user_email},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(50)
+    
+    return requests
+
+@api_router.put("/mentors/requests/{request_id}/respond")
+async def respond_to_mentor_request(request_id: str, status: str, user_email: str):
+    """Accept or decline mentor request"""
+    request = await db.mentor_requests.find_one({"id": request_id})
+    if not request:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    if request['mentor_email'] != user_email:
+        raise HTTPException(status_code=403, detail="Not your request")
+    
+    await db.mentor_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": status}}
+    )
+    
+    if status == "accepted":
+        # Update mentor stats
+        await db.mentors.update_one(
+            {"mentor_email": user_email},
+            {"$inc": {"total_mentees": 1}}
+        )
+        
+        # Award points to both
+        await db.users.update_one(
+            {"email": user_email},
+            {"$inc": {"reward_points": 50}}
+        )
+        await db.users.update_one(
+            {"email": request['mentee_email']},
+            {"$inc": {"reward_points": 25}}
+        )
+    
+    return {"message": f"Request {status}"}
+
+# ============== MAINTENANCE TRACKER ==============
+
+class MaintenanceItem(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_email: str
+    item_type: str  # "oil_change", "tire_rotation", "brake_inspection", "filter", "transmission", "coolant"
+    description: str
+    last_service_date: str
+    last_service_miles: int
+    interval_miles: int
+    interval_days: int
+    next_due_miles: int
+    next_due_date: str
+    notes: str = ""
+    is_completed: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+MAINTENANCE_DEFAULTS = {
+    "oil_change": {"name": "Oil Change", "interval_miles": 15000, "interval_days": 90, "icon": "🛢️"},
+    "tire_rotation": {"name": "Tire Rotation", "interval_miles": 10000, "interval_days": 60, "icon": "🔄"},
+    "brake_inspection": {"name": "Brake Inspection", "interval_miles": 25000, "interval_days": 180, "icon": "🛑"},
+    "air_filter": {"name": "Air Filter", "interval_miles": 30000, "interval_days": 365, "icon": "💨"},
+    "transmission": {"name": "Transmission Service", "interval_miles": 60000, "interval_days": 730, "icon": "⚙️"},
+    "coolant": {"name": "Coolant Flush", "interval_miles": 100000, "interval_days": 730, "icon": "❄️"},
+    "def_fluid": {"name": "DEF Fluid", "interval_miles": 5000, "interval_days": 30, "icon": "💧"},
+    "fuel_filter": {"name": "Fuel Filter", "interval_miles": 25000, "interval_days": 365, "icon": "⛽"},
+}
+
+@api_router.get("/maintenance/defaults")
+async def get_maintenance_defaults():
+    """Get default maintenance schedules"""
+    return MAINTENANCE_DEFAULTS
+
+@api_router.get("/maintenance/{user_email}")
+async def get_user_maintenance(user_email: str):
+    """Get user's maintenance items"""
+    items = await db.maintenance.find(
+        {"user_email": user_email},
+        {"_id": 0}
+    ).sort("next_due_date", 1).to_list(50)
+    
+    # Calculate status for each item
+    today = datetime.now(timezone.utc).date()
+    for item in items:
+        due_date = datetime.fromisoformat(item['next_due_date']).date()
+        days_until = (due_date - today).days
+        
+        if days_until < 0:
+            item['status'] = "overdue"
+        elif days_until <= 7:
+            item['status'] = "due_soon"
+        else:
+            item['status'] = "ok"
+        
+        item['days_until_due'] = days_until
+    
+    return items
+
+@api_router.post("/maintenance")
+async def add_maintenance_item(
+    item_type: str,
+    last_service_date: str,
+    last_service_miles: int,
+    notes: str = "",
+    user_email: str = ""
+):
+    """Add a maintenance item"""
+    if item_type not in MAINTENANCE_DEFAULTS:
+        raise HTTPException(status_code=400, detail="Invalid maintenance type")
+    
+    defaults = MAINTENANCE_DEFAULTS[item_type]
+    
+    # Calculate next due
+    last_date = datetime.fromisoformat(last_service_date)
+    next_due_date = last_date + timedelta(days=defaults['interval_days'])
+    next_due_miles = last_service_miles + defaults['interval_miles']
+    
+    item = MaintenanceItem(
+        user_email=user_email,
+        item_type=item_type,
+        description=defaults['name'],
+        last_service_date=last_service_date,
+        last_service_miles=last_service_miles,
+        interval_miles=defaults['interval_miles'],
+        interval_days=defaults['interval_days'],
+        next_due_miles=next_due_miles,
+        next_due_date=next_due_date.date().isoformat(),
+        notes=notes
+    )
+    
+    item_doc = item.model_dump()
+    item_doc['created_at'] = item_doc['created_at'].isoformat()
+    
+    await db.maintenance.insert_one(item_doc)
+    
+    return {"message": "Maintenance item added!", "item_id": item.id}
+
+@api_router.put("/maintenance/{item_id}/complete")
+async def complete_maintenance(
+    item_id: str,
+    service_date: str,
+    service_miles: int,
+    user_email: str
+):
+    """Mark maintenance as complete and schedule next"""
+    item = await db.maintenance.find_one({"id": item_id, "user_email": user_email})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    # Calculate next due
+    service_dt = datetime.fromisoformat(service_date)
+    next_due_date = service_dt + timedelta(days=item['interval_days'])
+    next_due_miles = service_miles + item['interval_miles']
+    
+    await db.maintenance.update_one(
+        {"id": item_id},
+        {"$set": {
+            "last_service_date": service_date,
+            "last_service_miles": service_miles,
+            "next_due_date": next_due_date.date().isoformat(),
+            "next_due_miles": next_due_miles,
+            "is_completed": False
+        }}
+    )
+    
+    # Award points
+    await db.users.update_one(
+        {"email": user_email},
+        {"$inc": {"reward_points": 15}}
+    )
+    
+    return {"message": "Maintenance logged!", "points_earned": 15, "next_due_date": next_due_date.date().isoformat()}
+
+@api_router.delete("/maintenance/{item_id}")
+async def delete_maintenance_item(item_id: str, user_email: str):
+    """Delete a maintenance item"""
+    result = await db.maintenance.delete_one({"id": item_id, "user_email": user_email})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"message": "Item deleted"}
+
+# ============== REWARDS STORE ==============
+
+REWARDS_CATALOG = [
+    {"id": "premium_week", "name": "Premium Features (1 Week)", "description": "Unlock all premium features for 7 days", "cost": 500, "icon": "👑", "category": "features"},
+    {"id": "premium_month", "name": "Premium Features (1 Month)", "description": "Unlock all premium features for 30 days", "cost": 1500, "icon": "💎", "category": "features"},
+    {"id": "custom_badge", "name": "Custom Profile Badge", "description": "Display a custom badge on your profile", "cost": 300, "icon": "🎖️", "category": "cosmetic"},
+    {"id": "priority_support", "name": "Priority Support", "description": "Get priority response from support team", "cost": 200, "icon": "⚡", "category": "service"},
+    {"id": "ad_free_week", "name": "Ad-Free Experience (1 Week)", "description": "Remove all ads for 7 days", "cost": 250, "icon": "🚫", "category": "features"},
+    {"id": "spotlight_boost", "name": "Spotlight Boost", "description": "Feature your profile in Driver Spotlight", "cost": 400, "icon": "🌟", "category": "visibility"},
+    {"id": "mentor_badge", "name": "Verified Mentor Badge", "description": "Get a verified mentor badge", "cost": 600, "icon": "🎓", "category": "cosmetic"},
+    {"id": "early_access", "name": "Early Access to Features", "description": "Try new features before everyone else", "cost": 350, "icon": "🚀", "category": "features"},
+]
+
+class RewardRedemption(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_email: str
+    reward_id: str
+    reward_name: str
+    cost: int
+    status: str = "active"
+    expires_at: Optional[str] = None
+    redeemed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.get("/rewards/catalog")
+async def get_rewards_catalog():
+    """Get available rewards"""
+    return REWARDS_CATALOG
+
+@api_router.get("/rewards/user/{user_email}")
+async def get_user_rewards(user_email: str):
+    """Get user's redeemed rewards"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    redemptions = await db.reward_redemptions.find(
+        {"user_email": user_email},
+        {"_id": 0}
+    ).sort("redeemed_at", -1).to_list(50)
+    
+    return {
+        "available_points": user.get('reward_points', 0),
+        "redemptions": redemptions
+    }
+
+@api_router.post("/rewards/redeem")
+async def redeem_reward(reward_id: str, user_email: str):
+    """Redeem a reward"""
+    # Find reward
+    reward = next((r for r in REWARDS_CATALOG if r['id'] == reward_id), None)
+    if not reward:
+        raise HTTPException(status_code=404, detail="Reward not found")
+    
+    # Check user points
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.get('reward_points', 0) < reward['cost']:
+        raise HTTPException(status_code=400, detail="Not enough points")
+    
+    # Calculate expiration for time-based rewards
+    expires_at = None
+    if "week" in reward_id.lower():
+        expires_at = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
+    elif "month" in reward_id.lower():
+        expires_at = (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
+    
+    # Create redemption
+    redemption = RewardRedemption(
+        user_email=user_email,
+        reward_id=reward_id,
+        reward_name=reward['name'],
+        cost=reward['cost'],
+        expires_at=expires_at
+    )
+    
+    redemption_doc = redemption.model_dump()
+    redemption_doc['redeemed_at'] = redemption_doc['redeemed_at'].isoformat()
+    
+    await db.reward_redemptions.insert_one(redemption_doc)
+    
+    # Deduct points
+    await db.users.update_one(
+        {"email": user_email},
+        {"$inc": {"reward_points": -reward['cost']}}
+    )
+    
+    logger.info(f"Reward redeemed: {user_email} - {reward['name']} for {reward['cost']} points")
+    
+    return {
+        "message": f"Redeemed {reward['name']}!",
+        "redemption_id": redemption.id,
+        "expires_at": expires_at,
+        "remaining_points": user.get('reward_points', 0) - reward['cost']
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
