@@ -206,26 +206,26 @@ export default function RoutePlanner() {
                 {/* Summary */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-blue-50 p-4 rounded-lg text-center">
-                    <p className="text-3xl font-black text-blue-600">{route.total_distance}</p>
+                    <p className="text-3xl font-black text-blue-600">{route.total_distance_miles || route.total_distance}</p>
                     <p className="text-sm text-slate-600">Miles</p>
                   </div>
                   <div className="bg-green-50 p-4 rounded-lg text-center">
                     <p className="text-3xl font-black text-green-600">
-                      {Math.floor(route.total_duration / 60)}h {Math.round(route.total_duration % 60)}m
+                      {route.estimated_drive_time_hours ? `${Math.floor(route.estimated_drive_time_hours)}h ${Math.round((route.estimated_drive_time_hours % 1) * 60)}m` : `${Math.floor((route.total_duration || 0) / 60)}h ${Math.round((route.total_duration || 0) % 60)}m`}
                     </p>
                     <p className="text-sm text-slate-600">Drive Time</p>
                   </div>
                 </div>
 
-                {/* Restrictions */}
-                {route.restrictions?.length > 0 && (
+                {/* Warnings/Restrictions */}
+                {(route.warnings?.length > 0 || route.restrictions?.length > 0) && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
                     <h4 className="font-bold flex items-center gap-2 text-amber-700 mb-2">
                       <AlertTriangle className="w-4 h-4" />
-                      Route Restrictions
+                      Route Warnings
                     </h4>
                     <ul className="space-y-1">
-                      {route.restrictions.map((r, idx) => (
+                      {(route.warnings || route.restrictions || []).map((r, idx) => (
                         <li key={idx} className="text-sm text-amber-600">• {r}</li>
                       ))}
                     </ul>
