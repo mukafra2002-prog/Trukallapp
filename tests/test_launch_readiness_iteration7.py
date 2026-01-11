@@ -283,7 +283,7 @@ class TestMaintenanceTracker:
         response = requests.get(f"{BASE_URL}/api/maintenance/defaults")
         assert response.status_code == 200
         data = response.json()
-        assert isinstance(data, list)
+        assert isinstance(data, dict)  # Returns dict with maintenance types as keys
         assert len(data) > 0
         print(f"✅ Maintenance Defaults: {len(data)} types")
     
