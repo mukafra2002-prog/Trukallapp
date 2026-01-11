@@ -29,6 +29,8 @@ import RewardsStore from "@/components/RewardsStore";
 import DriverSpotlight from "@/components/DriverSpotlight";
 import TruckWeight from "@/components/TruckWeight";
 import HOSTracker from "@/components/HOSTracker";
+import QRScanner from "@/components/QRScanner";
+import OnboardingTutorial from "@/components/OnboardingTutorial";
 
 const mapContainerStyle = {
   width: '100%',
