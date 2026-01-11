@@ -994,6 +994,26 @@ export default function DriverDashboard() {
           <SocialLinks />
         )}
 
+        {/* Achievements/Gamification Tab */}
+        {activeTab === "achievements" && (
+          <Gamification />
+        )}
+
+        {/* Rewards Store Tab */}
+        {activeTab === "rewards" && (
+          <RewardsStore />
+        )}
+
+        {/* Maintenance Tracker Tab */}
+        {activeTab === "maintenance" && (
+          <MaintenanceTracker />
+        )}
+
+        {/* Mentor System Tab */}
+        {activeTab === "mentors" && (
+          <MentorSystem />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
