@@ -323,6 +323,9 @@ export default function LandingPage() {
       {/* Killer Features Showcase - NEW */}
       <KillerFeaturesShowcase />
 
+      {/* Testimonials Section - NEW */}
+      <TestimonialsSection />
+
       {/* Features Section */}
       <div className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
