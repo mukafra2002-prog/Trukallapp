@@ -948,6 +948,15 @@ export default function DriverDashboard() {
             <Scale className="w-4 h-4 mr-2" />
             Weight
           </Button>
+          <Button
+            variant={activeTab === "hos" ? "default" : "outline"}
+            onClick={() => setActiveTab("hos")}
+            className={`touch-target ${activeTab === "hos" ? "bg-red-600 hover:bg-red-700" : "border-red-300 text-red-700"}`}
+            data-testid="tab-hos"
+          >
+            <Clock className="w-4 h-4 mr-2" />
+            HOS
+          </Button>
         </div>
 
         {/* Driver Spotlight - Shows on Dashboard tab */}
