@@ -265,8 +265,8 @@ class TestInAppMessaging:
         )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         data = response.json()
-        assert "message_id" in data
-        print(f"✓ Message sent: {data['message']}")
+        assert "id" in data  # API returns the full message object with 'id'
+        print(f"✓ Message sent: id={data['id']}")
     
     def test_get_messages_between_users(self):
         """Test GET /api/messages/{driver_email}/{partner_email}"""
