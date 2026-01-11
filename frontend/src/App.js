@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 import { Toaster } from "./components/ui/sonner";
 import "@/App.css";
+import '@/i18n/i18n'; // Initialize i18n
 
 // Import pages
 import LandingPage from "./pages/LandingPage";
