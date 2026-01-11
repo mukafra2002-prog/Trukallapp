@@ -4928,6 +4928,309 @@ async def redeem_reward(reward_id: str, user_email: str):
         "remaining_points": user.get('reward_points', 0) - reward['cost']
     }
 
+# ============== TRUCK WEIGHT MANAGEMENT ==============
+
+# Federal weight limits (in lbs)
+FEDERAL_WEIGHT_LIMITS = {
+    "single_axle": 20000,
+    "tandem_axle": 34000,
+    "tridem_axle": 42000,
+    "gross_weight": 80000,
+    "bridge_formula_note": "Total weight also limited by bridge formula based on axle spacing"
+}
+
+# State-specific variations (simplified - some states allow more)
+STATE_WEIGHT_LIMITS = {
+    "default": {"gross": 80000, "single": 20000, "tandem": 34000},
+    "MI": {"gross": 164000, "single": 20000, "tandem": 34000, "note": "With special permit on designated roads"},
+    "TX": {"gross": 84000, "single": 20000, "tandem": 34000, "note": "On designated highways"},
+    "NY": {"gross": 80000, "single": 22400, "tandem": 36000},
+    "CA": {"gross": 80000, "single": 20000, "tandem": 34000, "note": "Kingpin to rear axle max 40ft"},
+}
+
+class TruckWeightProfile(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_email: str
+    truck_name: str  # e.g., "My Freightliner", "Unit 501"
+    truck_type: str  # "semi", "straight", "tandem", "tri-axle"
+    
+    # Weight specs (all in lbs)
+    empty_weight: int  # Truck + trailer empty
+    gvwr: int  # Gross Vehicle Weight Rating
+    gcwr: int  # Gross Combined Weight Rating (truck + trailer + cargo)
+    
+    # Axle configuration
+    steer_axle_weight: int = 0  # Front axle empty
+    drive_axle_weight: int = 0  # Drive axles empty (tandem usually)
+    trailer_axle_weight: int = 0  # Trailer axles empty
+    
+    # Axle types
+    drive_axle_type: str = "tandem"  # "single", "tandem", "tridem"
+    trailer_axle_type: str = "tandem"  # "single", "tandem", "tridem", "spread"
+    
+    # Calculated max cargo
+    max_cargo_weight: int = 0
+    
+    # Additional specs
+    fuel_capacity_gallons: int = 0
+    def_capacity_gallons: int = 0
+    
+    is_default: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class TruckWeightProfileCreate(BaseModel):
+    truck_name: str
+    truck_type: str
+    empty_weight: int
+    gvwr: int
+    gcwr: int
+    steer_axle_weight: int = 0
+    drive_axle_weight: int = 0
+    trailer_axle_weight: int = 0
+    drive_axle_type: str = "tandem"
+    trailer_axle_type: str = "tandem"
+    fuel_capacity_gallons: int = 0
+    def_capacity_gallons: int = 0
+
+class WeightCalculation(BaseModel):
+    cargo_weight: int
+    fuel_gallons: int = 0  # Current fuel (7 lbs/gallon for diesel)
+    def_gallons: int = 0  # DEF fluid (9 lbs/gallon)
+    additional_weight: int = 0  # Tools, chains, etc.
+
+@api_router.get("/truck-weight/limits")
+async def get_weight_limits(state: Optional[str] = None):
+    """Get federal and state weight limits"""
+    response = {
+        "federal": FEDERAL_WEIGHT_LIMITS,
+        "state_limits": STATE_WEIGHT_LIMITS.get(state.upper(), STATE_WEIGHT_LIMITS["default"]) if state else STATE_WEIGHT_LIMITS["default"],
+        "tips": [
+            "Weigh your truck empty to know exact weights",
+            "Fuel weighs ~7 lbs/gallon, DEF ~9 lbs/gallon",
+            "Scale tickets are proof - keep them",
+            "Slide tandems to redistribute weight",
+            "Bridge formula affects long wheelbase trucks"
+        ]
+    }
+    if state:
+        response["selected_state"] = state.upper()
+    return response
+
+@api_router.get("/truck-weight/profiles/{user_email}")
+async def get_truck_profiles(user_email: str):
+    """Get user's saved truck weight profiles"""
+    profiles = await db.truck_weight_profiles.find(
+        {"user_email": user_email},
+        {"_id": 0}
+    ).sort("is_default", -1).to_list(10)
+    return profiles
+
+@api_router.post("/truck-weight/profiles")
+async def create_truck_profile(profile_data: TruckWeightProfileCreate, user_email: str):
+    """Create a truck weight profile"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Calculate max cargo
+    max_cargo = profile_data.gcwr - profile_data.empty_weight
+    
+    profile = TruckWeightProfile(
+        user_email=user_email,
+        max_cargo_weight=max_cargo,
+        **profile_data.model_dump()
+    )
+    
+    # Check if this is first profile - make it default
+    existing = await db.truck_weight_profiles.count_documents({"user_email": user_email})
+    if existing == 0:
+        profile.is_default = True
+    
+    profile_doc = profile.model_dump()
+    profile_doc['created_at'] = profile_doc['created_at'].isoformat()
+    profile_doc['updated_at'] = profile_doc['updated_at'].isoformat()
+    
+    await db.truck_weight_profiles.insert_one(profile_doc)
+    
+    # Award points
+    await db.users.update_one(
+        {"email": user_email},
+        {"$inc": {"reward_points": 25}}
+    )
+    
+    logger.info(f"Truck weight profile created: {user_email} - {profile.truck_name}")
+    return {"message": "Truck profile saved!", "points_earned": 25, "profile_id": profile.id, "max_cargo_weight": max_cargo}
+
+@api_router.put("/truck-weight/profiles/{profile_id}")
+async def update_truck_profile(profile_id: str, profile_data: TruckWeightProfileCreate, user_email: str):
+    """Update a truck weight profile"""
+    max_cargo = profile_data.gcwr - profile_data.empty_weight
+    
+    result = await db.truck_weight_profiles.update_one(
+        {"id": profile_id, "user_email": user_email},
+        {"$set": {
+            **profile_data.model_dump(),
+            "max_cargo_weight": max_cargo,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    return {"message": "Profile updated!", "max_cargo_weight": max_cargo}
+
+@api_router.put("/truck-weight/profiles/{profile_id}/default")
+async def set_default_profile(profile_id: str, user_email: str):
+    """Set a profile as default"""
+    # Remove default from all profiles
+    await db.truck_weight_profiles.update_many(
+        {"user_email": user_email},
+        {"$set": {"is_default": False}}
+    )
+    
+    # Set this one as default
+    result = await db.truck_weight_profiles.update_one(
+        {"id": profile_id, "user_email": user_email},
+        {"$set": {"is_default": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    return {"message": "Default profile set!"}
+
+@api_router.delete("/truck-weight/profiles/{profile_id}")
+async def delete_truck_profile(profile_id: str, user_email: str):
+    """Delete a truck weight profile"""
+    result = await db.truck_weight_profiles.delete_one(
+        {"id": profile_id, "user_email": user_email}
+    )
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    return {"message": "Profile deleted!"}
+
+@api_router.post("/truck-weight/calculate")
+async def calculate_weight(
+    profile_id: str,
+    calculation: WeightCalculation,
+    user_email: str
+):
+    """Calculate total weight and check against limits"""
+    profile = await db.truck_weight_profiles.find_one(
+        {"id": profile_id, "user_email": user_email},
+        {"_id": 0}
+    )
+    
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    
+    # Calculate weights
+    fuel_weight = calculation.fuel_gallons * 7  # Diesel ~7 lbs/gallon
+    def_weight = calculation.def_gallons * 9  # DEF ~9 lbs/gallon
+    
+    total_cargo = calculation.cargo_weight + calculation.additional_weight
+    total_weight = profile['empty_weight'] + total_cargo + fuel_weight + def_weight
+    
+    # Estimate axle weights (simplified distribution)
+    # Typically: 12% steer, 34% drives, 54% trailer for loaded semi
+    steer_loaded = int(total_weight * 0.12)
+    drive_loaded = int(total_weight * 0.34)
+    trailer_loaded = int(total_weight * 0.54)
+    
+    # Get axle limits based on type
+    def get_axle_limit(axle_type):
+        limits = {"single": 20000, "tandem": 34000, "tridem": 42000, "spread": 34000}
+        return limits.get(axle_type, 34000)
+    
+    drive_limit = get_axle_limit(profile.get('drive_axle_type', 'tandem'))
+    trailer_limit = get_axle_limit(profile.get('trailer_axle_type', 'tandem'))
+    
+    # Check against limits
+    warnings = []
+    is_legal = True
+    
+    if total_weight > 80000:
+        warnings.append(f"⚠️ OVERWEIGHT: {total_weight:,} lbs exceeds 80,000 lb federal limit by {total_weight - 80000:,} lbs")
+        is_legal = False
+    
+    if steer_loaded > 12000:
+        warnings.append(f"⚠️ Steer axle heavy: ~{steer_loaded:,} lbs (limit 12,000)")
+        
+    if drive_loaded > drive_limit:
+        warnings.append(f"⚠️ Drive axles over: ~{drive_loaded:,} lbs (limit {drive_limit:,})")
+        is_legal = False
+        
+    if trailer_loaded > trailer_limit:
+        warnings.append(f"⚠️ Trailer axles over: ~{trailer_loaded:,} lbs (limit {trailer_limit:,})")
+        is_legal = False
+    
+    # Calculate remaining capacity
+    remaining_capacity = 80000 - total_weight
+    
+    # Tips
+    tips = []
+    if not is_legal:
+        tips.append("Slide tandems to redistribute weight between axles")
+        tips.append("Consider removing some cargo or fuel")
+    if remaining_capacity > 0 and remaining_capacity < 5000:
+        tips.append(f"Close to limit - only {remaining_capacity:,} lbs remaining")
+    
+    return {
+        "is_legal": is_legal,
+        "total_weight": total_weight,
+        "remaining_capacity": max(0, remaining_capacity),
+        "breakdown": {
+            "empty_weight": profile['empty_weight'],
+            "cargo_weight": calculation.cargo_weight,
+            "fuel_weight": fuel_weight,
+            "def_weight": def_weight,
+            "additional_weight": calculation.additional_weight
+        },
+        "estimated_axle_weights": {
+            "steer": steer_loaded,
+            "drives": drive_loaded,
+            "trailer": trailer_loaded
+        },
+        "limits": {
+            "gross": 80000,
+            "steer": 12000,
+            "drives": drive_limit,
+            "trailer": trailer_limit
+        },
+        "warnings": warnings,
+        "tips": tips
+    }
+
+@api_router.get("/truck-weight/quick-check")
+async def quick_weight_check(
+    empty_weight: int,
+    cargo_weight: int,
+    fuel_gallons: int = 100
+):
+    """Quick weight check without profile"""
+    fuel_weight = fuel_gallons * 7
+    total = empty_weight + cargo_weight + fuel_weight
+    
+    is_legal = total <= 80000
+    remaining = 80000 - total
+    
+    return {
+        "is_legal": is_legal,
+        "total_weight": total,
+        "remaining_capacity": max(0, remaining),
+        "breakdown": {
+            "empty": empty_weight,
+            "cargo": cargo_weight,
+            "fuel": fuel_weight
+        },
+        "message": "✅ Legal weight" if is_legal else f"⚠️ OVERWEIGHT by {-remaining:,} lbs"
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
