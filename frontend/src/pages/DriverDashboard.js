@@ -104,6 +104,17 @@ export default function DriverDashboard() {
   const [fuelAverages, setFuelAverages] = useState([]);
   const [showFuelReportModal, setShowFuelReportModal] = useState(false);
   const [newFuelReport, setNewFuelReport] = useState({ station_name: "", chain: "pilot", city: "", state: "", diesel_price: "" });
+  
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  // Check if user needs onboarding on first load
+  useEffect(() => {
+    const onboardingComplete = localStorage.getItem('trukall_onboarding_complete');
+    if (!onboardingComplete && user) {
+      setShowOnboarding(true);
+    }
+  }, [user]);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
