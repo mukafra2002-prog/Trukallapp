@@ -811,6 +811,51 @@ export default function DriverDashboard() {
             <CloudRain className="w-4 h-4 mr-2" />
             Weather Alerts
           </Button>
+          <Button
+            variant={activeTab === "analytics" ? "default" : "outline"}
+            onClick={() => setActiveTab("analytics")}
+            className={`touch-target ${activeTab === "analytics" ? "bg-indigo-600 hover:bg-indigo-700" : "border-indigo-300 text-indigo-700"}`}
+            data-testid="tab-analytics"
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Analytics
+          </Button>
+          <Button
+            variant={activeTab === "route" ? "default" : "outline"}
+            onClick={() => setActiveTab("route")}
+            className={`touch-target ${activeTab === "route" ? "bg-purple-600 hover:bg-purple-700" : "border-purple-300 text-purple-700"}`}
+            data-testid="tab-route"
+          >
+            <Route className="w-4 h-4 mr-2" />
+            Route Planner
+          </Button>
+          <Button
+            variant={activeTab === "voice" ? "default" : "outline"}
+            onClick={() => setActiveTab("voice")}
+            className={`touch-target ${activeTab === "voice" ? "bg-teal-600 hover:bg-teal-700" : "border-teal-300 text-teal-700"}`}
+            data-testid="tab-voice"
+          >
+            <Mic className="w-4 h-4 mr-2" />
+            Voice
+          </Button>
+          <Button
+            variant={activeTab === "photos" ? "default" : "outline"}
+            onClick={() => setActiveTab("photos")}
+            className={`touch-target ${activeTab === "photos" ? "bg-pink-600 hover:bg-pink-700" : "border-pink-300 text-pink-700"}`}
+            data-testid="tab-photos"
+          >
+            <Image className="w-4 h-4 mr-2" />
+            Photo Reviews
+          </Button>
+          <Button
+            variant={activeTab === "messages" ? "default" : "outline"}
+            onClick={() => setActiveTab("messages")}
+            className={`touch-target ${activeTab === "messages" ? "bg-rose-600 hover:bg-rose-700" : "border-rose-300 text-rose-700"}`}
+            data-testid="tab-messages"
+          >
+            <MessageCircle className="w-4 h-4 mr-2" />
+            Messages
+          </Button>
         </div>
 
         {/* Weather Alerts Tab */}
