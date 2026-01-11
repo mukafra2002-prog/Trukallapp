@@ -75,6 +75,7 @@ function App() {
           </Routes>
         </BrowserRouter>
         <Toaster position="top-center" expand={false} richColors />
+        <PWAInstallPrompt />
       </div>
     </AuthContext.Provider>
   );
