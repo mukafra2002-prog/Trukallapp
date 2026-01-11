@@ -863,6 +863,31 @@ export default function DriverDashboard() {
           <WeatherAlerts />
         )}
 
+        {/* Analytics Dashboard Tab */}
+        {activeTab === "analytics" && (
+          <AnalyticsDashboard />
+        )}
+
+        {/* Route Planner Tab */}
+        {activeTab === "route" && (
+          <RoutePlanner />
+        )}
+
+        {/* Voice Commands Tab */}
+        {activeTab === "voice" && (
+          <VoiceCommands />
+        )}
+
+        {/* Photo Reviews Tab */}
+        {activeTab === "photos" && (
+          <PhotoReviews />
+        )}
+
+        {/* Messages Tab */}
+        {activeTab === "messages" && (
+          <InAppMessaging />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
