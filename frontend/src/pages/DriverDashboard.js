@@ -1039,6 +1039,11 @@ export default function DriverDashboard() {
           <TruckWeight />
         )}
 
+        {/* HOS Tracker Tab */}
+        {activeTab === "hos" && (
+          <HOSTracker />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
