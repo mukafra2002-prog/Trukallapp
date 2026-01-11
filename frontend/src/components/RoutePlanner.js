@@ -15,16 +15,18 @@ export default function RoutePlanner() {
   const [loading, setLoading] = useState(false);
   const [route, setRoute] = useState(null);
   const [formData, setFormData] = useState({
-    origin: "",
+    origin_address: "",
     origin_lat: 32.7767,
     origin_lng: -96.7970,
-    destination: "",
+    destination_address: "",
     destination_lat: 33.7490,
     destination_lng: -84.3880,
-    truck_height: 13.6,
-    truck_weight: 80000,
+    truck_type: "semi",
+    truck_height_ft: 13.6,
+    truck_weight_lbs: 80000,
     hazmat: false,
-    avoid_tolls: false
+    avoid_tolls: false,
+    include_parking_stops: true
   });
 
   const planRoute = async () => {
