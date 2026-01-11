@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,8 +9,11 @@ import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
 import { Truck, Shield, MapPin, DollarSign, Clock, Fuel, Bell, TrendingUp, Award, Users, CheckCircle, Star, Zap, Target } from "lucide-react";
+import LanguageSelector from "@/components/LanguageSelector";
+import KillerFeaturesShowcase from "@/components/KillerFeaturesShowcase";
 
 export default function LandingPage() {
+  const { t } = useTranslation();
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
