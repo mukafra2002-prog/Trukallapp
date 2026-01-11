@@ -970,7 +970,21 @@ export default function DriverDashboard() {
             <Clock className="w-4 h-4 mr-2" />
             HOS
           </Button>
+          <Button
+            variant={activeTab === "qr" ? "default" : "outline"}
+            onClick={() => setActiveTab("qr")}
+            className={`touch-target ${activeTab === "qr" ? "bg-indigo-600 hover:bg-indigo-700" : "border-indigo-300 text-indigo-700"}`}
+            data-testid="tab-qr"
+          >
+            <QrCode className="w-4 h-4 mr-2" />
+            QR Code
+          </Button>
         </div>
+
+        {/* Onboarding Tutorial */}
+        {showOnboarding && (
+          <OnboardingTutorial onComplete={() => setShowOnboarding(false)} />
+        )}
 
         {/* Driver Spotlight - Shows on Dashboard tab */}
         {activeTab === "dashboard" && (
