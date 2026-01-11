@@ -938,6 +938,15 @@ export default function DriverDashboard() {
             <GraduationCap className="w-4 h-4 mr-2" />
             Mentors
           </Button>
+          <Button
+            variant={activeTab === "weight" ? "default" : "outline"}
+            onClick={() => setActiveTab("weight")}
+            className={`touch-target ${activeTab === "weight" ? "bg-orange-600 hover:bg-orange-700" : "border-orange-300 text-orange-700"}`}
+            data-testid="tab-weight"
+          >
+            <Scale className="w-4 h-4 mr-2" />
+            Weight
+          </Button>
         </div>
 
         {/* Driver Spotlight - Shows on Dashboard tab */}
