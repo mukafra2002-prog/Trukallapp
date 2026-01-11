@@ -1261,12 +1261,29 @@ async def get_loads(
     loads = await db.loads.find(query, {"_id": 0}).to_list(1000)
     
     for load in loads:
+        # Handle pickup_date - could be "ASAP" or ISO date string
         if isinstance(load.get('pickup_date'), str):
-            load['pickup_date'] = datetime.fromisoformat(load['pickup_date'])
+            if load['pickup_date'].upper() == 'ASAP':
+                load['pickup_date'] = datetime.now(timezone.utc)
+            else:
+                try:
+                    load['pickup_date'] = datetime.fromisoformat(load['pickup_date'].replace('Z', '+00:00'))
+                except:
+                    load['pickup_date'] = datetime.now(timezone.utc)
+        
+        # Handle delivery_date
         if isinstance(load.get('delivery_date'), str):
-            load['delivery_date'] = datetime.fromisoformat(load['delivery_date'])
+            try:
+                load['delivery_date'] = datetime.fromisoformat(load['delivery_date'].replace('Z', '+00:00'))
+            except:
+                load['delivery_date'] = datetime.now(timezone.utc) + timedelta(days=3)
+        
+        # Handle created_at
         if isinstance(load.get('created_at'), str):
-            load['created_at'] = datetime.fromisoformat(load['created_at'])
+            try:
+                load['created_at'] = datetime.fromisoformat(load['created_at'].replace('Z', '+00:00'))
+            except:
+                load['created_at'] = datetime.now(timezone.utc)
     
     return loads
 
