@@ -5615,14 +5615,14 @@ DEMO_ACCOUNT = {
 async def demo_login():
     """Login with demo account"""
     # Check if demo account exists
-    demo_user = await db.users.find_one({"email": DEMO_ACCOUNT["email"]})
+    demo_user = await db.users.find_one({"email": DEMO_ACCOUNT["email"]}, {"_id": 0})
     
     if not demo_user:
-        # Create demo account
-        hashed = hashlib.sha256(DEMO_ACCOUNT["password"].encode()).hexdigest()
+        # Create demo account using the same password hashing as regular users
+        hashed = hash_password(DEMO_ACCOUNT["password"])
         demo_user = {
             "email": DEMO_ACCOUNT["email"],
-            "hashed_password": hashed,
+            "password_hash": hashed,
             "name": DEMO_ACCOUNT["name"],
             "role": DEMO_ACCOUNT["role"],
             "reward_points": 500,
@@ -5630,20 +5630,18 @@ async def demo_login():
             "is_demo": True
         }
         await db.users.insert_one(demo_user)
+        # Refetch without _id
+        demo_user = await db.users.find_one({"email": DEMO_ACCOUNT["email"]}, {"_id": 0})
     
-    token = jwt.encode(
-        {"email": DEMO_ACCOUNT["email"], "role": "driver", "exp": datetime.now(timezone.utc) + timedelta(hours=24)},
-        SECRET_KEY,
-        algorithm="HS256"
-    )
+    # Remove password hash from response
+    demo_user.pop('password_hash', None)
     
     return {
-        "token": token,
         "user": {
-            "email": DEMO_ACCOUNT["email"],
-            "name": DEMO_ACCOUNT["name"],
-            "role": "driver",
-            "reward_points": 500,
+            "email": demo_user.get("email"),
+            "name": demo_user.get("name"),
+            "role": demo_user.get("role", "driver"),
+            "reward_points": demo_user.get("reward_points", 500),
             "is_demo": True
         },
         "message": "Demo login successful! Explore all features."
