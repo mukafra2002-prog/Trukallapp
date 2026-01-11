@@ -3457,52 +3457,70 @@ SUBSCRIPTION_PLANS = [
         "id": "free",
         "name": "Free",
         "price": 0,
+        "annual_price": 0,
         "interval": "month",
         "type": "driver",
+        "trial_days": 0,
         "features": [
-            "Basic parking search",
-            "View 5 parking spots/day",
+            "Basic parking search (10 spots/day)",
+            "HOS Tracker (view only)",
+            "Community access (read & post)",
             "Basic load board access",
-            "Community reviews (read only)"
+            "Reward points earning",
+            "Ad-supported"
         ],
-        "is_popular": False
+        "is_popular": False,
+        "badge": None
     },
     {
         "id": "pro",
         "name": "Pro Driver",
-        "price": 9.99,
+        "price": 7.99,
+        "annual_price": 79,
+        "annual_savings": 17,
         "interval": "month",
         "type": "driver",
+        "trial_days": 7,
         "features": [
+            "Everything in Free +",
             "Unlimited parking search",
             "Real-time availability alerts",
+            "Full HOS Tracker with logging",
+            "Weight Calculator",
             "Full load board access",
             "Broker ratings & fraud alerts",
             "Shower credits tracker",
-            "Retail parking database",
             "Trip profit calculator",
-            "Priority support"
+            "Ad-free experience",
+            "Standard support"
         ],
-        "is_popular": True
+        "is_popular": True,
+        "badge": "Most Popular"
     },
     {
         "id": "premium",
         "name": "Premium Fleet",
-        "price": 24.99,
+        "price": 19.99,
+        "annual_price": 199,
+        "annual_savings": 40,
         "interval": "month",
         "type": "driver",
+        "trial_days": 14,
         "features": [
-            "Everything in Pro",
+            "Everything in Pro +",
             "DOT compliance tracking",
+            "Route planner with truck restrictions",
+            "Analytics dashboard",
             "Detention claims manager",
             "Convoy finder access",
-            "Route planning (coming soon)",
+            "Multi-truck profiles",
             "Fuel price alerts",
-            "Expense reports & analytics",
-            "Multi-driver fleet management",
-            "24/7 premium support"
+            "Expense reports",
+            "Fleet management tools",
+            "Priority support 24/7"
         ],
-        "is_popular": False
+        "is_popular": False,
+        "badge": "Best Value"
     }
 ]
 
@@ -3512,22 +3530,28 @@ PARTNER_PLANS = [
         "id": "partner-starter",
         "name": "Starter",
         "price": 0,
+        "annual_price": 0,
         "interval": "month",
         "type": "partner",
+        "trial_days": 0,
         "features": [
-            "List up to 1 parking location",
+            "List 1 parking location",
             "Basic booking management",
             "Customer reviews",
             "Email notifications"
         ],
-        "is_popular": False
+        "is_popular": False,
+        "badge": None
     },
     {
         "id": "partner-business",
         "name": "Business",
-        "price": 29.99,
+        "price": 24.99,
+        "annual_price": 249,
+        "annual_savings": 51,
         "interval": "month",
         "type": "partner",
+        "trial_days": 14,
         "features": [
             "List up to 5 parking locations",
             "Advanced booking management",
@@ -3538,17 +3562,21 @@ PARTNER_PLANS = [
             "Promotional tools",
             "Standard support"
         ],
-        "is_popular": True
+        "is_popular": True,
+        "badge": "Most Popular"
     },
     {
         "id": "partner-enterprise",
         "name": "Enterprise",
-        "price": 99.99,
+        "price": 79.99,
+        "annual_price": 799,
+        "annual_savings": 161,
         "interval": "month",
         "type": "partner",
+        "trial_days": 30,
         "features": [
             "Unlimited parking locations",
-            "Everything in Business",
+            "Everything in Business +",
             "Featured placement in search",
             "API access for integrations",
             "Custom branding",
@@ -3557,7 +3585,8 @@ PARTNER_PLANS = [
             "Dedicated account manager",
             "24/7 priority support"
         ],
-        "is_popular": False
+        "is_popular": False,
+        "badge": "Best for Chains"
     }
 ]
 
