@@ -103,28 +103,6 @@ export default function FeedbackForm() {
         <Badge className="bg-green-100 text-green-700">+25-50 points</Badge>
       </div>
 
-      {/* Google Form Link (Optional) */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <ExternalLink className="w-5 h-5 text-blue-600" />
-              <div>
-                <p className="font-medium text-blue-800">Prefer Google Forms?</p>
-                <p className="text-sm text-blue-600">Use our detailed feedback form</p>
-              </div>
-            </div>
-            <Button 
-              variant="outline" 
-              className="border-blue-300 text-blue-700"
-              onClick={() => window.open('https://forms.gle/trukall-feedback', '_blank')}
-            >
-              Open Form
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Feedback Form */}
       <Card>
         <CardHeader>
