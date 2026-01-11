@@ -27,6 +27,7 @@ import MentorSystem from "@/components/MentorSystem";
 import MaintenanceTracker from "@/components/MaintenanceTracker";
 import RewardsStore from "@/components/RewardsStore";
 import DriverSpotlight from "@/components/DriverSpotlight";
+import TruckWeight from "@/components/TruckWeight";
 
 const mapContainerStyle = {
   width: '100%',
