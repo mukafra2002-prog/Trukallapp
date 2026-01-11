@@ -901,7 +901,48 @@ export default function DriverDashboard() {
             <Globe className="w-4 h-4 mr-2" />
             Connect
           </Button>
+          <Button
+            variant={activeTab === "achievements" ? "default" : "outline"}
+            onClick={() => setActiveTab("achievements")}
+            className={`touch-target ${activeTab === "achievements" ? "bg-amber-600 hover:bg-amber-700" : "border-amber-300 text-amber-700"}`}
+            data-testid="tab-achievements"
+          >
+            <Trophy className="w-4 h-4 mr-2" />
+            Achievements
+          </Button>
+          <Button
+            variant={activeTab === "rewards" ? "default" : "outline"}
+            onClick={() => setActiveTab("rewards")}
+            className={`touch-target ${activeTab === "rewards" ? "bg-purple-600 hover:bg-purple-700" : "border-purple-300 text-purple-700"}`}
+            data-testid="tab-rewards"
+          >
+            <ShoppingBag className="w-4 h-4 mr-2" />
+            Rewards
+          </Button>
+          <Button
+            variant={activeTab === "maintenance" ? "default" : "outline"}
+            onClick={() => setActiveTab("maintenance")}
+            className={`touch-target ${activeTab === "maintenance" ? "bg-slate-600 hover:bg-slate-700" : "border-slate-300 text-slate-700"}`}
+            data-testid="tab-maintenance"
+          >
+            <Wrench className="w-4 h-4 mr-2" />
+            Maintenance
+          </Button>
+          <Button
+            variant={activeTab === "mentors" ? "default" : "outline"}
+            onClick={() => setActiveTab("mentors")}
+            className={`touch-target ${activeTab === "mentors" ? "bg-cyan-600 hover:bg-cyan-700" : "border-cyan-300 text-cyan-700"}`}
+            data-testid="tab-mentors"
+          >
+            <GraduationCap className="w-4 h-4 mr-2" />
+            Mentors
+          </Button>
         </div>
+
+        {/* Driver Spotlight - Shows on Dashboard tab */}
+        {activeTab === "dashboard" && (
+          <DriverSpotlight />
+        )}
 
         {/* Weather Alerts Tab */}
         {activeTab === "weather" && (
