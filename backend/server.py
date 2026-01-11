@@ -191,19 +191,27 @@ class PaymentTransaction(BaseModel):
 class Load(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    origin_city: str
-    origin_state: str
-    destination_city: str
-    destination_state: str
-    pickup_date: datetime
-    delivery_date: datetime
-    weight: int  # pounds
-    distance: int  # miles
-    rate: float  # dollars
-    equipment_type: str  # "flatbed", "dry_van", "reefer", "stepdeck"
-    contact_name: str
-    contact_phone: str
+    origin: Optional[str] = None  # Full origin string like "Atlanta, GA"
+    origin_city: Optional[str] = None
+    origin_state: Optional[str] = None
+    destination: Optional[str] = None  # Full destination string
+    destination_city: Optional[str] = None
+    destination_state: Optional[str] = None
+    pickup_date: Optional[datetime] = None
+    delivery_date: Optional[datetime] = None
+    weight: int = 40000  # pounds
+    distance: Optional[int] = None  # miles
+    miles: Optional[int] = None  # alias for distance
+    rate: float = 0  # dollars
+    rate_per_mile: Optional[float] = None
+    equipment_type: Optional[str] = None  # "flatbed", "dry_van", "reefer", "stepdeck"
+    equipment: Optional[str] = None  # alias
+    contact_name: Optional[str] = "Broker"
+    contact_phone: Optional[str] = "1-800-TRUKALL"
+    broker: Optional[str] = None
+    broker_rating: Optional[float] = None
     status: str = "available"  # "available", "booked", "completed"
+    posted_at: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class LoadCreate(BaseModel):
