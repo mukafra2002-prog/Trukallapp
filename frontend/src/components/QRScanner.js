@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { QrCode, Camera, X, Copy, Share2, Check } from "lucide-react";
-import QRCode from "qrcode.react";
+import { QRCodeCanvas } from "qrcode.react";
 
 export default function QRScanner({ onScan, referralCode }) {
   const [scanning, setScanning] = useState(false);
