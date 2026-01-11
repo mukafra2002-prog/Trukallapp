@@ -8,6 +8,8 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - **Backend**: FastAPI, Pydantic, Motor (async MongoDB driver)
 - **Database**: MongoDB
 - **Maps**: Google Maps API
+- **Payments**: Stripe
+- **Analytics**: Google Analytics, Microsoft Clarity (placeholder)
 - **PWA**: Service Worker, Web Manifest
 
 ## Core Features (Implemented)
@@ -26,19 +28,29 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - [x] Booking/reservation system
 - [x] Reward points system
 - [x] Notification bell with real-time alerts
-- [x] **Analytics Dashboard** - Earnings tracking, expense breakdown, performance metrics (NEW)
-- [x] **Truck Route Planner** - Route planning with truck restrictions (NEW)
-- [x] **Voice Commands** - Hands-free voice search (NEW)
-- [x] **Photo Reviews** - Photo uploads for parking reviews (NEW)
-- [x] **In-App Messaging** - Direct messaging between drivers (NEW)
-- [x] **Push Notifications** - Backend API ready (NEW)
+- [x] **Analytics Dashboard** - Earnings tracking, expense breakdown, performance metrics
+- [x] **Truck Route Planner** - Route planning with truck restrictions
+- [x] **Voice Commands** - Hands-free voice search
+- [x] **Photo Reviews** - Photo uploads for parking reviews
+- [x] **In-App Messaging** - Direct messaging between drivers
+- [x] **Push Notifications** - Backend API ready
+
+### Community & Engagement (NEW - Jan 11, 2026)
+- [x] **Community Board** - Forum-style posts with categories (General, Tips, Routes, Parking, Deals, Questions, Announcements)
+- [x] **Referral System** - Unique referral codes, 500 points for referrer, 250 for new user
+- [x] **Feedback Form** - In-app feedback with 5 types (General, Bug, Feature, Praise, Complaint) + Google Forms link
+- [x] **Social Links** - WhatsApp Business, Telegram, Facebook, Google My Business, Notion docs
+
+### Analytics & Tracking (NEW - Jan 11, 2026)
+- [x] **Google Analytics** - Page views, events tracking
+- [x] **Microsoft Clarity** - Heatmaps, session recordings (placeholder ID)
 
 ### Safety Features
 - [x] Emergency SOS button with contacts notification
 - [x] Fatigue monitor
 - [x] Wake-up timer/alarm
 - [x] DOT Compliance tracker
-- [x] **Weather & Road Alerts** (NEW)
+- [x] **Weather & Road Alerts**
 
 ### Financial Tools
 - [x] Load board for finding jobs
