@@ -2,81 +2,74 @@
 The user wants to build a comprehensive application for truck drivers named TrukAll. The goal is to solve numerous pain points, including finding safe parking, real-time lot availability, avoiding tickets, locating amenities (showers, food), and mitigating driver fatigue. The app should be user-friendly and feature-rich enough to surpass a competitor app, TruckPath. The user has requested a clean, light-themed, professional UI to attract users and wants the application to be fully functional on all devices (desktop, mobile, tablet) as a Progressive Web App (PWA).
 
 PRODUCT REQUIREMENTS:
-- User authentication for different roles (Driver, Partner, Admin).
-- Real-time parking locator with availability, amenities, and safety ratings.
-- Booking/reservation system for parking spots.
-- Driver dashboard with features like a rewards/loyalty system, fatigue monitor, and a wake-up timer.
-- Financial tools: Load board for finding jobs and an expense tracker.
-- PWA capabilities for offline access and native-like installation on mobile devices.
-- **Pre-launch critical features:** Google Maps integration, route planner, broker rating system, shower credits tracker, and retail parking database.
-- **Additional features to beat TruckPath:** Community reviews, convoy finder, and a trip/fuel calculator.
-- **User-requested additions:** Subscription plans, Admin Dashboard, Password Reset, Real-time driver-powered parking availability, Emergency SOS, Document Scanner, Fuel Price Alerts, Weather Alerts, Convoy Chat, Route Planner, Analytics Dashboard, Voice Commands, Photo Reviews, In-App Messaging, Push Notifications, Privacy/Terms pages, and Stripe integration.
+- **Core Functionality**: User authentication (Driver, Partner, Admin), real-time parking locator, booking system, Driver/Partner/Admin dashboards, PWA capabilities.
+- **Launch-Critical Features**: Google Maps, route planner, broker ratings, shower credits, retail parking DB, load board, expense tracker, emergency SOS, document scanner, fuel/weather alerts, convoy chat, community reviews, privacy/terms pages, Stripe integration.
+- **Post-Launch/Enhancements**: Convert to native app, AI-powered features, rewards store, gamification, HOS tracker, maintenance tracker, mentor system, truck weight manager, QR scanner, and an onboarding tutorial.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A feature-rich, launch-ready full-stack PWA named TrukAll (FastAPI, React, MongoDB). The app features a professional blue-and-white UI. It includes multi-role user authentication, a comprehensive Driver Dashboard with over 30 features, a Partner Dashboard, and an Admin Dashboard.
+A near-launch-ready, feature-rich full-stack PWA named TrukAll (FastAPI, React, MongoDB). The application now boasts over 40 features, including multi-role authentication, comprehensive dashboards, a complete Stripe payment flow for revised subscription plans, Google Maps, and Google Analytics.
 
-Key implemented features include: Real-time driver-powered parking availability, a functional Load Board, an Emergency SOS button, Google Maps integration (with a working user API key), a full Stripe payment flow for subscriptions (with user-provided keys), an in-app notification system, community reviews, convoy finder, convoy chat, weather alerts, a document scanner, and legal pages (Privacy Policy, Terms of Service). Google Analytics is also integrated.
+In this session, the following major feature sets were added and integrated:
+1.  **Core Driver Tools**: Route Planner, Analytics Dashboard, Voice Commands, Photo Reviews, In-App Messaging.
+2.  **Community & Engagement**: Feedback Form, Community Board, Referral System, Social Links (later customized by the user).
+3.  **Gamification & Retention**: A full gamification system with achievements, leaderboards, streaks, a rewards store, a mentor system, and a driver spotlight feature.
+4.  **Compliance & Utility**: A truck maintenance tracker, a truck weight manager/calculator, and a comprehensive Hours of Service (HOS) tracker.
+
+The app's subscription plans were also updated with new pricing, annual options, and free trials to optimize for launch.
 
 **Last working item**:
-- **Last item agent was working**: Implementing a batch of 6 new features requested by the user: Route Planner, Analytics Dashboard, Voice Commands, Photo Reviews, In-App Messaging, and Push Notifications. The agent had successfully added all the necessary backend models and API endpoints in  and had just started creating the corresponding frontend components, beginning with  and .
+- **Last item agent was working**: Implementing the final Pre-Launch Checklist features requested by the user. This includes an Onboarding Tutorial, Email Verification, Forgot Password, Demo Account, and a QR Code scanner. The agent successfully added the necessary backend logic for these features and created the initial frontend component files but has not yet integrated them into the UI.
 - **Status**: IN PROGRESS
-- **Agent Testing Done**: N (for the 6 new features)
-- **Which testing method agent to use?**: both. First, use  or a test script to verify all new backend endpoints for the 6 features. After that, once the frontend components are integrated, use the frontend testing agent to ensure the UI works correctly and integrates with the backend APIs.
+- **Agent Testing Done**: N (for the pre-launch checklist features)
+- **Which testing method agent to use?**: both. The backend needs testing via  for the new endpoints (e.g., password reset). The frontend requires integrating the new components (, , ) and then running the frontend testing agent to ensure they work correctly.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-There are no known bugs or blocking issues. All previously identified problems (SOS endpoint, Google Maps integration, deployment health checks, UI styling) have been resolved. The current focus is entirely on new feature development.
+There are no known bugs or blocking issues. All efforts are focused on completing the new feature implementations for launch.
 
 **In progress Task List**:
-- **Task 1: Implement 6 New User-Requested Features (P0)**
-  - **Description**: The user requested the addition of six new features: Route Planner, Analytics Dashboard, Voice Commands, Photo Reviews, In-App Messaging, and Push Notifications.
-  - **Where to resume**: The backend APIs and models are already created in . The agent has created  and . The next steps are:
-    1. Create the remaining frontend components: , , and .
-    2. Integrate all six new components into the  with corresponding tabs and rendering logic.
-    3. Implement frontend logic for features like voice commands (using the Web Speech API) and push notifications (using the Web Push API).
-    4. Thoroughly test all six new features.
-  - **What will be achieved with this?**: This will add significant new functionality to the app, making it even more comprehensive for drivers.
+- **Task 1: Implement Final Pre-Launch Feature Set (P0)**
+  - **Description**: Implement a comprehensive list of features to make the app launch-ready. This includes an Onboarding Tutorial, Email Verification, Forgot Password, a Demo Account, and a QR Code Scanner.
+  - **Where to resume**:
+    1.  The backend in  has been updated with endpoints for password resets and seeded data.
+    2.  Frontend components , , and  have been created.
+    3.  Dependencies  and  have been installed.
+    4.  **Next Steps**:
+        - Integrate  into the login flow.
+        - Implement logic to show  to new users upon their first login.
+        - Integrate the  into the  as a new tab.
+        - Implement a Demo Account login option.
+        - Add backend logic and an email service for sending password reset and verification emails.
+        - Implement landing page SEO improvements (meta tags in ).
+        - Seed initial data (truck stops, loads, community posts) to make the app feel alive at launch.
+  - **What will be achieved with this?**: This will make the application user-friendly for first-time users, secure against fake accounts, and robust enough for a public launch.
   - **Status**: IN PROGRESS
   - **Should Test frontend/backend/both after fix?**: Both.
   - **Blocked on something**: Nothing.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-    - **P1: Complete Frontend for 6 New Features**: This is the immediate continuation of the In progress Task List.
+    - **P0: Complete and Test Pre-Launch Feature Set**: This is the immediate continuation of the In progress Task List.
+    - **P1: Launch Strategy Implementation**: Add a launch offer (Free Pro for 30 days), placeholder testimonials, and a welcome email sequence.
 - **Future Tasks**:
-    - **Convert to Full Native App**: Post-launch, explore converting the PWA into a native application using Capacitor or React Native.
-    - **Implement Killer Features**: Enhance the app with advanced functionalities like an AI-powered smart alerts system or an integrated fuel card.
+    - Convert the PWA to a full native app (React Native/Capacitor).
+    - Implement Killer Features like an AI-powered smart trip planner or an integrated fuel card.
+    - Implement Partner Deals Hub for revenue sharing.
 
 **Completed work in this session**
-- **Critical Bug Fixes**:
-  - Fixed the  endpoint by removing a duplicate route.
-  - Fixed a datetime bug in the  endpoint.
-- **Major Integrations**:
-  - Integrated Google Maps API with a user-provided key and resolved billing errors.
-  - Integrated a full Stripe payment flow for subscriptions with user-provided keys.
-  - Added Google Analytics tracking.
-- **Feature Completion & Implementation**:
-  - Integrated the  component into a new  page.
-  - Added Partner/Parking Owner subscription plans (backend & frontend).
-  - Implemented a Share Location feature for convoys.
-  - Implemented a complete in-app notification system (bell icon, dropdown, backend logic).
-  - Added a dedicated Load Board tab to the UI.
-  - Implemented Weather Alerts feature (backend & frontend).
-  - Implemented Convoy Chat feature (backend & frontend).
-  - Added Privacy Policy, Terms of Service, and a Contact Us page.
-  - Added a mandatory Agree to Terms checkbox on the signup form.
-- **Deployment & UX Fixes**:
-  - Added a  endpoint to resolve a deployment blocker.
-  - Removed all hardcoded API keys and moved them to  files.
-  - Permanently fixed the recurring yellow UI theme issue by overriding CSS variables and updating PWA manifest files.
-  - Removed the Made with Emergent badge.
-- **Testing**:
-  - Ran multiple comprehensive test cycles using the testing agent, achieving a 100% pass rate on existing features and fixing new bugs found by the agent.
+- **6 New Core Features**: Implemented Route Planner, Analytics Dashboard, Voice Commands, Photo Reviews, In-App Messaging, and Push Notifications (backend).
+- **5 Community & Growth Features**: Added a Feedback Form, Community Board, Referral System, Social Links, and Microsoft Clarity tracking (later commented out per user request).
+- **5 Free Engagement Features**: Implemented a Gamification suite (Achievements, Leaderboards, Streaks), Mentor System, Maintenance Tracker, Rewards Store, and Driver Spotlight.
+- **Truck Weight Manager**: Added truck profiles and a legal weight calculator.
+- **HOS Tracker**: Added a full Hours of Service (HOS) compliance tracker.
+- **Subscription Overhaul**: Restructured and updated all Driver and Partner subscription plans with new pricing, annual discounts, and free trials.
+- **User Request Cleanup**: Removed several social links (WhatsApp, Telegram, Facebook) from the Connect page as the user did not own groups for them.
+- **Comprehensive Testing**: Ran multiple full test suites with the testing agent, fixing bugs and ensuring all existing and new features are working correctly.
 
 **Earlier issues found/mentioned but not fixed**
-- None. The issue of the unintegrated  component was resolved in this session.
+- None.
 
 **Known issue recurrence from previous fork**
 - N/A
@@ -85,94 +78,91 @@ There are no known bugs or blocking issues. All previously identified problems (
 
 
 **Key Technical Concepts**
-- **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, Axios, PWA, .
+- **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, Axios, PWA, , , .
 - **Backend**: FastAPI, Pydantic, Motor (async MongoDB driver).
 - **Database**: MongoDB.
 - **Payments**: Stripe.
 - **Architecture**: Monolithic full-stack application.
 
 **key DB schema**
-- **users**: {email, hashed_password, role, ...}
+- **users**: {email, hashed_password, role, points, ...}
 - **parking_spots**: {name, location, capacity, ...}
 - **reviews**: {spot_id, driver_email, rating, ...}
-- **notifications**: {user_email, message, is_read, ...}
-- **weather_alerts**: {location, severity, description, ...}
-- **convoy_messages**: {convoy_id, user_email, message, ...}
-- **routes**: {user_email, start_location, end_location, ...} *(New)*
-- **analytics_data**: {user_email, type, value, date} *(New)*
-- **direct_messages**: {sender_email, receiver_email, content, ...} *(New)*
-- **photo_reviews**: {review_id, image_url, ...} *(New)*
+- **hos_logs**: {driver_email, status, start_time, end_time, ...}
+- **maintenance_logs**: {driver_email, item_name, due_date, ...}
+- **gamification_state**: {driver_email, level, streak, achievements, ...}
+- **rewards**: {reward_id, name, cost, ...}
+- **truck_profiles**: {driver_email, name, empty_weight, ...}
+- **password_resets**: {email, token, expires_at}
 
 **changes in tech stack**
-- None.
+- Added  and  for QR code functionality.
 
 **All files of reference**
-- **/app/backend/server.py**: Critically important. Contains the entire backend logic, including the newly added models and endpoints for the 6 new features. Now extremely large.
-- **/app/frontend/src/pages/DriverDashboard.js**: Critically important. The main hub for all driver features. It needs to be updated to integrate the 6 new components. Also extremely large.
-- **/app/frontend/src/App.js**: Modified to add routes for legal pages and subscription success.
-- **/app/frontend/src/pages/LandingPage.js**: Modified to add footer links and a terms & conditions checkbox.
-- **/app/frontend/src/components/ConvoyFinder.js**: Modified to add a chat feature.
-- **/app/frontend/src/pages/ParkingDetails.js**: Created to display spot details and integrate reviews.
-- **/app/frontend/public/index.html**: Modified to add Google Analytics and fix PWA theme colors.
-- **/app/frontend/public/manifest.json**: Modified to fix PWA theme colors.
-- **/app/frontend/.env**: Updated to include .
-- **/app/backend/.env**: Updated with user's Stripe keys.
+- **/app/backend/server.py**: Critically important and extremely large. Contains all backend logic.
+- **/app/frontend/src/pages/DriverDashboard.js**: Critically important and extremely large. Integrates all 40+ driver-facing features.
+- **/app/frontend/src/components/**: All newly created component files, including , , , , , , and .
+- **/app/frontend/public/index.html**: Needs to be updated for SEO meta tags and to enable Microsoft Clarity.
+- **/app/memory/PRD.md**: Updated multiple times with completed features.
 
 **Areas that need refactoring**
-- ****: This file is dangerously large and complex. It urgently needs to be broken down into separate FastAPI routers by domain (e.g., , , ).
-- ****: This god component is unmaintainable. It should be refactored into smaller, self-contained components with their own state management and custom hooks.
+- ****: URGENT. This monolith is unmaintainable. It must be broken down into separate FastAPI routers by domain (e.g., , , ).
+- ****: CRITICAL. This is a god component with thousands of lines of code. It should be refactored into a layout that renders child components, each managing its own state and logic.
 
 **key api endpoints**
-- **/api/health**: Health check for deployment.
-- **/api/emergency/sos**: Triggers an emergency SOS alert.
-- **/api/subscriptions/create-checkout**: Creates a Stripe checkout session.
-- **/api/notifications**: Get/update user notifications.
-- **/api/weather-alerts**: CRUD for weather alerts.
-- **/api/convoy-chat/{convoy_id}/messages**: CRUD for convoy chat messages.
-- **/api/routes/plan**: Plan a truck-specific route. *(New)*
-- **/api/analytics/summary**: Get driver analytics. *(New)*
-- **/api/messages/{recipient_email}**: CRUD for direct messages. *(New)*
-- **/api/reviews/{review_id}/photos**: Add a photo to a review. *(New)*
+- **/api/hos/logs**: CRUD for Hours of Service logs.
+- **/api/weight/trucks**: CRUD for truck profiles.
+- **/api/gamification/status**: GET user's gamification progress.
+- **/api/rewards/redeem**: POST to redeem points for a reward.
+- **/api/auth/forgot-password**: POST to request a password reset.
+- **/api/auth/reset-password**: POST to set a new password with a token.
+- **/api/seed-data**: POST to populate the database with initial data (for development/testing).
 
 **Critical Info for New Agent**
-- Your immediate and highest priority is to continue the implementation of the six new features requested by the user. The backend work is done. You must now create the remaining frontend components and integrate all of them into the .
-- Be extremely cautious when editing  and . These files are massive and fragile.
-- After implementing the features, conduct a full testing cycle, starting with the new backend APIs and finishing with a comprehensive frontend test using the testing agent.
-- The user is aware that the app can be exported to GitHub for external deployment, but wants to continue development for now.
+- **Your top priority is to complete the pre-launch checklist.** The user wants to launch the app.
+- You must integrate the newly created but non-functional frontend components (, , ) into the main application UI.
+- The  and  files are extremely fragile due to their size. Edit with extreme caution.
+- After implementing the final launch features, a full regression test using the testing agent is mandatory before declaring the app ready for launch.
 
 **documents and test reports created in this job**
 - **/app/memory/PRD.md**
-- **/app/test_reports/iteration_2.json**
-- **/app/test_reports/iteration_3.json**
+- **/app/test_reports/iteration_4.json**
+- **/app/test_reports/iteration_5.json**
+- **/app/test_reports/iteration_6.json**
+- **/app/test_reports/iteration_7.json**
 
 **Last 10 User Messages and any pending HUMAN messages**
-- **User:** wants an email support option in the contact tab. (Status: COMPLETED)
-- **User:** initiated a deployment and asked the agent to fix build errors. (Status: COMPLETED)
-- **User:** asked to change the preview URL from  to . (Status: RESOLVED - Agent explained it's an auto-generated preview URL and provided steps for support to change the final production URL).
-- **User:** asked if the source code can be exported to GitHub for deployment on Vercel. (Status: RESOLVED - Agent confirmed yes and explained the steps).
-- **User:** Not yet because I still build the app. (Status: ACKNOWLEDGED - Agent paused on export prep).
-- **User:** Yes all - confirming they want all 6 suggested features. (Status: IN PROGRESS - Agent started implementation).
-- **User:** asked how the load board is found and how to configure Stripe. (Status: COMPLETED - Agent added a dedicated Load Board tab and implemented the Stripe flow).
-- **User:** asked to add privacy policy and terms of service. (Status: COMPLETED)
-- **User:** why there is a yellow loading color is poop up? (Status: COMPLETED - Agent fixed the UI theme issues).
-- **User:** billing is enabled - confirming Google Maps billing was set up. (Status: COMPLETED - Agent verified the map worked).
+1.  **User**: Asks for ideas on what to add before launch. (Status: COMPLETED)
+2.  **User**: All - Approves implementing the entire pre-launch checklist. (Status: IN PROGRESS)
+3.  **User**: Did you QR code scanner. (Status: ADDRESSED - Agent confirmed it wasn't added yet and got approval to add it).
+4.  **User**: Yes continue the work. (Status: IN PROGRESS - Agent continued with QR scanner and other launch features).
+5.  **User**: Continue working. (Status: IN PROGRESS)
+6.  **User**: Yes add it and test app to launch. (Status: COMPLETED - HOS tracker added and tested).
+7.  **User**: Asks about subscription plans. (Status: COMPLETED - Agent provided current plans).
+8.  **User**: Asks for suggestions on plans. (Status: COMPLETED - Agent provided new recommended plans).
+9.  **User**: Yes - Approves implementing the new subscription plans. (Status: COMPLETED).
+10. **User**: I need your idea before to launch. (Status: COMPLETED - Agent provided a detailed pre-launch checklist and strategy).
 
 **Project Health Check:**
 - **Broken**: None.
 - **Mocked**:
-    - **Voice Commands**: Backend API exists, but the frontend Web Speech API integration is not yet built.
-    - **Push Notifications**: Backend API exists, but the frontend Push API/Service Worker logic is not yet built.
-    - **In-App Messaging**: Backend API exists, but the frontend UI/component is not yet built.
+    - **Onboarding Tutorial**: Component created but not integrated.
+    - **Forgot Password**: Backend route exists, component created, but UI integration and email sending are not implemented.
+    - **QR Scanner**: Component created but not integrated into the dashboard.
+    - **Email Verification**: Planned, but no code exists yet.
+    - **Demo Account**: Planned, but no code exists yet.
+    - **Push Notifications**: Backend API exists, but frontend service worker logic is not implemented.
 
 **3rd Party Integrations**
-- **Google Maps API**: Integrated and fully functional. Requires a user-provided API key with billing enabled.
-- **Stripe**: Integrated and fully functional for subscriptions. Requires user-provided test/live keys.
-- **Google Analytics**: Integrated with a user-provided tracking ID.
+- **Google Maps API**: Integrated and functional.
+- **Stripe**: Integrated and functional with updated subscription plans.
+- **Google Analytics**: Integrated.
+- **Microsoft Clarity**: Script added to  but is currently commented out, awaiting a user-provided ID.
 
 **Testing status**
-- **Testing agent used after significant changes**: YES
+- **Testing agent used after significant changes**: YES. The last run was , which passed 36/36 tests.
 - **Troubleshoot agent used after agent stuck in loop**: NO
-- **Test files created**: None. All testing was performed via ad-hoc scripts, curl commands, and the testing agent.
+- **Test files created**: None. All testing via testing agent, curl, and screenshots.
 - **Known regressions**: None.
 
 **Credentials to test flow:**
@@ -182,4 +172,4 @@ There are no known bugs or blocking issues. All previously identified problems (
 - **Stripe Test Card**:  (any future date, any 3-digit CVC).
 
 **What agent forgot to execute**
-- Nothing. The agent successfully addressed all user requests and previously missed items from the initial handoff. The current work is a direct continuation of the user's latest request.</analysis>
+The agent is in the middle of a large, user-approved task. It has correctly created the necessary backend logic and frontend component shells for the pre-launch checklist but has not yet completed the UI integration and final implementation of these features. This is not a forgotten step but rather the next logical step in the current workflow.</analysis>
