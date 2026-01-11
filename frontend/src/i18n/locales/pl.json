@@ -1,0 +1,127 @@
+{
+  "hero": {
+    "badge": "Zaufało nam ponad 10 000 kierowców ciężarówek",
+    "title": "Nigdy więcej nie jedź na",
+    "titleHighlight": "Pełny Parking",
+    "titleEnd": "",
+    "subtitle": "Znajdź bezpieczny parking w kilka sekund, zarabiaj na giełdzie ładunków, śledź wydatki i dołącz do konwojów. Wszystko czego potrzebuje kierowca ciężarówki.",
+    "cta": "Zacznij Za Darmo",
+    "secondary": "Zobacz Jak Działa",
+    "trust1": "100% Darmowe Na Zawsze",
+    "trust2": "Bez Karty Kredytowej",
+    "trust3": "Działa na iPhone i Android"
+  },
+  "stats": {
+    "drivers": "Aktywni Kierowcy",
+    "saved": "Zaoszczędzone Rocznie",
+    "updates": "Aktualizacje w Czasie Rzeczywistym",
+    "rating": "Ocena Kierowców"
+  },
+  "features": {
+    "title": "Rozwiązujemy",
+    "titleHighlight": "Każdy Problem",
+    "subtitle": "Przestań tracić pieniądze, czas i sen. TrukAll rozwiązuje 10 głównych problemów kierowców ciężarówek.",
+    "parking": {
+      "title": "Rezerwuj Parking 24h Wcześniej",
+      "desc": "Nigdy więcej nie jedź na pełny parking. Zarezerwuj miejsce przed wyjazdem.",
+      "benefit": "Oszczędź $4,600/rok"
+    },
+    "loadBoard": {
+      "title": "Giełda Ładunków + Kalkulator",
+      "desc": "Znajdź płatne ładunki i sprawdź czy są opłacalne przed akceptacją.",
+      "benefit": "Zarabiaj więcej za milę"
+    },
+    "convoy": {
+      "title": "Wyszukiwarka Konwojów + Czat",
+      "desc": "Znajdź kierowców na swojej trasie. Podróżujcie razem dla bezpieczeństwa.",
+      "benefit": "Bezpieczniejsze trasy"
+    },
+    "emergency": {
+      "title": "SOS Awaryjne + GPS",
+      "desc": "Przycisk awaryjny jednym dotknięciem wysyła twoją lokalizację po pomoc.",
+      "benefit": "Funkcja ratująca życie"
+    },
+    "reviews": {
+      "title": "Zweryfikowane Opinie Kierowców",
+      "desc": "Prawdziwe opinie od prawdziwych kierowców. Wiedz co jest dobre przed wyjazdem.",
+      "benefit": "Zaufanie społeczności"
+    },
+    "rewards": {
+      "title": "System Nagród i Punktów",
+      "desc": "Zdobywaj punkty za rezerwacje, opinie i bezpieczną jazdę. Wymieniaj na nagrody.",
+      "benefit": "Płacą ci za używanie"
+    }
+  },
+  "killerFeatures": {
+    "title": "Zobacz Nasze",
+    "titleHighlight": "Najlepsze Funkcje",
+    "subtitle": "Te funkcje wyróżniają TrukAll spośród innych aplikacji dla kierowców",
+    "hos": {
+      "title": "Tracker Godzin Pracy",
+      "desc": "Nigdy więcej mandatów DOT. Śledź godziny jazdy, okno pracy i limity tygodniowe.",
+      "stat": "$16,000",
+      "statLabel": "średni mandat uniknięty"
+    },
+    "weight": {
+      "title": "Inteligentny Kalkulator Wagi",
+      "desc": "Znaj dokładną wagę osi przed ważeniem. Zapisuj wiele profili ciężarówek.",
+      "stat": "100%",
+      "statLabel": "dokładność wagi"
+    },
+    "qr": {
+      "title": "Skaner Kodów QR",
+      "desc": "Skanuj kody QR na postojach dla natychmiastowej rejestracji. Udostępniaj kod polecający.",
+      "stat": "500+",
+      "statLabel": "punktów bonusowych"
+    },
+    "realtime": {
+      "title": "Dostępność w Czasie Rzeczywistym",
+      "desc": "Zobacz aktualizacje parkingów od innych kierowców. Wiedz jak pełny jest każdy parking.",
+      "stat": "30sek",
+      "statLabel": "częstotliwość aktualizacji"
+    }
+  },
+  "cta": {
+    "title": "Dołącz do 10,000+ Kierowców Oszczędzających",
+    "subtitle": "Zacznij znajdować bezpieczny parking, zarabiać więcej i podróżować bezpieczniej.",
+    "button": "Zacznij Za Darmo"
+  },
+  "nav": {
+    "login": "Zaloguj się",
+    "signup": "Zarejestruj się",
+    "logout": "Wyloguj"
+  },
+  "auth": {
+    "welcome": "Witaj Ponownie",
+    "createAccount": "Utwórz Darmowe Konto",
+    "loginDesc": "Zaloguj się do swojego konta TrukAll",
+    "signupDesc": "Dołącz do 10,000+ kierowców",
+    "email": "Email",
+    "password": "Hasło",
+    "name": "Imię i Nazwisko",
+    "role": "Jestem",
+    "driver": "Kierowca Ciężarówki",
+    "partner": "Właściciel Parkingu",
+    "forgotPassword": "Zapomniałeś hasła?",
+    "loginBtn": "ZALOGUJ SIĘ",
+    "signupBtn": "Utwórz Darmowe Konto",
+    "demoBtn": "Wypróbuj Konto Demo",
+    "noAccount": "Nie masz konta?",
+    "hasAccount": "Masz już konto?",
+    "signupFree": "Zarejestruj się za darmo",
+    "agreeTerms": "Akceptuję",
+    "terms": "Regulamin",
+    "privacy": "Politykę Prywatności",
+    "and": "i"
+  },
+  "dashboard": {
+    "points": "Twoje Punkty",
+    "howToEarn": "Jak zdobywać?",
+    "fatigue": "Stan Zmęczenia",
+    "allGood": "WSZYSTKO OK",
+    "takeBreak": "ZRÓB PRZERWĘ!",
+    "wakeUp": "Alarm Budzika",
+    "notSet": "Nie ustawiono"
+  },
+  "language": "Język"
+}

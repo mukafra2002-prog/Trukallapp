@@ -1,0 +1,127 @@
+{
+  "hero": {
+    "badge": "Trusted by 10,000+ Truck Drivers",
+    "title": "Never Drive to a",
+    "titleHighlight": "Full Lot",
+    "titleEnd": "Again",
+    "subtitle": "Find safe parking in seconds, earn money with load board, track expenses, and join convoys. Everything a truck driver needs in one powerful app.",
+    "cta": "Start Free Today",
+    "secondary": "See How It Works",
+    "trust1": "100% Free Forever",
+    "trust2": "No Credit Card Required",
+    "trust3": "Works on iPhone & Android"
+  },
+  "stats": {
+    "drivers": "Active Drivers",
+    "saved": "Saved Per Year",
+    "updates": "Real-Time Updates",
+    "rating": "Driver Rating"
+  },
+  "features": {
+    "title": "We Solve",
+    "titleHighlight": "Every Pain Point",
+    "subtitle": "Stop losing money, time, and sleep. TrukAll solves all 10 major problems truck drivers face daily.",
+    "parking": {
+      "title": "Reserve Parking 24hrs Ahead",
+      "desc": "Never drive to a full lot again. Book your spot before you leave.",
+      "benefit": "Save $4,600/year"
+    },
+    "loadBoard": {
+      "title": "Load Board + Profit Calculator",
+      "desc": "Find paying loads and know if they're profitable before you accept.",
+      "benefit": "Earn more per mile"
+    },
+    "convoy": {
+      "title": "Convoy Finder + Live Chat",
+      "desc": "Find drivers on your route. Travel together for safety and company.",
+      "benefit": "Safer long hauls"
+    },
+    "emergency": {
+      "title": "Emergency SOS + GPS",
+      "desc": "One-tap emergency button sends your location to help instantly.",
+      "benefit": "Life-saving feature"
+    },
+    "reviews": {
+      "title": "Verified Driver Reviews",
+      "desc": "Real reviews from real drivers. Know what's good before you go.",
+      "benefit": "Community-powered trust"
+    },
+    "rewards": {
+      "title": "Rewards & Points System",
+      "desc": "Earn points for bookings, reviews, and safe driving. Redeem for rewards.",
+      "benefit": "Get paid to use it"
+    }
+  },
+  "killerFeatures": {
+    "title": "See Our",
+    "titleHighlight": "Killer Features",
+    "subtitle": "These features set TrukAll apart from every other trucking app",
+    "hos": {
+      "title": "HOS Compliance Tracker",
+      "desc": "Never get a DOT violation again. Track driving hours, duty window, and weekly limits automatically.",
+      "stat": "$16,000",
+      "statLabel": "avg fine avoided"
+    },
+    "weight": {
+      "title": "Smart Weight Calculator",
+      "desc": "Know your exact axle weights before hitting the scale. Save multiple truck profiles.",
+      "stat": "100%",
+      "statLabel": "scale accuracy"
+    },
+    "qr": {
+      "title": "QR Code Scanner",
+      "desc": "Scan truck stop QR codes for instant check-in. Share your referral code to earn bonus points.",
+      "stat": "500+",
+      "statLabel": "bonus points"
+    },
+    "realtime": {
+      "title": "Real-Time Availability",
+      "desc": "See live parking updates from fellow drivers. Know exactly how full each lot is right now.",
+      "stat": "30sec",
+      "statLabel": "update frequency"
+    }
+  },
+  "cta": {
+    "title": "Join 10,000+ Drivers Saving Money & Time",
+    "subtitle": "Start finding safe parking, earning more per mile, and traveling safer today. No credit card required.",
+    "button": "Start Free Now"
+  },
+  "nav": {
+    "login": "Login",
+    "signup": "Sign Up Free",
+    "logout": "Logout"
+  },
+  "auth": {
+    "welcome": "Welcome Back",
+    "createAccount": "Create Free Account",
+    "loginDesc": "Login to your TrukAll account",
+    "signupDesc": "Join 10,000+ drivers today",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full Name",
+    "role": "I am a",
+    "driver": "Truck Driver",
+    "partner": "Parking Lot Owner",
+    "forgotPassword": "Forgot password?",
+    "loginBtn": "LOGIN",
+    "signupBtn": "Create Free Account",
+    "demoBtn": "Try Demo Account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signupFree": "Sign up free",
+    "agreeTerms": "I agree to the",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "and": "and"
+  },
+  "dashboard": {
+    "points": "Your Points",
+    "howToEarn": "How to earn?",
+    "fatigue": "Fatigue Status",
+    "allGood": "ALL GOOD",
+    "takeBreak": "TAKE A BREAK!",
+    "wakeUp": "Wake-up Alarm",
+    "notSet": "Not set"
+  },
+  "language": "Language"
+}

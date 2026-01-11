@@ -1,0 +1,127 @@
+{
+  "hero": {
+    "badge": "Confiado por más de 10,000 Camioneros",
+    "title": "Nunca Llegues a un",
+    "titleHighlight": "Estacionamiento Lleno",
+    "titleEnd": "Otra Vez",
+    "subtitle": "Encuentra estacionamiento seguro en segundos, gana dinero con tablero de cargas, rastrea gastos y únete a convoyes. Todo lo que un camionero necesita en una app.",
+    "cta": "Empieza Gratis Hoy",
+    "secondary": "Ver Cómo Funciona",
+    "trust1": "100% Gratis Siempre",
+    "trust2": "Sin Tarjeta de Crédito",
+    "trust3": "Funciona en iPhone y Android"
+  },
+  "stats": {
+    "drivers": "Conductores Activos",
+    "saved": "Ahorrado Por Año",
+    "updates": "Actualizaciones en Tiempo Real",
+    "rating": "Calificación de Conductores"
+  },
+  "features": {
+    "title": "Resolvemos",
+    "titleHighlight": "Todos Tus Problemas",
+    "subtitle": "Deja de perder dinero, tiempo y sueño. TrukAll resuelve los 10 problemas principales que enfrentan los camioneros.",
+    "parking": {
+      "title": "Reserva Estacionamiento 24hrs Antes",
+      "desc": "Nunca llegues a un estacionamiento lleno. Reserva tu lugar antes de salir.",
+      "benefit": "Ahorra $4,600/año"
+    },
+    "loadBoard": {
+      "title": "Tablero de Cargas + Calculadora",
+      "desc": "Encuentra cargas que pagan bien y sabe si son rentables antes de aceptar.",
+      "benefit": "Gana más por milla"
+    },
+    "convoy": {
+      "title": "Buscador de Convoy + Chat",
+      "desc": "Encuentra conductores en tu ruta. Viaja junto para seguridad y compañía.",
+      "benefit": "Viajes más seguros"
+    },
+    "emergency": {
+      "title": "SOS de Emergencia + GPS",
+      "desc": "Botón de emergencia de un toque envía tu ubicación para ayuda instantánea.",
+      "benefit": "Función salvavidas"
+    },
+    "reviews": {
+      "title": "Reseñas Verificadas de Conductores",
+      "desc": "Reseñas reales de conductores reales. Sabe qué es bueno antes de ir.",
+      "benefit": "Confianza de la comunidad"
+    },
+    "rewards": {
+      "title": "Sistema de Recompensas y Puntos",
+      "desc": "Gana puntos por reservas, reseñas y conducción segura. Canjea por premios.",
+      "benefit": "Te pagan por usarlo"
+    }
+  },
+  "killerFeatures": {
+    "title": "Mira Nuestras",
+    "titleHighlight": "Funciones Estrella",
+    "subtitle": "Estas funciones hacen que TrukAll sea diferente a cualquier otra app de camiones",
+    "hos": {
+      "title": "Rastreador de Horas de Servicio",
+      "desc": "Nunca recibas una violación del DOT. Rastrea horas de conducción, ventana de servicio y límites semanales.",
+      "stat": "$16,000",
+      "statLabel": "multa promedio evitada"
+    },
+    "weight": {
+      "title": "Calculadora de Peso Inteligente",
+      "desc": "Conoce el peso exacto de tus ejes antes de la báscula. Guarda múltiples perfiles de camión.",
+      "stat": "100%",
+      "statLabel": "precisión en báscula"
+    },
+    "qr": {
+      "title": "Escáner de Código QR",
+      "desc": "Escanea códigos QR de paradas de camiones para registro instantáneo. Comparte tu código de referido.",
+      "stat": "500+",
+      "statLabel": "puntos de bonificación"
+    },
+    "realtime": {
+      "title": "Disponibilidad en Tiempo Real",
+      "desc": "Ve actualizaciones en vivo de estacionamiento de otros conductores. Sabe qué tan lleno está cada lugar.",
+      "stat": "30seg",
+      "statLabel": "frecuencia de actualización"
+    }
+  },
+  "cta": {
+    "title": "Únete a 10,000+ Conductores Ahorrando Dinero",
+    "subtitle": "Empieza a encontrar estacionamiento seguro, ganar más por milla y viajar más seguro hoy.",
+    "button": "Empieza Gratis Ahora"
+  },
+  "nav": {
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse Gratis",
+    "logout": "Cerrar Sesión"
+  },
+  "auth": {
+    "welcome": "Bienvenido de Vuelta",
+    "createAccount": "Crear Cuenta Gratis",
+    "loginDesc": "Inicia sesión en tu cuenta TrukAll",
+    "signupDesc": "Únete a 10,000+ conductores hoy",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "name": "Nombre Completo",
+    "role": "Soy un",
+    "driver": "Camionero",
+    "partner": "Dueño de Estacionamiento",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "loginBtn": "INICIAR SESIÓN",
+    "signupBtn": "Crear Cuenta Gratis",
+    "demoBtn": "Probar Cuenta Demo",
+    "noAccount": "¿No tienes cuenta?",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "signupFree": "Regístrate gratis",
+    "agreeTerms": "Acepto los",
+    "terms": "Términos de Servicio",
+    "privacy": "Política de Privacidad",
+    "and": "y"
+  },
+  "dashboard": {
+    "points": "Tus Puntos",
+    "howToEarn": "¿Cómo ganar?",
+    "fatigue": "Estado de Fatiga",
+    "allGood": "TODO BIEN",
+    "takeBreak": "¡TOMA UN DESCANSO!",
+    "wakeUp": "Alarma de Despertar",
+    "notSet": "No configurado"
+  },
+  "language": "Idioma"
+}
