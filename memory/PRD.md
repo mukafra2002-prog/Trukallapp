@@ -26,6 +26,12 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - [x] Booking/reservation system
 - [x] Reward points system
 - [x] Notification bell with real-time alerts
+- [x] **Analytics Dashboard** - Earnings tracking, expense breakdown, performance metrics (NEW)
+- [x] **Truck Route Planner** - Route planning with truck restrictions (NEW)
+- [x] **Voice Commands** - Hands-free voice search (NEW)
+- [x] **Photo Reviews** - Photo uploads for parking reviews (NEW)
+- [x] **In-App Messaging** - Direct messaging between drivers (NEW)
+- [x] **Push Notifications** - Backend API ready (NEW)
 
 ### Safety Features
 - [x] Emergency SOS button with contacts notification
