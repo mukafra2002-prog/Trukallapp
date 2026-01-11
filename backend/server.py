@@ -1457,10 +1457,12 @@ async def get_active_emergencies():
     
     return emergencies
 
-# ============== HOS (HOURS OF SERVICE) ==============
+# ============== HOS (HOURS OF SERVICE) - LEGACY ENDPOINTS ==============
+# Note: These are legacy endpoints. New HOS tracker endpoints are defined later in the file.
 
-@api_router.get("/hos/{driver_email}")
-async def get_hos_status(driver_email: str):
+@api_router.get("/hos-legacy/{driver_email}")
+async def get_hos_status_legacy(driver_email: str):
+    """Legacy HOS status endpoint - use /hos/summary/{email} instead"""
     user = await db.users.find_one({"email": driver_email})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -1495,8 +1497,9 @@ async def get_hos_status(driver_email: str):
         "status": "good" if hours_remaining > 2 else "warning" if hours_remaining > 0 else "violation"
     }
 
-@api_router.post("/hos/{driver_email}/reset")
-async def reset_hos(driver_email: str):
+@api_router.post("/hos-legacy/{driver_email}/reset")
+async def reset_hos_legacy(driver_email: str):
+    """Legacy HOS reset endpoint"""
     result = await db.users.update_one(
         {"email": driver_email},
         {
