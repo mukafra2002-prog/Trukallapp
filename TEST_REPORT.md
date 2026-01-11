@@ -2,7 +2,7 @@
 ## Device Compatibility & Feature Testing
 
 **Test Date:** December 27, 2024
-**App URL:** https://roadhaven.preview.emergentagent.com
+**App URL:** https://roadmates-1.preview.emergentagent.com
 **Status:** ✅ ALL SYSTEMS OPERATIONAL
 
 ---
@@ -297,7 +297,7 @@ Error: User not fully initialized with HOS data
 ### How to Install on Each Device
 
 #### iPhone/iPad
-1. Open Safari: https://roadhaven.preview.emergentagent.com
+1. Open Safari: https://roadmates-1.preview.emergentagent.com
 2. Tap Share button (box with arrow)
 3. Scroll down, tap "Add to Home Screen"
 4. Confirm "Add"
@@ -307,7 +307,7 @@ Error: User not fully initialized with HOS data
 **Test Status:** ✅ Verified working
 
 #### Android Phone/Tablet
-1. Open Chrome: https://roadhaven.preview.emergentagent.com
+1. Open Chrome: https://roadmates-1.preview.emergentagent.com
 2. Tap ⋮ menu (three dots)
 3. Select "Add to Home screen"
 4. Confirm app name "TrukAll"
@@ -318,7 +318,7 @@ Error: User not fully initialized with HOS data
 **Test Status:** ✅ Verified working
 
 #### Desktop (Chrome/Edge)
-1. Visit: https://roadhaven.preview.emergentagent.com
+1. Visit: https://roadmates-1.preview.emergentagent.com
 2. Look for install icon in address bar (⊕ or 🖥️)
 3. Click "Install TrukAll"
 4. App opens in standalone window
@@ -413,7 +413,7 @@ Error: User not fully initialized with HOS data
 ✅ Weather and weigh station data
 
 ### Test on Your Devices:
-**Live URL:** https://roadhaven.preview.emergentagent.com
+**Live URL:** https://roadmates-1.preview.emergentagent.com
 
 **Test Accounts:**
 - Driver: driver@test.com / password123
