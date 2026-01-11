@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Truck, Shield, MapPin, DollarSign, Clock, Fuel, Bell, TrendingUp, Award, Users, CheckCircle, Star, Zap, Target } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import KillerFeaturesShowcase from "@/components/KillerFeaturesShowcase";
+import TestimonialsSection from "@/components/TestimonialsSection";
 
 export default function LandingPage() {
   const { t } = useTranslation();
