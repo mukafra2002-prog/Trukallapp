@@ -536,6 +536,24 @@ export default function LandingPage() {
                   <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12" disabled={loading} data-testid="modal-login-submit">
                     {loading ? 'Logging in...' : 'LOGIN'}
                   </Button>
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="bg-white px-2 text-gray-500">or</span>
+                    </div>
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-12 border-2 border-green-500 text-green-600 hover:bg-green-50" 
+                    disabled={loading}
+                    onClick={handleDemoLogin}
+                    data-testid="demo-login-btn"
+                  >
+                    {loading ? 'Loading...' : '🚀 Try Demo Account'}
+                  </Button>
                   <p className="text-center text-sm text-gray-600">
                     Don't have an account?{' '}
                     <button type="button" className="text-blue-600 font-semibold" onClick={() => setIsLogin(false)}>
