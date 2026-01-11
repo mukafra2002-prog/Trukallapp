@@ -35,7 +35,7 @@ export default function PhotoReviews({ spotId, spotName }) {
 
   const fetchReviews = async () => {
     try {
-      const response = await axios.get(`${API}/photo-reviews/${spotId}`);
+      const response = await axios.get(`${API}/reviews/photo/${spotId}`);
       setReviews(response.data);
     } catch (error) {
       console.error("Failed to load reviews");
