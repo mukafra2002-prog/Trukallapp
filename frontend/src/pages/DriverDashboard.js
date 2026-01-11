@@ -251,9 +251,10 @@ export default function DriverDashboard() {
   const fetchLoads = async () => {
     try {
       const response = await axios.get(`${API}/loads`);
-      setLoads(response.data);
+      setLoads(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to load loads", error);
+      setLoads([]);
     }
   };
 
