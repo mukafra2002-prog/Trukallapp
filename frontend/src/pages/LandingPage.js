@@ -165,15 +165,15 @@ export default function LandingPage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-white/30">
               <Zap className="w-4 h-4 text-yellow-300" />
-              <span className="text-white font-semibold text-sm">Trusted by 10,000+ Truck Drivers</span>
+              <span className="text-white font-semibold text-sm">{t('hero.badge')}</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
-              Never Drive to a <span className="text-yellow-300">Full Lot</span> Again
+              {t('hero.title')} <span className="text-yellow-300">{t('hero.titleHighlight')}</span> {t('hero.titleEnd')}
             </h1>
             
             <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Find safe parking in seconds, earn money with load board, track expenses, and join convoys. Everything a truck driver needs in one powerful app.
+              {t('hero.subtitle')}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
@@ -184,14 +184,14 @@ export default function LandingPage() {
                 data-testid="hero-cta-btn"
               >
                 <Target className="w-6 h-6 mr-2" />
-                Start Free Today
+                {t('hero.cta')}
               </Button>
               <Button 
                 size="lg"
                 className="btn-secondary text-xl px-8 py-7"
                 onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
               >
-                See How It Works
+                {t('hero.secondary')}
               </Button>
             </div>
 
@@ -199,15 +199,15 @@ export default function LandingPage() {
             <div className="flex flex-wrap items-center justify-center gap-4 text-white/80 text-sm">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>100% Free Forever</span>
+                <span>{t('hero.trust1')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>No Credit Card Required</span>
+                <span>{t('hero.trust2')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-400" />
-                <span>Works on iPhone & Android</span>
+                <span>{t('hero.trust3')}</span>
               </div>
             </div>
           </div>
