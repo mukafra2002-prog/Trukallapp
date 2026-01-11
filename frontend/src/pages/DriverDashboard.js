@@ -928,6 +928,26 @@ export default function DriverDashboard() {
           <InAppMessaging />
         )}
 
+        {/* Community Board Tab */}
+        {activeTab === "community" && (
+          <CommunityBoard />
+        )}
+
+        {/* Referral System Tab */}
+        {activeTab === "referral" && (
+          <ReferralSystem />
+        )}
+
+        {/* Feedback Tab */}
+        {activeTab === "feedback" && (
+          <FeedbackForm />
+        )}
+
+        {/* Social Links Tab */}
+        {activeTab === "connect" && (
+          <SocialLinks />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
