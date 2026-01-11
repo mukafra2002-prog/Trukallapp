@@ -6,14 +6,6 @@ import { ExternalLink, MessageCircle, Send, Facebook, FileText, MapPin, Phone, M
 export default function SocialLinks() {
   const socialLinks = [
     {
-      name: "Facebook Group",
-      description: "Connect with fellow drivers",
-      icon: Facebook,
-      color: "bg-blue-700 hover:bg-blue-800",
-      url: "https://facebook.com/groups/trukall", // Replace with actual
-      badge: "Join Free"
-    },
-    {
       name: "Google My Business",
       description: "See reviews & location",
       icon: MapPin,
