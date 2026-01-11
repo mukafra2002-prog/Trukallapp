@@ -86,6 +86,30 @@
     "subtitle": "Start finding safe parking, earning more per mile, and traveling safer today. No credit card required.",
     "button": "Start Free Now"
   },
+  "testimonials": {
+    "title": "What Drivers",
+    "titleHighlight": "Are Saying",
+    "reviews": [
+      {
+        "name": "Mike Johnson",
+        "location": "Texas, USA",
+        "text": "This app saved my career! I haven't gotten a single HOS violation since I started using it. The real-time parking updates are a game changer.",
+        "rating": 5
+      },
+      {
+        "name": "Robert Williams",
+        "location": "California, USA",
+        "text": "The weight calculator is perfect. Saved me thousands in overweight fines. Best trucking app I've ever used.",
+        "rating": 5
+      },
+      {
+        "name": "James Davis",
+        "location": "Florida, USA",
+        "text": "Finally an app made BY truckers FOR truckers. The convoy finder helped me make friends on the road. 5 stars!",
+        "rating": 5
+      }
+    ]
+  },
   "nav": {
     "login": "Login",
     "signup": "Sign Up Free",
