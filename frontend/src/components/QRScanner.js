@@ -206,7 +206,7 @@ export default function QRScanner({ onScan, referralCode }) {
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-4">
             <div className="p-4 bg-white rounded-lg shadow-inner">
-              <QRCode
+              <QRCodeCanvas
                 id="referral-qr-code"
                 value={`https://trukall.app/signup?ref=${referralCode}`}
                 size={200}
