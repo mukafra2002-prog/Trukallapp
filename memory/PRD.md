@@ -4,23 +4,39 @@
 TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solves critical pain points including finding safe parking, real-time lot availability, avoiding tickets, locating amenities, and mitigating driver fatigue.
 
 ## Tech Stack
-- **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, Axios, qrcode.react
+- **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, Axios, qrcode.react, react-i18next
 - **Backend**: FastAPI, Pydantic, Motor (async MongoDB driver)
 - **Database**: MongoDB
 - **Maps**: Google Maps API
 - **Payments**: Stripe
 - **Analytics**: Google Analytics, Microsoft Clarity (placeholder)
 - **PWA**: Service Worker, Web Manifest
+- **i18n**: react-i18next with 5 languages
 
 ## Core Features (Implemented)
+
+### Multi-Language Support (NEW - Jan 11, 2026)
+- [x] 5 Languages: English, Spanish (Español), Polish (Polski), Russian (Русский), Hindi (हिन्दी)
+- [x] Language selector in navigation
+- [x] Auto-detects browser language
+- [x] Persists selection in localStorage
+
+### Killer Features Visual Showcase (NEW - Jan 11, 2026)
+- [x] Auto-rotating feature cards (4 second intervals)
+- [x] HOS Tracker - "$16,000 avg fine avoided"
+- [x] Weight Calculator - "100% scale accuracy"
+- [x] QR Scanner - "500+ bonus points"
+- [x] Real-Time Updates - "30sec update frequency"
+- [x] Navigation dots and arrows
+- [x] Feature-specific pills/tags
 
 ### Authentication & Users
 - [x] Multi-role authentication (Driver, Partner, Admin)
 - [x] Password reset functionality (with 6-digit code - MOCKED email)
 - [x] JWT-based login
 - [x] User profile management
-- [x] **Demo Account** - Try app without signup (NEW - Jan 11, 2026)
-- [x] **Forgot Password Flow** - Email + 6-digit code reset (NEW - Jan 11, 2026)
+- [x] Demo Account - Try app without signup
+- [x] Forgot Password Flow - Email + 6-digit code reset
 
 ### Driver Dashboard
 - [x] Google Maps integration with parking markers
