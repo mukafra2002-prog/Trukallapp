@@ -174,15 +174,15 @@ export default function RoutePlanner() {
                     size="sm"
                     onClick={() => setFormData({
                       ...formData,
-                      origin: r.origin,
-                      destination: r.destination,
+                      origin_address: r.origin_address,
+                      destination_address: r.destination_address,
                       origin_lat: r.origin_lat,
                       origin_lng: r.origin_lng,
                       destination_lat: r.dest_lat,
                       destination_lng: r.dest_lng
                     })}
                   >
-                    {r.origin} → {r.destination}
+                    {r.origin_address} → {r.destination_address}
                   </Button>
                 ))}
               </div>
