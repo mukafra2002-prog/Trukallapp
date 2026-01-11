@@ -108,7 +108,7 @@ export default function PhotoReviews({ spotId, spotName }) {
 
   const markHelpful = async (reviewId) => {
     try {
-      await axios.post(`${API}/photo-reviews/${reviewId}/helpful?driver_email=${user.email}`);
+      await axios.post(`${API}/reviews/${reviewId}/helpful?driver_email=${user.email}`);
       toast.success("Marked as helpful!");
       fetchReviews();
     } catch (error) {
