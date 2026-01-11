@@ -6,22 +6,6 @@ import { ExternalLink, MessageCircle, Send, Facebook, FileText, MapPin, Phone, M
 export default function SocialLinks() {
   const socialLinks = [
     {
-      name: "WhatsApp Business",
-      description: "Chat with us directly",
-      icon: MessageCircle,
-      color: "bg-green-500 hover:bg-green-600",
-      url: "https://wa.me/1234567890", // Replace with actual
-      badge: "Chat Now"
-    },
-    {
-      name: "Telegram Community",
-      description: "Join our trucker group",
-      icon: Send,
-      color: "bg-blue-500 hover:bg-blue-600",
-      url: "https://t.me/trukall_community", // Replace with actual
-      badge: "10K+ Members"
-    },
-    {
       name: "Facebook Group",
       description: "Connect with fellow drivers",
       icon: Facebook,
