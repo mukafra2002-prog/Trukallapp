@@ -122,6 +122,15 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 
 ## Recent Updates (January 2026)
 
+### Session: January 11, 2026 (COMMUNITY & ENGAGEMENT FEATURES)
+- **Feedback Form** - In-app feedback with 5 types (General, Bug, Feature, Praise, Complaint) + Google Forms link, awards 25-50 points
+- **Community Board** - Forum-style posts with 7 categories, likes, comments, awards 20 points per post
+- **Referral System** - Unique referral codes (TRUK + hash), 500 pts for referrer, 250 for new user
+- **Social Links Page** - WhatsApp Business, Telegram, Facebook, Google Business, Notion (placeholder URLs)
+- **Microsoft Clarity** - Added tracking script (placeholder ID)
+- All 19 backend tests passing (100%)
+- All 4 new frontend tabs working
+
 ### Session: January 11, 2026 (6 NEW FEATURES ADDED)
 - **Analytics Dashboard** - Track earnings, expenses, miles, loads with Week/Month/Year views
 - **Truck Route Planner** - Plan routes with truck-specific restrictions (height, weight, hazmat, tolls)
