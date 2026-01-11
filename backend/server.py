@@ -5231,6 +5231,357 @@ async def quick_weight_check(
         "message": "✅ Legal weight" if is_legal else f"⚠️ OVERWEIGHT by {-remaining:,} lbs"
     }
 
+# ============== HOURS OF SERVICE (HOS) TRACKER ==============
+
+# HOS Rules (Federal Motor Carrier Safety Regulations)
+HOS_RULES = {
+    "driving_limit": 11 * 60,  # 11 hours in minutes
+    "duty_window": 14 * 60,  # 14-hour duty window in minutes
+    "weekly_limit": 70 * 60,  # 70 hours in 8 days in minutes
+    "break_required_after": 8 * 60,  # 30-min break required after 8 hours driving
+    "break_duration": 30,  # 30-minute break
+    "sleeper_split_option": True,  # 7/3 or 8/2 split sleeper
+    "restart_hours": 34,  # 34-hour restart
+}
+
+DUTY_STATUSES = ["off_duty", "sleeper", "driving", "on_duty"]
+
+class HOSLog(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_email: str
+    status: str  # "off_duty", "sleeper", "driving", "on_duty"
+    start_time: datetime
+    end_time: Optional[datetime] = None
+    duration_minutes: int = 0
+    location: str = ""
+    notes: str = ""
+    vehicle_id: str = ""
+    odometer_start: int = 0
+    odometer_end: int = 0
+
+class HOSLogCreate(BaseModel):
+    status: str
+    location: str = ""
+    notes: str = ""
+    vehicle_id: str = ""
+    odometer: int = 0
+
+class HOSSummary(BaseModel):
+    driving_today: int = 0  # minutes
+    duty_today: int = 0  # minutes (driving + on_duty)
+    driving_remaining: int = 660  # 11 hours in minutes
+    duty_window_remaining: int = 840  # 14 hours in minutes
+    weekly_hours: int = 0  # minutes in last 8 days
+    weekly_remaining: int = 4200  # 70 hours in minutes
+    break_needed: bool = False
+    time_until_break: int = 480  # minutes until break needed
+    last_34_hour_restart: Optional[str] = None
+    current_status: str = "off_duty"
+    violations: List[str] = []
+
+@api_router.get("/hos/rules")
+async def get_hos_rules():
+    """Get HOS rules reference"""
+    return {
+        "rules": {
+            "driving_limit": "11 hours",
+            "duty_window": "14 hours", 
+            "weekly_limit": "70 hours in 8 days",
+            "break_required": "30-min break after 8 hours driving",
+            "restart": "34-hour restart resets weekly hours"
+        },
+        "statuses": [
+            {"id": "off_duty", "name": "Off Duty", "icon": "🏠", "color": "gray"},
+            {"id": "sleeper", "name": "Sleeper Berth", "icon": "😴", "color": "blue"},
+            {"id": "driving", "name": "Driving", "icon": "🚛", "color": "green"},
+            {"id": "on_duty", "name": "On Duty (Not Driving)", "icon": "📋", "color": "amber"}
+        ],
+        "tips": [
+            "Start your 14-hour window when you first go On Duty or Driving",
+            "The 14-hour window cannot be extended with breaks",
+            "Sleeper berth time of 7+ hours pauses your 14-hour clock",
+            "34-hour restart must include two 1am-5am periods"
+        ]
+    }
+
+@api_router.get("/hos/summary/{user_email}")
+async def get_hos_summary(user_email: str):
+    """Get current HOS summary with remaining time"""
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    eight_days_ago = now - timedelta(days=8)
+    
+    # Get today's logs
+    today_logs = await db.hos_logs.find({
+        "user_email": user_email,
+        "start_time": {"$gte": today_start.isoformat()}
+    }, {"_id": 0}).sort("start_time", 1).to_list(100)
+    
+    # Get last 8 days logs for weekly calculation
+    weekly_logs = await db.hos_logs.find({
+        "user_email": user_email,
+        "start_time": {"$gte": eight_days_ago.isoformat()}
+    }, {"_id": 0}).sort("start_time", 1).to_list(500)
+    
+    # Calculate today's hours
+    driving_today = 0
+    on_duty_today = 0
+    duty_window_start = None
+    
+    for log in today_logs:
+        duration = log.get('duration_minutes', 0)
+        if log['status'] == 'driving':
+            driving_today += duration
+            if not duty_window_start:
+                duty_window_start = log['start_time']
+        elif log['status'] == 'on_duty':
+            on_duty_today += duration
+            if not duty_window_start:
+                duty_window_start = log['start_time']
+    
+    # Calculate weekly hours
+    weekly_driving = 0
+    weekly_on_duty = 0
+    
+    for log in weekly_logs:
+        duration = log.get('duration_minutes', 0)
+        if log['status'] == 'driving':
+            weekly_driving += duration
+        elif log['status'] == 'on_duty':
+            weekly_on_duty += duration
+    
+    total_duty_today = driving_today + on_duty_today
+    weekly_total = weekly_driving + weekly_on_duty
+    
+    # Calculate duty window remaining
+    duty_window_remaining = HOS_RULES['duty_window']
+    if duty_window_start:
+        start_dt = datetime.fromisoformat(duty_window_start.replace('Z', '+00:00')) if isinstance(duty_window_start, str) else duty_window_start
+        elapsed = (now - start_dt).total_seconds() / 60
+        duty_window_remaining = max(0, HOS_RULES['duty_window'] - elapsed)
+    
+    # Check for break requirement
+    time_since_break = 0
+    break_needed = False
+    for log in reversed(today_logs):
+        if log['status'] in ['off_duty', 'sleeper'] and log.get('duration_minutes', 0) >= 30:
+            break
+        if log['status'] == 'driving':
+            time_since_break += log.get('duration_minutes', 0)
+    
+    if time_since_break >= HOS_RULES['break_required_after']:
+        break_needed = True
+    
+    # Get current status
+    current_status = "off_duty"
+    current_log = await db.hos_logs.find_one(
+        {"user_email": user_email, "end_time": None},
+        {"_id": 0},
+        sort=[("start_time", -1)]
+    )
+    if current_log:
+        current_status = current_log['status']
+    
+    # Check for violations
+    violations = []
+    if driving_today > HOS_RULES['driving_limit']:
+        violations.append(f"⚠️ Driving limit exceeded: {driving_today // 60}h {driving_today % 60}m / 11h")
+    if duty_window_remaining <= 0:
+        violations.append("⚠️ 14-hour duty window exhausted")
+    if weekly_total > HOS_RULES['weekly_limit']:
+        violations.append(f"⚠️ Weekly limit exceeded: {weekly_total // 60}h / 70h")
+    if break_needed:
+        violations.append("⚠️ 30-minute break required (8 hours driving)")
+    
+    return {
+        "current_status": current_status,
+        "today": {
+            "driving_minutes": driving_today,
+            "driving_display": f"{driving_today // 60}h {driving_today % 60}m",
+            "driving_remaining": max(0, HOS_RULES['driving_limit'] - driving_today),
+            "driving_remaining_display": f"{max(0, HOS_RULES['driving_limit'] - driving_today) // 60}h {max(0, HOS_RULES['driving_limit'] - driving_today) % 60}m",
+            "duty_minutes": total_duty_today,
+            "duty_display": f"{total_duty_today // 60}h {total_duty_today % 60}m",
+            "duty_window_remaining": int(duty_window_remaining),
+            "duty_window_remaining_display": f"{int(duty_window_remaining) // 60}h {int(duty_window_remaining) % 60}m"
+        },
+        "weekly": {
+            "total_minutes": weekly_total,
+            "total_display": f"{weekly_total // 60}h {weekly_total % 60}m",
+            "remaining_minutes": max(0, HOS_RULES['weekly_limit'] - weekly_total),
+            "remaining_display": f"{max(0, HOS_RULES['weekly_limit'] - weekly_total) // 60}h {max(0, HOS_RULES['weekly_limit'] - weekly_total) % 60}m"
+        },
+        "break": {
+            "needed": break_needed,
+            "time_since_last": time_since_break,
+            "time_until_required": max(0, HOS_RULES['break_required_after'] - time_since_break)
+        },
+        "violations": violations,
+        "is_compliant": len(violations) == 0
+    }
+
+@api_router.post("/hos/log")
+async def log_duty_status(log_data: HOSLogCreate, user_email: str):
+    """Log a duty status change"""
+    if log_data.status not in DUTY_STATUSES:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {DUTY_STATUSES}")
+    
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    now = datetime.now(timezone.utc)
+    
+    # End any current active log
+    current_log = await db.hos_logs.find_one(
+        {"user_email": user_email, "end_time": None}
+    )
+    
+    if current_log:
+        start_time = datetime.fromisoformat(current_log['start_time'].replace('Z', '+00:00')) if isinstance(current_log['start_time'], str) else current_log['start_time']
+        duration = int((now - start_time).total_seconds() / 60)
+        
+        await db.hos_logs.update_one(
+            {"id": current_log['id']},
+            {"$set": {
+                "end_time": now.isoformat(),
+                "duration_minutes": duration,
+                "odometer_end": log_data.odometer if log_data.odometer > 0 else current_log.get('odometer_start', 0)
+            }}
+        )
+    
+    # Create new log
+    new_log = HOSLog(
+        user_email=user_email,
+        status=log_data.status,
+        start_time=now,
+        location=log_data.location,
+        notes=log_data.notes,
+        vehicle_id=log_data.vehicle_id,
+        odometer_start=log_data.odometer
+    )
+    
+    log_doc = new_log.model_dump()
+    log_doc['start_time'] = log_doc['start_time'].isoformat()
+    
+    await db.hos_logs.insert_one(log_doc)
+    
+    # Get updated summary
+    summary = await get_hos_summary(user_email)
+    
+    # Create notification if violation
+    if summary.get('violations'):
+        notification = Notification(
+            recipient_email=user_email,
+            type="hos_violation",
+            title="⚠️ HOS Violation Warning",
+            message=summary['violations'][0],
+            data={"violations": summary['violations']}
+        )
+        notif_doc = notification.model_dump()
+        notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+        await db.notifications.insert_one(notif_doc)
+    
+    logger.info(f"HOS logged: {user_email} - {log_data.status}")
+    
+    return {
+        "message": f"Status changed to {log_data.status}",
+        "log_id": new_log.id,
+        "summary": summary
+    }
+
+@api_router.get("/hos/logs/{user_email}")
+async def get_hos_logs(user_email: str, days: int = 7):
+    """Get HOS logs for specified days"""
+    start_date = datetime.now(timezone.utc) - timedelta(days=days)
+    
+    logs = await db.hos_logs.find({
+        "user_email": user_email,
+        "start_time": {"$gte": start_date.isoformat()}
+    }, {"_id": 0}).sort("start_time", -1).to_list(500)
+    
+    return logs
+
+@api_router.get("/hos/daily/{user_email}/{date}")
+async def get_daily_hos(user_email: str, date: str):
+    """Get HOS logs for a specific day"""
+    try:
+        day_start = datetime.fromisoformat(date).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
+        day_end = day_start + timedelta(days=1)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    
+    logs = await db.hos_logs.find({
+        "user_email": user_email,
+        "start_time": {"$gte": day_start.isoformat(), "$lt": day_end.isoformat()}
+    }, {"_id": 0}).sort("start_time", 1).to_list(100)
+    
+    # Calculate totals for the day
+    totals = {"driving": 0, "on_duty": 0, "off_duty": 0, "sleeper": 0}
+    for log in logs:
+        status = log['status']
+        duration = log.get('duration_minutes', 0)
+        totals[status] = totals.get(status, 0) + duration
+    
+    return {
+        "date": date,
+        "logs": logs,
+        "totals": {
+            "driving": f"{totals['driving'] // 60}h {totals['driving'] % 60}m",
+            "on_duty": f"{totals['on_duty'] // 60}h {totals['on_duty'] % 60}m",
+            "off_duty": f"{totals['off_duty'] // 60}h {totals['off_duty'] % 60}m",
+            "sleeper": f"{totals['sleeper'] // 60}h {totals['sleeper'] % 60}m"
+        }
+    }
+
+@api_router.get("/hos/restart-calculator/{user_email}")
+async def calculate_restart(user_email: str):
+    """Calculate when 34-hour restart will complete"""
+    # Find last duty activity
+    last_duty = await db.hos_logs.find_one(
+        {"user_email": user_email, "status": {"$in": ["driving", "on_duty"]}},
+        {"_id": 0},
+        sort=[("end_time", -1)]
+    )
+    
+    if not last_duty or not last_duty.get('end_time'):
+        return {
+            "can_restart": True,
+            "message": "No recent duty activity found",
+            "restart_available": True
+        }
+    
+    last_duty_end = datetime.fromisoformat(last_duty['end_time'].replace('Z', '+00:00')) if isinstance(last_duty['end_time'], str) else last_duty['end_time']
+    now = datetime.now(timezone.utc)
+    hours_off = (now - last_duty_end).total_seconds() / 3600
+    
+    if hours_off >= 34:
+        return {
+            "can_restart": True,
+            "hours_off": round(hours_off, 1),
+            "message": "34-hour restart complete! Weekly hours reset.",
+            "restart_completed_at": (last_duty_end + timedelta(hours=34)).isoformat()
+        }
+    else:
+        restart_time = last_duty_end + timedelta(hours=34)
+        hours_remaining = 34 - hours_off
+        return {
+            "can_restart": False,
+            "hours_off": round(hours_off, 1),
+            "hours_remaining": round(hours_remaining, 1),
+            "restart_completes_at": restart_time.isoformat(),
+            "message": f"{round(hours_remaining, 1)} hours until 34-hour restart completes"
+        }
+
+@api_router.delete("/hos/log/{log_id}")
+async def delete_hos_log(log_id: str, user_email: str):
+    """Delete a HOS log entry (admin/correction)"""
+    result = await db.hos_logs.delete_one({"id": log_id, "user_email": user_email})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Log not found")
+    return {"message": "Log deleted"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
