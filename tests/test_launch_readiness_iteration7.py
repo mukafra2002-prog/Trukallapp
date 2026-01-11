@@ -367,7 +367,7 @@ class TestFeedbackForm:
         response = requests.post(
             f"{BASE_URL}/api/feedback?user_email={DRIVER_EMAIL}",
             json={
-                "category": "feature_request",
+                "feedback_type": "feature_request",
                 "subject": "TEST_Feedback",
                 "message": "This is a test feedback submission",
                 "rating": 5
