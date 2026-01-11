@@ -1,42 +1,90 @@
 {
   "name": "TrukAll - Complete Truck Driver Solution",
   "short_name": "TrukAll",
-  "description": "Find parking, track expenses, find loads, and more - all in one app",
+  "description": "Find safe parking, track HOS, find loads, join convoys. 40+ features for truck drivers. 100% Free.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
+  "background_color": "#0f172a",
   "theme_color": "#2563eb",
   "orientation": "any",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/truck-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/truck-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/truck-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/truck-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["navigation", "transportation", "business"],
-  "screenshots": [],
+  "categories": ["navigation", "transportation", "business", "productivity"],
   "shortcuts": [
     {
       "name": "Find Parking",
       "short_name": "Parking",
-      "description": "Find available parking spots",
-      "url": "/driver",
+      "description": "Find available truck parking near you",
+      "url": "/driver?tab=map",
+      "icons": [{ "src": "/truck-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "HOS Tracker",
+      "short_name": "HOS",
+      "description": "Track your hours of service",
+      "url": "/driver?tab=hos",
       "icons": [{ "src": "/truck-icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Load Board",
       "short_name": "Loads",
       "description": "Find available loads",
-      "url": "/driver",
+      "url": "/driver?tab=loads",
+      "icons": [{ "src": "/truck-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Emergency SOS",
+      "short_name": "SOS",
+      "description": "Emergency assistance",
+      "url": "/driver?tab=safety",
       "icons": [{ "src": "/truck-icon-192.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "related_applications": [],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "TrukAll Dashboard"
+    }
+  ],
+  "iarc_rating_id": "",
+  "share_target": {
+    "action": "/driver",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
