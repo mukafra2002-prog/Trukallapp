@@ -108,6 +108,20 @@ export default function LandingPage() {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${API}/auth/demo-login`);
+      login(response.data.user);
+      toast.success(response.data.message || "Welcome to the demo!");
+      navigate('/driver');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Demo login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
