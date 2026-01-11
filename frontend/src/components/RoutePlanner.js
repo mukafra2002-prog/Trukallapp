@@ -80,8 +80,8 @@ export default function RoutePlanner() {
               <Label>Origin</Label>
               <div className="flex gap-2">
                 <Input
-                  value={formData.origin}
-                  onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
+                  value={formData.origin_address}
+                  onChange={(e) => setFormData({ ...formData, origin_address: e.target.value })}
                   placeholder="e.g., Dallas, TX"
                   data-testid="route-origin"
                 />
@@ -95,8 +95,8 @@ export default function RoutePlanner() {
               <Label>Destination</Label>
               <div className="flex gap-2">
                 <Input
-                  value={formData.destination}
-                  onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                  value={formData.destination_address}
+                  onChange={(e) => setFormData({ ...formData, destination_address: e.target.value })}
                   placeholder="e.g., Atlanta, GA"
                   data-testid="route-destination"
                 />
@@ -112,8 +112,8 @@ export default function RoutePlanner() {
                 <Input
                   type="number"
                   step="0.1"
-                  value={formData.truck_height}
-                  onChange={(e) => setFormData({ ...formData, truck_height: parseFloat(e.target.value) })}
+                  value={formData.truck_height_ft}
+                  onChange={(e) => setFormData({ ...formData, truck_height_ft: parseFloat(e.target.value) })}
                   data-testid="truck-height"
                 />
               </div>
@@ -121,8 +121,8 @@ export default function RoutePlanner() {
                 <Label>Truck Weight (lbs)</Label>
                 <Input
                   type="number"
-                  value={formData.truck_weight}
-                  onChange={(e) => setFormData({ ...formData, truck_weight: parseInt(e.target.value) })}
+                  value={formData.truck_weight_lbs}
+                  onChange={(e) => setFormData({ ...formData, truck_weight_lbs: parseInt(e.target.value) })}
                   data-testid="truck-weight"
                 />
               </div>
