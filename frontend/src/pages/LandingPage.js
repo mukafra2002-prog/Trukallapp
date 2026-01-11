@@ -139,24 +139,26 @@ export default function LandingPage() {
               </div>
               <span className="text-3xl font-black text-white">TrukAll</span>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <LanguageSelector variant="hero" />
               <Button 
                 variant="ghost" 
                 className="text-white hover:bg-white/20"
                 onClick={() => { setIsLogin(true); setShowAuthModal(true); }}
                 data-testid="login-nav-btn"
               >
-                Login
+                {t('nav.login')}
               </Button>
               <Button 
                 className="bg-white text-blue-600 hover:bg-gray-100 font-bold"
                 onClick={() => { setIsLogin(false); setShowAuthModal(true); }}
                 data-testid="signup-nav-btn"
               >
-                Sign Up Free
+                {t('nav.signup')}
               </Button>
             </div>
           </nav>
+
 
           {/* Hero Content */}
           <div className="text-center max-w-4xl mx-auto">
