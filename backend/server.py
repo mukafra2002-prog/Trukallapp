@@ -3703,6 +3703,498 @@ async def cancel_subscription(user_email: str):
     
     return {"message": "Subscription cancelled"}
 
+# ============== FEEDBACK SYSTEM ==============
+
+class Feedback(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_email: str
+    user_name: str
+    feedback_type: str  # "bug", "feature", "general", "complaint", "praise"
+    subject: str
+    message: str
+    rating: Optional[int] = None  # 1-5 stars
+    screenshot_url: Optional[str] = None
+    status: str = "new"  # "new", "in_progress", "resolved", "closed"
+    admin_response: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class FeedbackCreate(BaseModel):
+    feedback_type: str
+    subject: str
+    message: str
+    rating: Optional[int] = None
+    screenshot_url: Optional[str] = None
+
+@api_router.post("/feedback")
+async def submit_feedback(feedback_data: FeedbackCreate, user_email: str):
+    """Submit user feedback"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    feedback = Feedback(
+        user_email=user_email,
+        user_name=user['name'],
+        **feedback_data.model_dump()
+    )
+    
+    feedback_doc = feedback.model_dump()
+    feedback_doc['created_at'] = feedback_doc['created_at'].isoformat()
+    
+    await db.feedback.insert_one(feedback_doc)
+    
+    # Award points for feedback
+    points_earned = 50 if feedback_data.rating else 25
+    await db.users.update_one(
+        {"email": user_email},
+        {"$inc": {"reward_points": points_earned}}
+    )
+    
+    logger.info(f"Feedback submitted by {user_email}: {feedback_data.subject}")
+    return {"message": "Thank you for your feedback!", "points_earned": points_earned, "feedback_id": feedback.id}
+
+@api_router.get("/feedback/{user_email}")
+async def get_user_feedback(user_email: str):
+    """Get feedback submitted by a user"""
+    feedback_list = await db.feedback.find(
+        {"user_email": user_email},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return feedback_list
+
+@api_router.get("/feedback/admin/all")
+async def get_all_feedback(status: Optional[str] = None, limit: int = 50):
+    """Admin: Get all feedback"""
+    query = {}
+    if status:
+        query['status'] = status
+    
+    feedback_list = await db.feedback.find(query, {"_id": 0}).sort("created_at", -1).to_list(limit)
+    return feedback_list
+
+@api_router.put("/feedback/{feedback_id}/respond")
+async def respond_to_feedback(feedback_id: str, response: str, status: str = "resolved"):
+    """Admin: Respond to feedback"""
+    result = await db.feedback.update_one(
+        {"id": feedback_id},
+        {"$set": {"admin_response": response, "status": status}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Feedback not found")
+    
+    return {"message": "Response sent"}
+
+# ============== COMMUNITY CHAT/BOARD ==============
+
+class CommunityPost(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    author_email: str
+    author_name: str
+    category: str  # "general", "tips", "routes", "parking", "deals", "questions", "announcements"
+    title: str
+    content: str
+    images: List[str] = []
+    likes: int = 0
+    liked_by: List[str] = []
+    comments_count: int = 0
+    is_pinned: bool = False
+    is_featured: bool = False
+    tags: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CommunityPostCreate(BaseModel):
+    category: str
+    title: str
+    content: str
+    images: List[str] = []
+    tags: List[str] = []
+
+class CommunityComment(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    post_id: str
+    author_email: str
+    author_name: str
+    content: str
+    likes: int = 0
+    liked_by: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CommunityCommentCreate(BaseModel):
+    content: str
+
+@api_router.get("/community/posts")
+async def get_community_posts(
+    category: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 50,
+    skip: int = 0
+):
+    """Get community posts"""
+    query = {}
+    if category:
+        query['category'] = category
+    if search:
+        query['$or'] = [
+            {'title': {'$regex': search, '$options': 'i'}},
+            {'content': {'$regex': search, '$options': 'i'}},
+            {'tags': {'$in': [search.lower()]}}
+        ]
+    
+    posts = await db.community_posts.find(query, {"_id": 0}).sort([
+        ("is_pinned", -1),
+        ("is_featured", -1),
+        ("created_at", -1)
+    ]).skip(skip).limit(limit).to_list(limit)
+    
+    return posts
+
+@api_router.post("/community/posts")
+async def create_community_post(post_data: CommunityPostCreate, user_email: str):
+    """Create a community post"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    post = CommunityPost(
+        author_email=user_email,
+        author_name=user['name'],
+        **post_data.model_dump()
+    )
+    
+    post_doc = post.model_dump()
+    post_doc['created_at'] = post_doc['created_at'].isoformat()
+    
+    await db.community_posts.insert_one(post_doc)
+    
+    # Award points for posting
+    await db.users.update_one(
+        {"email": user_email},
+        {"$inc": {"reward_points": 20}}
+    )
+    
+    logger.info(f"Community post created by {user_email}: {post.title}")
+    return {"message": "Post created!", "points_earned": 20, "post_id": post.id}
+
+@api_router.get("/community/posts/{post_id}")
+async def get_community_post(post_id: str):
+    """Get a single post with comments"""
+    post = await db.community_posts.find_one({"id": post_id}, {"_id": 0})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    comments = await db.community_comments.find(
+        {"post_id": post_id},
+        {"_id": 0}
+    ).sort("created_at", 1).to_list(100)
+    
+    post['comments'] = comments
+    return post
+
+@api_router.post("/community/posts/{post_id}/like")
+async def like_community_post(post_id: str, user_email: str):
+    """Like/unlike a post"""
+    post = await db.community_posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    liked_by = post.get('liked_by', [])
+    
+    if user_email in liked_by:
+        # Unlike
+        await db.community_posts.update_one(
+            {"id": post_id},
+            {"$pull": {"liked_by": user_email}, "$inc": {"likes": -1}}
+        )
+        return {"message": "Unliked", "liked": False}
+    else:
+        # Like
+        await db.community_posts.update_one(
+            {"id": post_id},
+            {"$push": {"liked_by": user_email}, "$inc": {"likes": 1}}
+        )
+        # Award points to post author
+        await db.users.update_one(
+            {"email": post['author_email']},
+            {"$inc": {"reward_points": 5}}
+        )
+        return {"message": "Liked!", "liked": True}
+
+@api_router.post("/community/posts/{post_id}/comments")
+async def add_comment(post_id: str, comment_data: CommunityCommentCreate, user_email: str):
+    """Add a comment to a post"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    post = await db.community_posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    comment = CommunityComment(
+        post_id=post_id,
+        author_email=user_email,
+        author_name=user['name'],
+        content=comment_data.content
+    )
+    
+    comment_doc = comment.model_dump()
+    comment_doc['created_at'] = comment_doc['created_at'].isoformat()
+    
+    await db.community_comments.insert_one(comment_doc)
+    
+    # Update comment count
+    await db.community_posts.update_one(
+        {"id": post_id},
+        {"$inc": {"comments_count": 1}}
+    )
+    
+    # Award points
+    await db.users.update_one(
+        {"email": user_email},
+        {"$inc": {"reward_points": 10}}
+    )
+    
+    return {"message": "Comment added!", "points_earned": 10, "comment_id": comment.id}
+
+@api_router.get("/community/categories")
+async def get_community_categories():
+    """Get available categories with post counts"""
+    pipeline = [
+        {"$group": {"_id": "$category", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    
+    results = await db.community_posts.aggregate(pipeline).to_list(20)
+    
+    categories = [
+        {"id": "general", "name": "General Discussion", "icon": "💬"},
+        {"id": "tips", "name": "Trucker Tips", "icon": "💡"},
+        {"id": "routes", "name": "Route Advice", "icon": "🛣️"},
+        {"id": "parking", "name": "Parking Spots", "icon": "🅿️"},
+        {"id": "deals", "name": "Deals & Discounts", "icon": "💰"},
+        {"id": "questions", "name": "Questions", "icon": "❓"},
+        {"id": "announcements", "name": "Announcements", "icon": "📢"}
+    ]
+    
+    # Add counts
+    count_map = {r['_id']: r['count'] for r in results}
+    for cat in categories:
+        cat['count'] = count_map.get(cat['id'], 0)
+    
+    return categories
+
+# ============== REFERRAL SYSTEM ==============
+
+class Referral(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    referrer_email: str
+    referrer_name: str
+    referral_code: str
+    referred_email: Optional[str] = None
+    referred_name: Optional[str] = None
+    status: str = "pending"  # "pending", "completed", "rewarded"
+    reward_points: int = 500
+    bonus_type: Optional[str] = None  # "free_month", "points", "discount"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+
+def generate_referral_code(email: str) -> str:
+    """Generate unique referral code"""
+    import hashlib
+    hash_input = f"{email}{datetime.now().timestamp()}"
+    return f"TRUK{hashlib.md5(hash_input.encode()).hexdigest()[:8].upper()}"
+
+@api_router.get("/referral/code/{user_email}")
+async def get_referral_code(user_email: str):
+    """Get or create user's referral code"""
+    user = await db.users.find_one({"email": user_email})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if user already has a referral code
+    existing = await db.referral_codes.find_one({"email": user_email}, {"_id": 0})
+    
+    if existing:
+        return {
+            "referral_code": existing['code'],
+            "referral_link": f"https://trukall.app/signup?ref={existing['code']}",
+            "total_referrals": existing.get('total_referrals', 0),
+            "total_earned": existing.get('total_earned', 0)
+        }
+    
+    # Create new referral code
+    code = generate_referral_code(user_email)
+    
+    await db.referral_codes.insert_one({
+        "email": user_email,
+        "name": user['name'],
+        "code": code,
+        "total_referrals": 0,
+        "total_earned": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return {
+        "referral_code": code,
+        "referral_link": f"https://trukall.app/signup?ref={code}",
+        "total_referrals": 0,
+        "total_earned": 0
+    }
+
+@api_router.post("/referral/apply")
+async def apply_referral_code(referral_code: str, new_user_email: str):
+    """Apply referral code during signup"""
+    # Find referral code
+    referral = await db.referral_codes.find_one({"code": referral_code.upper()})
+    if not referral:
+        raise HTTPException(status_code=404, detail="Invalid referral code")
+    
+    # Check if already referred
+    existing = await db.referrals.find_one({
+        "referral_code": referral_code.upper(),
+        "referred_email": new_user_email
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="Already used this referral")
+    
+    new_user = await db.users.find_one({"email": new_user_email})
+    if not new_user:
+        raise HTTPException(status_code=404, detail="New user not found")
+    
+    # Create referral record
+    ref_record = Referral(
+        referrer_email=referral['email'],
+        referrer_name=referral['name'],
+        referral_code=referral_code.upper(),
+        referred_email=new_user_email,
+        referred_name=new_user['name'],
+        status="completed",
+        completed_at=datetime.now(timezone.utc)
+    )
+    
+    ref_doc = ref_record.model_dump()
+    ref_doc['created_at'] = ref_doc['created_at'].isoformat()
+    ref_doc['completed_at'] = ref_doc['completed_at'].isoformat()
+    
+    await db.referrals.insert_one(ref_doc)
+    
+    # Reward both users
+    reward_points = 500
+    
+    # Reward referrer
+    await db.users.update_one(
+        {"email": referral['email']},
+        {"$inc": {"reward_points": reward_points}}
+    )
+    
+    # Reward new user (welcome bonus)
+    await db.users.update_one(
+        {"email": new_user_email},
+        {"$inc": {"reward_points": 250}}
+    )
+    
+    # Update referral stats
+    await db.referral_codes.update_one(
+        {"code": referral_code.upper()},
+        {"$inc": {"total_referrals": 1, "total_earned": reward_points}}
+    )
+    
+    # Create notification for referrer
+    notification = Notification(
+        recipient_email=referral['email'],
+        type="referral",
+        title="🎉 Referral Bonus!",
+        message=f"{new_user['name']} joined using your referral code! You earned {reward_points} points!",
+        data={"referred_user": new_user_email, "points": reward_points}
+    )
+    notif_doc = notification.model_dump()
+    notif_doc['created_at'] = notif_doc['created_at'].isoformat()
+    await db.notifications.insert_one(notif_doc)
+    
+    logger.info(f"Referral completed: {referral['email']} referred {new_user_email}")
+    
+    return {
+        "message": "Referral applied successfully!",
+        "referrer_reward": reward_points,
+        "new_user_bonus": 250
+    }
+
+@api_router.get("/referral/stats/{user_email}")
+async def get_referral_stats(user_email: str):
+    """Get user's referral statistics"""
+    referral_code = await db.referral_codes.find_one({"email": user_email}, {"_id": 0})
+    
+    if not referral_code:
+        return {
+            "has_code": False,
+            "total_referrals": 0,
+            "total_earned": 0,
+            "referrals": []
+        }
+    
+    referrals = await db.referrals.find(
+        {"referrer_email": user_email},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    return {
+        "has_code": True,
+        "referral_code": referral_code['code'],
+        "total_referrals": referral_code.get('total_referrals', 0),
+        "total_earned": referral_code.get('total_earned', 0),
+        "referrals": referrals
+    }
+
+@api_router.get("/referral/leaderboard")
+async def get_referral_leaderboard(limit: int = 10):
+    """Get top referrers"""
+    leaders = await db.referral_codes.find(
+        {"total_referrals": {"$gt": 0}},
+        {"_id": 0, "email": 0}
+    ).sort("total_referrals", -1).limit(limit).to_list(limit)
+    
+    # Add rank
+    for i, leader in enumerate(leaders):
+        leader['rank'] = i + 1
+    
+    return leaders
+
+# ============== SOCIAL LINKS & APP CONFIG ==============
+
+@api_router.get("/app/config")
+async def get_app_config():
+    """Get app configuration including social links"""
+    return {
+        "app_name": "TrukAll",
+        "tagline": "Never Drive to a Full Lot Again",
+        "version": "2.0.0",
+        "social_links": {
+            "whatsapp": "https://wa.me/1234567890",  # Replace with actual
+            "telegram": "https://t.me/trukall_community",  # Replace with actual
+            "facebook": "https://facebook.com/groups/trukall",  # Replace with actual
+            "google_business": "https://g.page/trukall",  # Replace with actual
+        },
+        "support": {
+            "email": "support@trukall.app",
+            "feedback_form": "https://forms.gle/your-form-id",  # Replace with actual
+            "notion_docs": "https://trukall.notion.site"  # Replace with actual
+        },
+        "referral_rewards": {
+            "referrer_points": 500,
+            "new_user_points": 250,
+            "description": "Earn 500 points for each friend you refer!"
+        },
+        "firebase_config": {
+            "enabled": False,
+            "note": "Configure Firebase in environment variables"
+        }
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
