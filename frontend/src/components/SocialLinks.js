@@ -4,24 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { ExternalLink, MessageCircle, Send, Facebook, FileText, MapPin, Phone, Mail, Globe } from "lucide-react";
 
 export default function SocialLinks() {
-  const socialLinks = [
-    {
-      name: "Google My Business",
-      description: "See reviews & location",
-      icon: MapPin,
-      color: "bg-red-500 hover:bg-red-600",
-      url: "https://g.page/trukall", // Replace with actual
-      badge: "4.8 Rating"
-    },
-    {
-      name: "Documentation",
-      description: "Help center & guides",
-      icon: FileText,
-      color: "bg-slate-700 hover:bg-slate-800",
-      url: "https://trukall.notion.site", // Replace with actual
-      badge: "Notion"
-    }
-  ];
+  const socialLinks = [];
+  // Social links will be added later - WhatsApp, Telegram, Facebook, Google Business, Notion
 
   const contactInfo = [
     { icon: Mail, label: "support@trukall.app", type: "email" },
