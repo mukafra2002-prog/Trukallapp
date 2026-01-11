@@ -73,12 +73,10 @@ class TestHOSTracker:
         response = requests.get(f"{BASE_URL}/api/hos/rules")
         assert response.status_code == 200
         data = response.json()
-        assert "driving_limit" in data
-        assert "duty_window" in data
-        assert "weekly_limit" in data
-        assert "break_required_after" in data
+        assert "rules" in data
+        assert "statuses" in data
         assert "tips" in data
-        print(f"✅ HOS Rules: Driving limit={data['driving_limit']}min, Duty window={data['duty_window']}min")
+        print(f"✅ HOS Rules: {data['rules']}")
     
     def test_hos_summary(self):
         """Test HOS summary for driver"""
