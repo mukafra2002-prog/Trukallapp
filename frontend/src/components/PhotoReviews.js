@@ -78,7 +78,7 @@ export default function PhotoReviews({ spotId, spotName }) {
 
     try {
       const response = await axios.post(
-        `${API}/photo-reviews?driver_email=${user.email}`,
+        `${API}/reviews/photo?driver_email=${user.email}`,
         {
           spot_id: spotId,
           rating: formData.rating,
@@ -90,7 +90,7 @@ export default function PhotoReviews({ spotId, spotName }) {
         }
       );
       
-      toast.success(`Review submitted! +${response.data.points_earned} points`);
+      toast.success(`Review submitted! +${response.data.points_earned || 10} points`);
       setShowForm(false);
       setFormData({
         rating: 5,
