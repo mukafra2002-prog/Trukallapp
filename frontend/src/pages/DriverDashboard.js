@@ -485,6 +485,29 @@ export default function DriverDashboard() {
     }
   };
 
+  const downloadDocument = (doc) => {
+    try {
+      // If document has file_data (base64), create download
+      if (doc.file_data) {
+        const link = document.createElement('a');
+        link.href = doc.file_data;
+        link.download = `${doc.title || 'document'}.${doc.file_type || 'png'}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Document downloaded!");
+      } else if (doc.file_url) {
+        // If document has URL, open in new tab
+        window.open(doc.file_url, '_blank');
+        toast.success("Opening document...");
+      } else {
+        toast.error("No file data available for download");
+      }
+    } catch (error) {
+      toast.error("Failed to download document");
+    }
+  };
+
   // Fuel Functions
   const fetchFuelPrices = async () => {
     try {
