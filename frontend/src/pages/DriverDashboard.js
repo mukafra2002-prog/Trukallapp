@@ -485,25 +485,30 @@ export default function DriverDashboard() {
     }
   };
 
-  const downloadDocument = (doc) => {
+  const downloadDocument = async (doc) => {
     try {
-      // If document has file_data (base64), create download
-      if (doc.file_data) {
+      // Fetch full document with file_data
+      const response = await axios.get(`${API}/documents/detail/${doc.id}`);
+      const fullDoc = response.data;
+      
+      if (fullDoc.file_data) {
+        // Create download link for base64 data
         const link = document.createElement('a');
-        link.href = doc.file_data;
-        link.download = `${doc.title || 'document'}.${doc.file_type || 'png'}`;
+        link.href = fullDoc.file_data;
+        link.download = `${fullDoc.title || 'document'}.${fullDoc.file_type || 'png'}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         toast.success("Document downloaded!");
-      } else if (doc.file_url) {
-        // If document has URL, open in new tab
-        window.open(doc.file_url, '_blank');
+      } else if (fullDoc.file_url) {
+        // Open URL in new tab
+        window.open(fullDoc.file_url, '_blank');
         toast.success("Opening document...");
       } else {
         toast.error("No file data available for download");
       }
     } catch (error) {
+      console.error("Download error:", error);
       toast.error("Failed to download document");
     }
   };
