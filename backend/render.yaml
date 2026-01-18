@@ -1,0 +1,32 @@
+# Render Blueprint for TrukAll Backend
+# Deploy: Connect GitHub repo → Select this file
+
+services:
+  - type: web
+    name: trukall-api
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: MONGO_URL
+        sync: false  # Set manually in Render dashboard
+      - key: DB_NAME
+        value: trukall_db
+      - key: CORS_ORIGINS
+        sync: false  # Set to your Vercel frontend URL
+      - key: STRIPE_API_KEY
+        sync: false  # Set manually - use live key for production
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false  # Set manually - use live key for production
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+databases:
+  - name: trukall-mongodb
+    plan: free
+    databaseName: trukall_db
+    # Note: Render offers PostgreSQL. For MongoDB, use MongoDB Atlas (free tier)
