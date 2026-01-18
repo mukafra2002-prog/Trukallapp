@@ -2389,9 +2389,14 @@ export default function DriverDashboard() {
                             <p className="text-xs text-slate-500">{doc.doc_type.toUpperCase()} • {new Date(doc.created_at).toLocaleDateString()}</p>
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => deleteDocument(doc.id)}>
-                          <Trash2 className="w-4 h-4 text-red-500" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => downloadDocument(doc)} title="Download">
+                            <Download className="w-4 h-4 text-blue-500" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => deleteDocument(doc.id)} title="Delete">
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
