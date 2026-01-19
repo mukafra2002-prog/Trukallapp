@@ -1304,13 +1304,450 @@ async def create_load(load_data: LoadCreate):
     load = Load(**load_data.model_dump())
     
     load_doc = load.model_dump()
-    load_doc['pickup_date'] = load_doc['pickup_date'].isoformat()
-    load_doc['delivery_date'] = load_doc['delivery_date'].isoformat()
+    load_doc['pickup_date'] = load_doc['pickup_date'].isoformat() if load_doc.get('pickup_date') else None
+    load_doc['delivery_date'] = load_doc['delivery_date'].isoformat() if load_doc.get('delivery_date') else None
     load_doc['created_at'] = load_doc['created_at'].isoformat()
     
     await db.loads.insert_one(load_doc)
     logger.info(f"Load created: {load.origin_city} to {load.destination_city}")
     return load
+
+# ============== DAT-LIKE FEATURES ==============
+
+# 1. LANE RATE DATA - Market averages per lane
+@api_router.get("/loads/lane-rates")
+async def get_lane_rates():
+    """Get average market rates per lane (origin-destination pair)"""
+    pipeline = [
+        {"$match": {"rate": {"$gt": 0}}},
+        {"$group": {
+            "_id": {
+                "origin": {"$ifNull": ["$origin", {"$concat": ["$origin_city", ", ", "$origin_state"]}]},
+                "destination": {"$ifNull": ["$destination", {"$concat": ["$destination_city", ", ", "$destination_state"]}]}
+            },
+            "avg_rate": {"$avg": "$rate"},
+            "min_rate": {"$min": "$rate"},
+            "max_rate": {"$max": "$rate"},
+            "avg_rate_per_mile": {"$avg": {"$cond": [
+                {"$gt": [{"$ifNull": ["$miles", "$distance"]}, 0]},
+                {"$divide": ["$rate", {"$ifNull": ["$miles", "$distance"]}]},
+                0
+            ]}},
+            "load_count": {"$sum": 1},
+            "avg_distance": {"$avg": {"$ifNull": ["$miles", "$distance"]}}
+        }},
+        {"$project": {
+            "_id": 0,
+            "origin": "$_id.origin",
+            "destination": "$_id.destination",
+            "avg_rate": {"$round": ["$avg_rate", 2]},
+            "min_rate": {"$round": ["$min_rate", 2]},
+            "max_rate": {"$round": ["$max_rate", 2]},
+            "avg_rate_per_mile": {"$round": ["$avg_rate_per_mile", 2]},
+            "load_count": 1,
+            "avg_distance": {"$round": ["$avg_distance", 0]}
+        }},
+        {"$sort": {"load_count": -1}},
+        {"$limit": 50}
+    ]
+    
+    rates = await db.loads.aggregate(pipeline).to_list(50)
+    return rates
+
+# 2. SMART LOAD MATCHING - Match loads to driver location
+@api_router.get("/loads/smart-match")
+async def smart_load_match(
+    driver_lat: float,
+    driver_lng: float,
+    max_deadhead_miles: int = 100,
+    equipment_type: Optional[str] = None,
+    min_rate: Optional[float] = None,
+    min_rate_per_mile: Optional[float] = None
+):
+    """Smart load matching based on driver's current location"""
+    # Get all available loads
+    query = {"status": "available"}
+    if equipment_type:
+        query["$or"] = [
+            {"equipment_type": equipment_type},
+            {"equipment": equipment_type}
+        ]
+    if min_rate:
+        query["rate"] = {"$gte": min_rate}
+    
+    loads = await db.loads.find(query, {"_id": 0}).to_list(1000)
+    
+    # City coordinates (simplified - in production use geocoding API)
+    city_coords = {
+        "atlanta": (33.749, -84.388),
+        "dallas": (32.7767, -96.7970),
+        "chicago": (41.8781, -87.6298),
+        "los angeles": (34.0522, -118.2437),
+        "houston": (29.7604, -95.3698),
+        "phoenix": (33.4484, -112.0740),
+        "denver": (39.7392, -104.9903),
+        "miami": (25.7617, -80.1918),
+        "seattle": (47.6062, -122.3321),
+        "new york": (40.7128, -74.0060),
+        "memphis": (35.1495, -90.0490),
+        "indianapolis": (39.7684, -86.1581),
+        "columbus": (39.9612, -82.9988),
+        "charlotte": (35.2271, -80.8431),
+        "nashville": (36.1627, -86.7816),
+        "jacksonville": (30.3322, -81.6557),
+        "san antonio": (29.4241, -98.4936),
+        "philadelphia": (39.9526, -75.1652),
+        "detroit": (42.3314, -83.0458),
+        "el paso": (31.7619, -106.4850)
+    }
+    
+    def get_coords(city_state):
+        if not city_state:
+            return None
+        city = city_state.lower().split(",")[0].strip()
+        return city_coords.get(city)
+    
+    def calc_distance(lat1, lng1, lat2, lng2):
+        """Calculate distance in miles using Haversine formula"""
+        from math import radians, sin, cos, sqrt, atan2
+        R = 3959  # Earth's radius in miles
+        
+        lat1, lng1, lat2, lng2 = map(radians, [lat1, lng1, lat2, lng2])
+        dlat = lat2 - lat1
+        dlng = lng2 - lng1
+        
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlng/2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1-a))
+        
+        return R * c
+    
+    matched_loads = []
+    for load in loads:
+        origin = load.get('origin') or f"{load.get('origin_city', '')}, {load.get('origin_state', '')}"
+        origin_coords = get_coords(origin)
+        
+        if origin_coords:
+            deadhead = calc_distance(driver_lat, driver_lng, origin_coords[0], origin_coords[1])
+            
+            if deadhead <= max_deadhead_miles:
+                # Calculate rate per mile
+                distance = load.get('miles') or load.get('distance') or 0
+                rate = load.get('rate', 0)
+                rate_per_mile = rate / distance if distance > 0 else 0
+                
+                # Filter by min rate per mile
+                if min_rate_per_mile and rate_per_mile < min_rate_per_mile:
+                    continue
+                
+                load['deadhead_miles'] = round(deadhead, 1)
+                load['rate_per_mile'] = round(rate_per_mile, 2)
+                load['match_score'] = round(100 - (deadhead / max_deadhead_miles * 50) + (rate_per_mile * 20), 1)
+                matched_loads.append(load)
+    
+    # Sort by match score
+    matched_loads.sort(key=lambda x: x.get('match_score', 0), reverse=True)
+    
+    return matched_loads[:20]
+
+# 3. ADVANCED LOAD FILTERS
+@api_router.get("/loads/search")
+async def advanced_load_search(
+    origin_city: Optional[str] = None,
+    origin_state: Optional[str] = None,
+    destination_city: Optional[str] = None,
+    destination_state: Optional[str] = None,
+    equipment_type: Optional[str] = None,
+    min_rate: Optional[float] = None,
+    max_rate: Optional[float] = None,
+    min_rate_per_mile: Optional[float] = None,
+    min_distance: Optional[int] = None,
+    max_distance: Optional[int] = None,
+    min_weight: Optional[int] = None,
+    max_weight: Optional[int] = None,
+    pickup_date_from: Optional[str] = None,
+    pickup_date_to: Optional[str] = None,
+    sort_by: str = "rate",  # rate, distance, rate_per_mile, pickup_date
+    sort_order: str = "desc"
+):
+    """Advanced load search with multiple filters"""
+    query = {"status": "available"}
+    
+    # Location filters
+    if origin_city:
+        query["$or"] = query.get("$or", [])
+        query["$or"].append({"origin_city": {"$regex": origin_city, "$options": "i"}})
+        query["$or"].append({"origin": {"$regex": origin_city, "$options": "i"}})
+    if origin_state:
+        query["origin_state"] = {"$regex": origin_state, "$options": "i"}
+    if destination_city:
+        query["$or"] = query.get("$or", [])
+        query["$or"].append({"destination_city": {"$regex": destination_city, "$options": "i"}})
+        query["$or"].append({"destination": {"$regex": destination_city, "$options": "i"}})
+    if destination_state:
+        query["destination_state"] = {"$regex": destination_state, "$options": "i"}
+    
+    # Equipment filter
+    if equipment_type:
+        query["$or"] = query.get("$or", [])
+        query["$or"].append({"equipment_type": {"$regex": equipment_type, "$options": "i"}})
+        query["$or"].append({"equipment": {"$regex": equipment_type, "$options": "i"}})
+    
+    # Rate filters
+    if min_rate or max_rate:
+        query["rate"] = {}
+        if min_rate:
+            query["rate"]["$gte"] = min_rate
+        if max_rate:
+            query["rate"]["$lte"] = max_rate
+    
+    # Weight filters
+    if min_weight or max_weight:
+        query["weight"] = {}
+        if min_weight:
+            query["weight"]["$gte"] = min_weight
+        if max_weight:
+            query["weight"]["$lte"] = max_weight
+    
+    loads = await db.loads.find(query, {"_id": 0}).to_list(1000)
+    
+    # Post-process for additional filters
+    filtered_loads = []
+    for load in loads:
+        distance = load.get('miles') or load.get('distance') or 0
+        rate = load.get('rate', 0)
+        rate_per_mile = rate / distance if distance > 0 else 0
+        
+        # Distance filter
+        if min_distance and distance < min_distance:
+            continue
+        if max_distance and distance > max_distance:
+            continue
+        
+        # Rate per mile filter
+        if min_rate_per_mile and rate_per_mile < min_rate_per_mile:
+            continue
+        
+        load['rate_per_mile'] = round(rate_per_mile, 2)
+        load['distance'] = distance
+        filtered_loads.append(load)
+    
+    # Sort
+    sort_key = {
+        "rate": lambda x: x.get('rate', 0),
+        "distance": lambda x: x.get('distance', 0),
+        "rate_per_mile": lambda x: x.get('rate_per_mile', 0),
+        "pickup_date": lambda x: x.get('pickup_date', '')
+    }.get(sort_by, lambda x: x.get('rate', 0))
+    
+    filtered_loads.sort(key=sort_key, reverse=(sort_order == "desc"))
+    
+    return {
+        "total": len(filtered_loads),
+        "loads": filtered_loads[:100]
+    }
+
+# 4. BROKER CREDIT SCORES
+@api_router.get("/brokers/credit-score/{broker_name}")
+async def get_broker_credit_score(broker_name: str):
+    """Get comprehensive broker credit score and payment history"""
+    # Get all ratings for this broker
+    ratings = await db.broker_ratings.find(
+        {"broker_name": {"$regex": broker_name, "$options": "i"}}
+    ).to_list(1000)
+    
+    # Get fraud reports
+    fraud_reports = await db.broker_fraud_reports.find(
+        {"broker_name": {"$regex": broker_name, "$options": "i"}}
+    ).to_list(100)
+    
+    if not ratings and not fraud_reports:
+        return {
+            "broker_name": broker_name,
+            "credit_score": None,
+            "message": "No data available for this broker"
+        }
+    
+    # Calculate credit score (0-100)
+    base_score = 70
+    
+    if ratings:
+        avg_rating = sum(r.get('rating', 3) for r in ratings) / len(ratings)
+        rating_score = (avg_rating / 5) * 30  # Up to 30 points from ratings
+        
+        # Payment speed bonus
+        quick_pay_count = sum(1 for r in ratings if r.get('days_to_pay', 30) <= 15)
+        payment_score = (quick_pay_count / len(ratings)) * 20  # Up to 20 points
+        
+        # Volume bonus (more transactions = more reliable)
+        volume_score = min(len(ratings) / 10, 1) * 10  # Up to 10 points
+        
+        base_score = 40 + rating_score + payment_score + volume_score
+    
+    # Fraud penalty
+    fraud_penalty = len(fraud_reports) * 15  # -15 points per fraud report
+    
+    final_score = max(0, min(100, base_score - fraud_penalty))
+    
+    # Determine grade
+    if final_score >= 90:
+        grade = "A+"
+        risk_level = "Very Low"
+    elif final_score >= 80:
+        grade = "A"
+        risk_level = "Low"
+    elif final_score >= 70:
+        grade = "B"
+        risk_level = "Medium"
+    elif final_score >= 60:
+        grade = "C"
+        risk_level = "Medium-High"
+    elif final_score >= 50:
+        grade = "D"
+        risk_level = "High"
+    else:
+        grade = "F"
+        risk_level = "Very High"
+    
+    # Calculate payment stats
+    days_to_pay_list = [r.get('days_to_pay', 30) for r in ratings if r.get('days_to_pay')]
+    avg_days_to_pay = sum(days_to_pay_list) / len(days_to_pay_list) if days_to_pay_list else None
+    
+    return {
+        "broker_name": broker_name,
+        "credit_score": round(final_score),
+        "grade": grade,
+        "risk_level": risk_level,
+        "total_reviews": len(ratings),
+        "average_rating": round(sum(r.get('rating', 3) for r in ratings) / len(ratings), 1) if ratings else None,
+        "avg_days_to_pay": round(avg_days_to_pay) if avg_days_to_pay else None,
+        "fraud_reports": len(fraud_reports),
+        "recommendation": "Recommended" if final_score >= 70 else "Use Caution" if final_score >= 50 else "Not Recommended"
+    }
+
+# 5. FUEL ALONG ROUTE
+@api_router.get("/fuel/along-route")
+async def get_fuel_along_route(
+    origin_city: str,
+    destination_city: str,
+    max_price: Optional[float] = None
+):
+    """Get fuel prices along a route"""
+    # Get all fuel prices
+    fuel_prices = await db.fuel_prices.find({}, {"_id": 0}).to_list(1000)
+    
+    if not fuel_prices:
+        # Return sample data if no fuel prices in DB
+        return {
+            "route": f"{origin_city} → {destination_city}",
+            "fuel_stops": [
+                {"station": "Pilot Travel Center", "city": origin_city, "price": 3.45, "savings": 0.15},
+                {"station": "Love's Travel Stop", "city": "Midway Stop", "price": 3.52, "savings": 0.08},
+                {"station": "TA Petro", "city": destination_city, "price": 3.49, "savings": 0.11}
+            ],
+            "cheapest_stop": {"station": "Pilot Travel Center", "city": origin_city, "price": 3.45},
+            "avg_price_on_route": 3.49,
+            "potential_savings": "$45.00 (on 300 gallons)"
+        }
+    
+    # Filter by max price if specified
+    if max_price:
+        fuel_prices = [f for f in fuel_prices if f.get('diesel_price', 0) <= max_price]
+    
+    # Sort by price
+    fuel_prices.sort(key=lambda x: x.get('diesel_price', 999))
+    
+    avg_price = sum(f.get('diesel_price', 0) for f in fuel_prices) / len(fuel_prices) if fuel_prices else 0
+    cheapest = fuel_prices[0] if fuel_prices else None
+    
+    return {
+        "route": f"{origin_city} → {destination_city}",
+        "fuel_stops": fuel_prices[:10],
+        "cheapest_stop": cheapest,
+        "avg_price_on_route": round(avg_price, 2),
+        "potential_savings": f"${round((avg_price - cheapest.get('diesel_price', avg_price)) * 300, 2)} (on 300 gallons)" if cheapest else "$0"
+    }
+
+# 6. LOAD ALERTS - Subscribe to matching loads
+@api_router.post("/loads/alerts/subscribe")
+async def subscribe_to_load_alerts(
+    driver_email: str,
+    origin_states: Optional[List[str]] = None,
+    destination_states: Optional[List[str]] = None,
+    equipment_types: Optional[List[str]] = None,
+    min_rate: Optional[float] = None,
+    min_rate_per_mile: Optional[float] = None,
+    max_deadhead_miles: Optional[int] = None
+):
+    """Subscribe to load alerts matching criteria"""
+    alert_config = {
+        "driver_email": driver_email,
+        "origin_states": origin_states or [],
+        "destination_states": destination_states or [],
+        "equipment_types": equipment_types or [],
+        "min_rate": min_rate,
+        "min_rate_per_mile": min_rate_per_mile,
+        "max_deadhead_miles": max_deadhead_miles,
+        "active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Upsert alert config
+    await db.load_alerts.update_one(
+        {"driver_email": driver_email},
+        {"$set": alert_config},
+        upsert=True
+    )
+    
+    return {"message": "Load alerts configured successfully", "config": alert_config}
+
+@api_router.get("/loads/alerts/{driver_email}")
+async def get_load_alerts(driver_email: str):
+    """Get driver's load alert configuration"""
+    config = await db.load_alerts.find_one({"driver_email": driver_email}, {"_id": 0})
+    return config or {"message": "No alerts configured", "active": False}
+
+@api_router.get("/loads/alerts/matches/{driver_email}")
+async def get_matching_loads_for_alerts(driver_email: str):
+    """Get loads matching driver's alert criteria"""
+    config = await db.load_alerts.find_one({"driver_email": driver_email})
+    
+    if not config or not config.get('active'):
+        return {"message": "No active alerts", "matches": []}
+    
+    query = {"status": "available"}
+    
+    if config.get('origin_states'):
+        query["origin_state"] = {"$in": config['origin_states']}
+    if config.get('destination_states'):
+        query["destination_state"] = {"$in": config['destination_states']}
+    if config.get('equipment_types'):
+        query["$or"] = [
+            {"equipment_type": {"$in": config['equipment_types']}},
+            {"equipment": {"$in": config['equipment_types']}}
+        ]
+    if config.get('min_rate'):
+        query["rate"] = {"$gte": config['min_rate']}
+    
+    loads = await db.loads.find(query, {"_id": 0}).to_list(100)
+    
+    # Calculate rate per mile and filter
+    filtered = []
+    for load in loads:
+        distance = load.get('miles') or load.get('distance') or 1
+        rate = load.get('rate', 0)
+        rate_per_mile = rate / distance
+        
+        if config.get('min_rate_per_mile') and rate_per_mile < config['min_rate_per_mile']:
+            continue
+        
+        load['rate_per_mile'] = round(rate_per_mile, 2)
+        filtered.append(load)
+    
+    return {
+        "total_matches": len(filtered),
+        "matches": filtered[:20],
+        "alert_config": {k: v for k, v in config.items() if k != '_id'}
+    }
 
 # ============== EXPENSE TRACKER ROUTES ==============
 
