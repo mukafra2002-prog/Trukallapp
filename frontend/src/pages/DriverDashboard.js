@@ -718,7 +718,7 @@ export default function DriverDashboard() {
         <div className="max-w-7xl mx-auto flex gap-3">
           <Input
             type="text"
-            placeholder="Search by city (e.g., Dallas, Atlanta)"
+            placeholder={t('dashboard.searchPlaceholder')}
             value={searchCity}
             onChange={(e) => setSearchCity(e.target.value)}
             className="touch-target border-slate-300"
@@ -740,7 +740,7 @@ export default function DriverDashboard() {
             data-testid="tab-live"
           >
             <Radio className="w-4 h-4 mr-2 animate-pulse" />
-            LIVE Updates
+            {t('tabs.live')}
           </Button>
           <Button
             variant={activeTab === "map" ? "default" : "outline"}
@@ -749,7 +749,7 @@ export default function DriverDashboard() {
             data-testid="tab-map"
           >
             <MapPin className="w-4 h-4 mr-2" />
-            Find Parking
+            {t('tabs.map')}
           </Button>
           <Button
             variant={activeTab === "bookings" ? "default" : "outline"}
@@ -758,7 +758,7 @@ export default function DriverDashboard() {
             data-testid="tab-bookings"
           >
             <History className="w-4 h-4 mr-2" />
-            My Bookings
+            {t('tabs.bookings')}
           </Button>
           <Button
             variant={activeTab === "showers" ? "default" : "outline"}
@@ -767,7 +767,7 @@ export default function DriverDashboard() {
             data-testid="tab-showers"
           >
             <ShowerHead className="w-4 h-4 mr-2" />
-            Shower Credits
+            {t('tabs.showers')}
           </Button>
           <Button
             variant={activeTab === "brokers" ? "default" : "outline"}
@@ -776,7 +776,7 @@ export default function DriverDashboard() {
             data-testid="tab-brokers"
           >
             <Building2 className="w-4 h-4 mr-2" />
-            Broker Ratings
+            {t('tabs.brokers')}
           </Button>
           <Button
             variant={activeTab === "retail" ? "default" : "outline"}
