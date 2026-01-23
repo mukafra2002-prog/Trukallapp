@@ -34,6 +34,16 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
   - Market rate range visualization
   - Top paying lanes list
   - Negotiation tips
+- [x] **Load Profitability Calculator Tab** - True profit analysis (NEW)
+  - Input: Load rate, miles, deadhead, fuel price, MPG
+  - Additional costs: Tolls, lumper fees, other costs
+  - Time/goals: Estimated hours, hourly earning goal
+  - Output: Net profit, $/mile, hourly rate, profit margin
+  - Visual cost breakdown with fuel gallons
+  - Trip details with deadhead percentage
+  - Hourly goal check (meets/below)
+  - Save calculations to localStorage
+  - Quick tips for profitability
 
 ### i18n Dashboard Support (NEW - Jan 23, 2026)
 - [x] useTranslation hook added to DriverDashboard.js
