@@ -1041,6 +1041,15 @@ export default function DriverDashboard() {
             <BarChart3 className="w-4 h-4 mr-2" />
             Rate Compare
           </Button>
+          <Button
+            variant={activeTab === "profitcalc" ? "default" : "outline"}
+            onClick={() => setActiveTab("profitcalc")}
+            className={`touch-target ${activeTab === "profitcalc" ? "bg-orange-600 hover:bg-orange-700" : "border-orange-300 text-orange-700"}`}
+            data-testid="tab-profitcalc"
+          >
+            <Calculator className="w-4 h-4 mr-2" />
+            Profit Calc
+          </Button>
         </div>
 
         {/* Onboarding Tutorial */}
