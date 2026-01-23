@@ -1206,6 +1206,11 @@ export default function DriverDashboard() {
           <LoadProfitCalculator />
         )}
 
+        {/* FMCSA Carrier Verification Tab */}
+        {activeTab === "fmcsa" && (
+          <CarrierVerification />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
