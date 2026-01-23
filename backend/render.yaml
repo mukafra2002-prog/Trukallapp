@@ -22,11 +22,11 @@ services:
         sync: false  # Set manually - use live key for production
       - key: STRIPE_PUBLISHABLE_KEY
         sync: false  # Set manually - use live key for production
+      - key: FMCSA_WEBKEY
+        sync: false  # Optional: FREE from mobile.fmcsa.dot.gov
+      - key: EIA_API_KEY
+        sync: false  # Optional: FREE from eia.gov/opendata
     healthCheckPath: /api/health
     autoDeploy: true
 
-databases:
-  - name: trukall-mongodb
-    plan: free
-    databaseName: trukall_db
-    # Note: Render offers PostgreSQL. For MongoDB, use MongoDB Atlas (free tier)
+# Note: Render offers PostgreSQL. For MongoDB, use MongoDB Atlas (free tier)
