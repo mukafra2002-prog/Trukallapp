@@ -27,6 +27,13 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
   - Days to pay average
   - Fraud report tracking
   - Verification tips
+- [x] **Rate Comparison Tool Tab** - Compare your rates to market (NEW)
+  - Enter load details (origin, destination, rate, miles)
+  - See market average comparison with visual gauge
+  - Get % difference feedback (above/below market)
+  - Market rate range visualization
+  - Top paying lanes list
+  - Negotiation tips
 
 ### i18n Dashboard Support (NEW - Jan 23, 2026)
 - [x] useTranslation hook added to DriverDashboard.js
