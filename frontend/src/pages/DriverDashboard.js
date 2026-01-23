@@ -1176,6 +1176,11 @@ export default function DriverDashboard() {
           <BrokerCreditScore />
         )}
 
+        {/* Rate Comparison Tab */}
+        {activeTab === "ratecompare" && (
+          <RateComparison />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
