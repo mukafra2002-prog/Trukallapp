@@ -1191,6 +1191,11 @@ export default function DriverDashboard() {
           <RateComparison />
         )}
 
+        {/* Load Profit Calculator Tab */}
+        {activeTab === "profitcalc" && (
+          <LoadProfitCalculator />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
