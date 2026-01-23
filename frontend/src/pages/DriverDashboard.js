@@ -1031,6 +1031,15 @@ export default function DriverDashboard() {
             <Shield className="w-4 h-4 mr-2" />
             Broker Score
           </Button>
+          <Button
+            variant={activeTab === "ratecompare" ? "default" : "outline"}
+            onClick={() => setActiveTab("ratecompare")}
+            className={`touch-target ${activeTab === "ratecompare" ? "bg-emerald-600 hover:bg-emerald-700" : "border-emerald-300 text-emerald-700"}`}
+            data-testid="tab-ratecompare"
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Rate Compare
+          </Button>
         </div>
 
         {/* Onboarding Tutorial */}
