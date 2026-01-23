@@ -1051,6 +1051,15 @@ export default function DriverDashboard() {
             <Calculator className="w-4 h-4 mr-2" />
             Profit Calc
           </Button>
+          <Button
+            variant={activeTab === "fmcsa" ? "default" : "outline"}
+            onClick={() => setActiveTab("fmcsa")}
+            className={`touch-target ${activeTab === "fmcsa" ? "bg-blue-600 hover:bg-blue-700" : "border-blue-300 text-blue-700"}`}
+            data-testid="tab-fmcsa"
+          >
+            <FileText className="w-4 h-4 mr-2" />
+            FMCSA Verify
+          </Button>
         </div>
 
         {/* Onboarding Tutorial */}
