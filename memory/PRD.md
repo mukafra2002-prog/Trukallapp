@@ -44,6 +44,20 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
   - Hourly goal check (meets/below)
   - Save calculations to localStorage
   - Quick tips for profitability
+- [x] **FMCSA Carrier Verification Tab** - Real carrier/broker license verification (NEW)
+  - Search by DOT Number or Carrier Name
+  - Real-time FMCSA database lookup (free API)
+  - Operating authority status (Authorized/Not Authorized)
+  - Out of Service warnings
+  - Safety BASICs scores with percentile visualization
+  - Fleet info (power units, drivers)
+  - Contact information and address
+  - Demo mode when API key not configured
+- [x] **National Fuel Prices API** - Real fuel price data (NEW)
+  - Diesel and regular gas national averages
+  - Regional price breakdown (6 regions)
+  - Week and year change indicators
+  - Uses EIA (Energy Information Administration) data
 
 ### i18n Dashboard Support (NEW - Jan 23, 2026)
 - [x] useTranslation hook added to DriverDashboard.js
