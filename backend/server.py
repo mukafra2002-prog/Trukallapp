@@ -1624,6 +1624,255 @@ async def get_broker_credit_score(broker_name: str):
         "recommendation": "Recommended" if final_score >= 70 else "Use Caution" if final_score >= 50 else "Not Recommended"
     }
 
+# ============== FMCSA CARRIER VERIFICATION (FREE API) ==============
+
+FMCSA_WEBKEY = os.environ.get('FMCSA_WEBKEY', '')
+FMCSA_BASE_URL = "https://mobile.fmcsa.dot.gov/qc/services"
+
+@api_router.get("/fmcsa/carrier/{dot_number}")
+async def verify_carrier_fmcsa(dot_number: str):
+    """
+    Verify carrier/broker using FMCSA official database.
+    Returns real operating authority, safety ratings, and license status.
+    """
+    if not FMCSA_WEBKEY:
+        # Return demo data if no API key configured
+        return {
+            "dot_number": dot_number,
+            "verified": False,
+            "message": "FMCSA API key not configured. Using demo data.",
+            "demo_data": {
+                "legal_name": f"Demo Carrier {dot_number}",
+                "allow_to_operate": "Y",
+                "out_of_service": "N",
+                "mc_number": f"MC-{dot_number[:6]}",
+                "safety_rating": "Satisfactory",
+                "authority_status": "ACTIVE"
+            }
+        }
+    
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            # Get basic carrier info
+            url = f"{FMCSA_BASE_URL}/carriers/{dot_number}?webKey={FMCSA_WEBKEY}"
+            response = await client.get(url)
+            
+            if response.status_code != 200:
+                return {
+                    "dot_number": dot_number,
+                    "verified": False,
+                    "error": f"FMCSA API returned status {response.status_code}"
+                }
+            
+            data = response.json()
+            carrier = data.get("content", {})
+            
+            # Extract key information
+            return {
+                "dot_number": dot_number,
+                "verified": True,
+                "legal_name": carrier.get("legalName"),
+                "dba_name": carrier.get("dbaName"),
+                "allow_to_operate": carrier.get("allowedToOperate"),
+                "out_of_service": carrier.get("oosStatus"),
+                "out_of_service_date": carrier.get("oosDate"),
+                "mc_number": carrier.get("mcNumber"),
+                "physical_address": {
+                    "street": carrier.get("phyStreet"),
+                    "city": carrier.get("phyCity"),
+                    "state": carrier.get("phyState"),
+                    "zip": carrier.get("phyZipcode"),
+                    "country": carrier.get("phyCountry", "USA")
+                },
+                "phone": carrier.get("telephone"),
+                "carrier_operation": carrier.get("carrierOperation"),
+                "safety_rating": carrier.get("safetyRating"),
+                "safety_rating_date": carrier.get("safetyRatingDate"),
+                "total_drivers": carrier.get("totalDrivers"),
+                "total_power_units": carrier.get("totalPowerUnits"),
+                "is_authorized": carrier.get("allowedToOperate") == "Y" and carrier.get("oosStatus") != "Y"
+            }
+    except httpx.TimeoutException:
+        return {"dot_number": dot_number, "verified": False, "error": "FMCSA API timeout"}
+    except Exception as e:
+        logger.error(f"FMCSA API error: {str(e)}")
+        return {"dot_number": dot_number, "verified": False, "error": str(e)}
+
+@api_router.get("/fmcsa/carrier/{dot_number}/safety")
+async def get_carrier_safety_basics(dot_number: str):
+    """
+    Get carrier safety BASICs scores from FMCSA.
+    Higher percentile = WORSE safety record (0-100 scale).
+    """
+    if not FMCSA_WEBKEY:
+        # Return demo safety data
+        return {
+            "dot_number": dot_number,
+            "verified": False,
+            "message": "FMCSA API key not configured. Using demo data.",
+            "safety_basics": {
+                "unsafe_driving": {"percentile": 35, "status": "OK"},
+                "hours_of_service": {"percentile": 22, "status": "OK"},
+                "vehicle_maintenance": {"percentile": 45, "status": "OK"},
+                "controlled_substance": {"percentile": 0, "status": "OK"},
+                "hazmat_compliance": {"percentile": 15, "status": "OK"},
+                "driver_fitness": {"percentile": 28, "status": "OK"},
+                "crash_indicator": {"percentile": 42, "status": "OK"}
+            },
+            "overall_status": "SATISFACTORY"
+        }
+    
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            url = f"{FMCSA_BASE_URL}/carriers/{dot_number}/basics?webKey={FMCSA_WEBKEY}"
+            response = await client.get(url)
+            
+            if response.status_code != 200:
+                return {"dot_number": dot_number, "verified": False, "error": f"API error {response.status_code}"}
+            
+            data = response.json()
+            basics = data.get("content", {}).get("basicsViolations", [])
+            
+            safety_data = {}
+            for basic in basics:
+                category = basic.get("basicShortDesc", "").lower().replace(" ", "_")
+                safety_data[category] = {
+                    "percentile": basic.get("percentile", 0),
+                    "total_violations": basic.get("totalViolations", 0),
+                    "status": "ALERT" if basic.get("percentile", 0) >= 65 else "OK"
+                }
+            
+            # Determine overall status
+            alert_count = sum(1 for b in safety_data.values() if b.get("status") == "ALERT")
+            overall = "UNSATISFACTORY" if alert_count >= 3 else "CONDITIONAL" if alert_count >= 1 else "SATISFACTORY"
+            
+            return {
+                "dot_number": dot_number,
+                "verified": True,
+                "safety_basics": safety_data,
+                "overall_status": overall,
+                "alert_count": alert_count
+            }
+    except Exception as e:
+        logger.error(f"FMCSA Safety API error: {str(e)}")
+        return {"dot_number": dot_number, "verified": False, "error": str(e)}
+
+@api_router.get("/fmcsa/search")
+async def search_carriers_fmcsa(name: str, limit: int = 10):
+    """Search carriers by name in FMCSA database"""
+    if not FMCSA_WEBKEY:
+        # Return demo search results
+        return {
+            "query": name,
+            "verified": False,
+            "message": "FMCSA API key not configured. Using demo data.",
+            "results": [
+                {"dot_number": "1234567", "legal_name": f"{name} Transport LLC", "allow_to_operate": "Y"},
+                {"dot_number": "2345678", "legal_name": f"{name} Logistics Inc", "allow_to_operate": "Y"},
+                {"dot_number": "3456789", "legal_name": f"{name} Trucking Co", "allow_to_operate": "N"}
+            ]
+        }
+    
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            url = f"{FMCSA_BASE_URL}/carriers/name/{name}?webKey={FMCSA_WEBKEY}&size={limit}"
+            response = await client.get(url)
+            
+            if response.status_code != 200:
+                return {"query": name, "verified": False, "error": f"API error {response.status_code}"}
+            
+            data = response.json()
+            carriers = data.get("content", [])
+            
+            results = []
+            for carrier in carriers[:limit]:
+                results.append({
+                    "dot_number": carrier.get("dotNumber"),
+                    "legal_name": carrier.get("legalName"),
+                    "dba_name": carrier.get("dbaName"),
+                    "city": carrier.get("phyCity"),
+                    "state": carrier.get("phyState"),
+                    "allow_to_operate": carrier.get("allowedToOperate"),
+                    "out_of_service": carrier.get("oosStatus")
+                })
+            
+            return {
+                "query": name,
+                "verified": True,
+                "total_found": len(carriers),
+                "results": results
+            }
+    except Exception as e:
+        logger.error(f"FMCSA Search API error: {str(e)}")
+        return {"query": name, "verified": False, "error": str(e)}
+
+# ============== EIA FUEL PRICE API (FREE) ==============
+
+EIA_API_KEY = os.environ.get('EIA_API_KEY', '')
+
+@api_router.get("/fuel/prices/national")
+async def get_national_fuel_prices():
+    """
+    Get current national average fuel prices from EIA (U.S. Energy Information Administration).
+    Free API with real diesel/gas prices.
+    """
+    if not EIA_API_KEY:
+        # Return realistic current prices without API
+        return {
+            "source": "Demo Data (EIA API key not configured)",
+            "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "prices": {
+                "diesel": {
+                    "national_avg": 3.75,
+                    "week_change": -0.03,
+                    "year_change": -0.25
+                },
+                "regular_gas": {
+                    "national_avg": 3.19,
+                    "week_change": -0.02,
+                    "year_change": -0.18
+                }
+            },
+            "regional": {
+                "east_coast": {"diesel": 3.82, "gas": 3.25},
+                "midwest": {"diesel": 3.65, "gas": 3.12},
+                "gulf_coast": {"diesel": 3.58, "gas": 3.05},
+                "rocky_mountain": {"diesel": 3.72, "gas": 3.28},
+                "west_coast": {"diesel": 4.15, "gas": 3.85},
+                "california": {"diesel": 4.45, "gas": 4.25}
+            }
+        }
+    
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            # EIA API for diesel prices
+            diesel_url = f"https://api.eia.gov/v2/petroleum/pri/gnd/data/?api_key={EIA_API_KEY}&frequency=weekly&data[0]=value&facets[product][]=EPD2D&facets[series][]=EMD_EPD2D_PTE_NUS_DPG&sort[0][column]=period&sort[0][direction]=desc&length=1"
+            
+            response = await client.get(diesel_url)
+            
+            if response.status_code == 200:
+                data = response.json()
+                diesel_data = data.get("response", {}).get("data", [])
+                diesel_price = diesel_data[0].get("value") if diesel_data else 3.75
+                
+                return {
+                    "source": "U.S. Energy Information Administration (EIA)",
+                    "date": diesel_data[0].get("period") if diesel_data else datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                    "prices": {
+                        "diesel": {
+                            "national_avg": float(diesel_price),
+                            "unit": "$/gallon"
+                        }
+                    },
+                    "verified": True
+                }
+            else:
+                return {"verified": False, "error": f"EIA API error: {response.status_code}"}
+                
+    except Exception as e:
+        logger.error(f"EIA API error: {str(e)}")
+        return {"verified": False, "error": str(e)}
+
 # 5. FUEL ALONG ROUTE
 @api_router.get("/fuel/along-route")
 async def get_fuel_along_route(
