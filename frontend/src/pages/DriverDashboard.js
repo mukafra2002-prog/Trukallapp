@@ -627,14 +627,14 @@ export default function DriverDashboard() {
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900" data-testid="driver-name">{user.name}</h2>
-              <p className="text-sm text-slate-500">Truck Driver</p>
+              <p className="text-sm text-slate-500">{t('dashboard.truckDriver')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <NotificationBell />
             <Button variant="outline" onClick={logout} data-testid="logout-btn" className="border-slate-300 text-slate-700 hover:bg-slate-100">
               <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              {t('nav.logout')}
             </Button>
           </div>
         </div>
@@ -649,12 +649,12 @@ export default function DriverDashboard() {
               <div className="flex items-center gap-2">
                 <Award className="w-6 h-6 text-blue-600" />
                 <div>
-                  <p className="text-xs text-slate-600">Your Points</p>
+                  <p className="text-xs text-slate-600">{t('dashboard.points')}</p>
                   <p className="text-2xl font-bold mono text-blue-600">{rewardPoints}</p>
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => toast.info("Earn points by booking parking, reporting spots, and using TrukAll daily!")} className="text-slate-600 hover:text-blue-600">
-                <span className="text-xs">How to earn?</span>
+                <span className="text-xs">{t('dashboard.howToEarn')}</span>
               </Button>
             </CardContent>
           </Card>
@@ -673,18 +673,18 @@ export default function DriverDashboard() {
                   'text-green-600'
                 }`} />
                 <div>
-                  <p className="text-xs text-slate-600">Fatigue Status</p>
+                  <p className="text-xs text-slate-600">{t('dashboard.fatigue')}</p>
                   <p className={`font-bold ${
                     fatigueLevel === 'danger' ? 'text-red-600' :
                     fatigueLevel === 'warning' ? 'text-amber-600' :
                     'text-green-600'
                   }`}>
-                    {fatigueLevel === 'danger' ? 'TAKE A BREAK!' : fatigueLevel === 'warning' ? 'TAKE BREAK SOON' : 'ALL GOOD'}
+                    {fatigueLevel === 'danger' ? t('dashboard.takeBreak') : fatigueLevel === 'warning' ? t('dashboard.takeBreakSoon') : t('dashboard.allGood')}
                   </p>
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => toast.info("Based on your driving hours and time of day. Rest when needed!")} className="text-slate-600">
-                <span className="text-xs">Info</span>
+                <span className="text-xs">{t('common.info')}</span>
               </Button>
             </CardContent>
           </Card>
@@ -695,8 +695,8 @@ export default function DriverDashboard() {
               <div className="flex items-center gap-2">
                 <Bell className="w-6 h-6 text-slate-600" />
                 <div>
-                  <p className="text-xs text-slate-600">Wake-up Alarm</p>
-                  <p className="font-bold text-slate-900">{wakeUpTime || 'Not set'}</p>
+                  <p className="text-xs text-slate-600">{t('dashboard.wakeUp')}</p>
+                  <p className="font-bold text-slate-900">{wakeUpTime || t('dashboard.notSet')}</p>
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => {
@@ -706,7 +706,7 @@ export default function DriverDashboard() {
                   toast.success(`Wake-up alarm set for ${time}`);
                 }
               }} className="text-blue-600 hover:text-blue-700">
-                <span className="text-xs">Set</span>
+                <span className="text-xs">{t('common.set')}</span>
               </Button>
             </CardContent>
           </Card>
