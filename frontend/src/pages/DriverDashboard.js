@@ -34,6 +34,7 @@ import QRScanner from "@/components/QRScanner";
 import OnboardingTutorial from "@/components/OnboardingTutorial";
 import SmartLoadBoard from "@/components/SmartLoadBoard";
 import BrokerCreditScore from "@/components/BrokerCreditScore";
+import RateComparison from "@/components/RateComparison";
 
 const mapContainerStyle = {
   width: '100%',
