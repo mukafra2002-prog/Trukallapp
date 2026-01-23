@@ -1010,6 +1010,24 @@ export default function DriverDashboard() {
             <QrCode className="w-4 h-4 mr-2" />
             QR Code
           </Button>
+          <Button
+            variant={activeTab === "smartloads" ? "default" : "outline"}
+            onClick={() => setActiveTab("smartloads")}
+            className={`touch-target ${activeTab === "smartloads" ? "bg-purple-600 hover:bg-purple-700" : "border-purple-300 text-purple-700"}`}
+            data-testid="tab-smartloads"
+          >
+            <Target className="w-4 h-4 mr-2" />
+            Smart Loads
+          </Button>
+          <Button
+            variant={activeTab === "brokerscore" ? "default" : "outline"}
+            onClick={() => setActiveTab("brokerscore")}
+            className={`touch-target ${activeTab === "brokerscore" ? "bg-cyan-600 hover:bg-cyan-700" : "border-cyan-300 text-cyan-700"}`}
+            data-testid="tab-brokerscore"
+          >
+            <Shield className="w-4 h-4 mr-2" />
+            Broker Score
+          </Button>
         </div>
 
         {/* Onboarding Tutorial */}
