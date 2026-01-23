@@ -35,6 +35,7 @@ import OnboardingTutorial from "@/components/OnboardingTutorial";
 import SmartLoadBoard from "@/components/SmartLoadBoard";
 import BrokerCreditScore from "@/components/BrokerCreditScore";
 import RateComparison from "@/components/RateComparison";
+import LoadProfitCalculator from "@/components/LoadProfitCalculator";
 
 const mapContainerStyle = {
   width: '100%',
