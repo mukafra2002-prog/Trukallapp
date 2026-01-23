@@ -1151,6 +1151,19 @@ export default function DriverDashboard() {
           </div>
         )}
 
+        {/* Smart Load Board Tab */}
+        {activeTab === "smartloads" && (
+          <SmartLoadBoard 
+            driverEmail={user?.email} 
+            driverLocation={null}
+          />
+        )}
+
+        {/* Broker Credit Score Tab */}
+        {activeTab === "brokerscore" && (
+          <BrokerCreditScore />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
