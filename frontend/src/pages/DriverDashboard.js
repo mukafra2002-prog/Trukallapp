@@ -36,6 +36,7 @@ import SmartLoadBoard from "@/components/SmartLoadBoard";
 import BrokerCreditScore from "@/components/BrokerCreditScore";
 import RateComparison from "@/components/RateComparison";
 import LoadProfitCalculator from "@/components/LoadProfitCalculator";
+import CarrierVerification from "@/components/CarrierVerification";
 
 const mapContainerStyle = {
   width: '100%',
