@@ -652,13 +652,23 @@ export default function DriverDashboard() {
               <span className="text-2xl font-bold text-white">{user.name.charAt(0)}</span>
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900" data-testid="driver-name">{user.name}</h2>
-              <p className="text-sm text-slate-500">{t('dashboard.truckDriver')}</p>
+              <h2 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`} data-testid="driver-name">{user.name}</h2>
+              <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{t('dashboard.truckDriver')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Dark Mode Toggle */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setDarkMode(!darkMode)}
+              className={darkMode ? 'text-yellow-400 hover:bg-slate-700' : 'text-slate-600 hover:bg-slate-100'}
+              data-testid="dark-mode-toggle"
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </Button>
             <NotificationBell />
-            <Button variant="outline" onClick={logout} data-testid="logout-btn" className="border-slate-300 text-slate-700 hover:bg-slate-100">
+            <Button variant="outline" onClick={logout} data-testid="logout-btn" className={darkMode ? 'border-slate-600 text-slate-300 hover:bg-slate-700' : 'border-slate-300 text-slate-700 hover:bg-slate-100'}>
               <LogOut className="w-4 h-4 mr-2" />
               {t('nav.logout')}
             </Button>
