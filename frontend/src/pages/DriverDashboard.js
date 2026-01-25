@@ -1132,6 +1132,33 @@ export default function DriverDashboard() {
             <Fuel className="w-4 h-4 mr-2" />
             Fuel Tracker
           </Button>
+          <Button
+            variant={activeTab === "forums" ? "default" : "outline"}
+            onClick={() => setActiveTab("forums")}
+            className={`touch-target ${activeTab === "forums" ? "bg-indigo-600 hover:bg-indigo-700" : "border-indigo-300 text-indigo-700"}`}
+            data-testid="tab-forums"
+          >
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Forums
+          </Button>
+          <Button
+            variant={activeTab === "hazards" ? "default" : "outline"}
+            onClick={() => setActiveTab("hazards")}
+            className={`touch-target ${activeTab === "hazards" ? "bg-red-600 hover:bg-red-700" : "border-red-300 text-red-700"}`}
+            data-testid="tab-hazards"
+          >
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            Hazards
+          </Button>
+          <Button
+            variant={activeTab === "earnings" ? "default" : "outline"}
+            onClick={() => setActiveTab("earnings")}
+            className={`touch-target ${activeTab === "earnings" ? "bg-green-600 hover:bg-green-700" : "border-green-300 text-green-700"}`}
+            data-testid="tab-earnings"
+          >
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Earnings
+          </Button>
         </div>
 
         {/* Onboarding Tutorial */}
