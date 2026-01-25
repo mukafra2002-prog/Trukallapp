@@ -1330,6 +1330,21 @@ export default function DriverDashboard() {
           <FuelEfficiencyTracker />
         )}
 
+        {/* Driver Forums Tab */}
+        {activeTab === "forums" && (
+          <DriverForums />
+        )}
+
+        {/* Hazard Alerts Tab */}
+        {activeTab === "hazards" && (
+          <HazardAlerts />
+        )}
+
+        {/* Earnings Dashboard Tab */}
+        {activeTab === "earnings" && (
+          <EarningsDashboard />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
