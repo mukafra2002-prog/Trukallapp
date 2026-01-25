@@ -234,24 +234,32 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 ## Known Issues
 - Google Maps shows deprecation warning for google.maps.Marker (minor)
 - `/api/loads` has pre-existing data issue with 'ASAP' date format
+- Lint warnings in DriverDashboard.js (unreachable code, missing deps) - pre-existing
 
 ## Mocked/Placeholder Features
 - **Email Service** - Password reset shows code in UI toast (no real email)
 - **Push Notifications** - Backend ready, frontend pending
 - **Microsoft Clarity** - Script added with placeholder ID
+- **FMCSA/EIA APIs** - Backend endpoints use demo data, need real API keys
+
+## Completed Tasks (Jan 25, 2026)
+- [x] ~~Complete i18n for remaining dashboard tabs and content~~ - DONE
+- [x] All 40+ tab buttons translated
+- [x] Map tab content fully translated
+- [x] Language selector added to dashboard
 
 ## Upcoming Tasks (P1)
-1. Complete i18n for remaining dashboard tabs and content
-2. Add Advanced Load Filters (deadhead miles, equipment type) UI
-3. Add Fuel Optimization feature (cheapest fuel on route) UI
+1. Refactor DriverDashboard.js into smaller components (URGENT - 3070+ lines)
+2. Refactor server.py into modular routers (URGENT - 6000+ lines)
+3. Add Advanced Load Filters (deadhead miles, equipment type) UI
+4. Add Fuel Optimization feature (cheapest fuel on route) UI
 
 ## Future/Backlog Tasks (P2)
-1. Refactor server.py into modular routers (urgent - file very large)
-2. Refactor DriverDashboard.js into smaller components (urgent - 2500+ lines)
+1. Connect FMCSA API with real WebKey (user needs to provide)
+2. Connect EIA API with real API Key (user needs to provide)
 3. Integrate real third-party freight APIs (DAT, Truckstop.com)
-4. Integrate official FMCSA API for broker verification
-5. Add real email service (Resend/SendGrid)
-6. Convert PWA to native app (Capacitor/React Native)
+4. Add real email service (Resend/SendGrid)
+5. Convert PWA to native app (Capacitor/React Native)
 
 ## File Structure
 ```
