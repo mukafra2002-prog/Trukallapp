@@ -661,6 +661,8 @@ export default function DriverDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Language Selector */}
+            <LanguageSelector />
             {/* Dark Mode Toggle */}
             <Button 
               variant="ghost" 
