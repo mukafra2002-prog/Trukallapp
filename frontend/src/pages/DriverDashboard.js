@@ -41,6 +41,9 @@ import PreTripChecklist from "@/components/PreTripChecklist";
 import ExpenseTracker from "@/components/ExpenseTracker";
 import BreakTimer from "@/components/BreakTimer";
 import FuelEfficiencyTracker from "@/components/FuelEfficiencyTracker";
+import DriverForums from "@/components/DriverForums";
+import HazardAlerts from "@/components/HazardAlerts";
+import EarningsDashboard from "@/components/EarningsDashboard";
 
 
 const mapContainerStyle = {
