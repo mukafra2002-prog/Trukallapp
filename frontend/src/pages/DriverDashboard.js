@@ -1133,7 +1133,7 @@ export default function DriverDashboard() {
           <Button
             variant={activeTab === "fueltrack" ? "default" : "outline"}
             onClick={() => setActiveTab("fueltrack")}
-            className={`touch-target ${activeTab === "fueltrack" ? "bg-yellow-600 hover:bg-yellow-700" : "border-yellow-300 text-yellow-700"}`}
+            className={`touch-target ${activeTab === "fueltrack" ? "bg-blue-600 hover:bg-blue-700" : "border-slate-300 text-slate-700"}`}
             data-testid="tab-fueltrack"
           >
             <Fuel className="w-4 h-4 mr-2" />
