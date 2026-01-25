@@ -59,6 +59,40 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
   - Week and year change indicators
   - Uses EIA (Energy Information Administration) data
 
+### Quick Win Features (NEW - Jan 25, 2026)
+- [x] **Pre-Trip Inspection Checklist** - DOT-compliant digital inspection
+  - 31 inspection items across 4 categories (Exterior, Interior, Trailer, Fluids)
+  - Critical items highlighted in red
+  - Progress bar with percentage
+  - Odometer logging
+  - Notes for defects
+  - Inspection history saved locally
+- [x] **Dark Mode Toggle** - Night-friendly theme
+  - Toggle in header (moon/sun icon)
+  - Persists preference in localStorage
+  - Automatic theme switching
+- [x] **Expense Tracker with Categories** - Tax-deductible expense logging
+  - 8 categories (Fuel, Food, Repairs, Tolls, Parking, Lodging, Supplies, Other)
+  - Filter by week/month/year/all time
+  - Category breakdown with visual bars
+  - Export to CSV for tax purposes
+  - Total spending and transaction count
+- [x] **HOS Break Timer** - Compliant break reminders
+  - 30-Min Break timer (required after 8h driving)
+  - 10-Hour Rest timer (off-duty period)
+  - 34-Hour Restart timer (weekly restart)
+  - Custom timer option
+  - Sound alert on completion
+  - Break history tracking
+  - HOS rules quick reference
+- [x] **Fuel Efficiency Tracker** - MPG monitoring
+  - Log fuel stops with gallons, cost, odometer
+  - Automatic MPG calculation
+  - Average MPG with trend indicator
+  - Cost per mile tracking
+  - Total gallons and spending
+  - Fuel efficiency tips
+
 ### i18n Dashboard Support (NEW - Jan 23, 2026)
 - [x] useTranslation hook added to DriverDashboard.js
 - [x] Extended translation keys for dashboard, tabs, and common UI elements
