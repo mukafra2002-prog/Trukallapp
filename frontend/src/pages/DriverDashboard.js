@@ -1695,74 +1695,7 @@ export default function DriverDashboard() {
 
         {/* Shower Credits Tab */}
         {activeTab === "showers" && (
-          <div className="space-y-6">
-            {/* Summary Card */}
-            <Card className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShowerHead className="w-6 h-6 text-blue-500" />
-                  Your Shower Credits
-                </CardTitle>
-                <CardDescription>Track your rewards across all truck stop chains</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <p className="text-3xl font-bold text-blue-500">{showerTotals.total_available_showers}</p>
-                    <p className="text-sm text-muted-foreground">Available Showers</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-cyan-500">{showerTotals.total_points.toLocaleString()}</p>
-                    <p className="text-sm text-muted-foreground">Total Points</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-purple-500">{showerTotals.chains_tracked}</p>
-                    <p className="text-sm text-muted-foreground">Chains Tracked</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Individual Chain Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {showerCredits.length === 0 ? (
-                <Card className="col-span-full">
-                  <CardContent className="py-8 text-center">
-                    <ShowerHead className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">No shower credits tracked yet</p>
-                    <p className="text-sm text-muted-foreground mt-2">Add your rewards numbers to track your credits</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                showerCredits.map((credit) => (
-                  <Card key={credit.id} className="overflow-hidden" data-testid={`shower-credit-${credit.chain}`}>
-                    <div className={`h-2 ${getChainColor(credit.chain)}`}></div>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">{getChainDisplayName(credit.chain)}</CardTitle>
-                      {credit.rewards_number && (
-                        <CardDescription className="font-mono text-xs">{credit.rewards_number}</CardDescription>
-                      )}
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Available Showers</p>
-                          <p className="text-2xl font-bold">{credit.available_showers}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm text-muted-foreground">Points</p>
-                          <p className="text-xl font-bold text-blue-500">{credit.points_balance.toLocaleString()}</p>
-                        </div>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-3">
-                        Last updated: {new Date(credit.last_updated).toLocaleDateString()}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
+          <ShowerCreditsTab showerCredits={showerCredits} showerTotals={showerTotals} />
         )}
 
         {/* Broker Ratings Tab */}
