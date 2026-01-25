@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AuthContext, API } from "@/App";
 import axios from "axios";
 import { toast } from "sonner";
-import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell, TrendingUp, ShowerHead, Building2, Star, ThumbsUp, ThumbsDown, AlertOctagon, Store, Users, Calculator, FileText, CreditCard, Crown, Check, Truck, Calendar, Radio, Eye, Send, Zap, Phone, AlertCircle, Camera, FolderOpen, Trash2, Plus, CloudRain, ArrowRight, Mic, MessageCircle, BarChart3, Route, Image, Gift, MessageSquare, Globe, Trophy, Wrench, GraduationCap, ShoppingBag, Scale, QrCode, Download, Target } from "lucide-react";
+import { MapPin, DollarSign, Shield, Droplets, Utensils, Fuel, Wifi, LogOut, History, Search, Award, AlertTriangle, Clock, Bell, TrendingUp, ShowerHead, Building2, Star, ThumbsUp, ThumbsDown, AlertOctagon, Store, Users, Calculator, FileText, CreditCard, Crown, Check, Truck, Calendar, Radio, Eye, Send, Zap, Phone, AlertCircle, Camera, FolderOpen, Trash2, Plus, CloudRain, ArrowRight, Mic, MessageCircle, BarChart3, Route, Image, Gift, MessageSquare, Globe, Trophy, Wrench, GraduationCap, ShoppingBag, Scale, QrCode, Download, Target, ClipboardCheck, Timer, Moon, Sun } from "lucide-react";
 import ConvoyFinder from "@/components/ConvoyFinder";
 import NotificationBell from "@/components/NotificationBell";
 import WeatherAlerts from "@/components/WeatherAlerts";
@@ -37,6 +37,11 @@ import BrokerCreditScore from "@/components/BrokerCreditScore";
 import RateComparison from "@/components/RateComparison";
 import LoadProfitCalculator from "@/components/LoadProfitCalculator";
 import CarrierVerification from "@/components/CarrierVerification";
+import PreTripChecklist from "@/components/PreTripChecklist";
+import ExpenseTracker from "@/components/ExpenseTracker";
+import BreakTimer from "@/components/BreakTimer";
+import FuelEfficiencyTracker from "@/components/FuelEfficiencyTracker";
+
 
 const mapContainerStyle = {
   width: '100%',
