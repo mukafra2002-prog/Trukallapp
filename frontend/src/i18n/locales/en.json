@@ -52,64 +52,6 @@
       "benefit": "Get paid to use it"
     }
   },
-  "killerFeatures": {
-    "title": "See Our",
-    "titleHighlight": "Killer Features",
-    "subtitle": "These features set TrukAll apart from every other trucking app",
-    "hos": {
-      "title": "HOS Compliance Tracker",
-      "desc": "Never get a DOT violation again. Track driving hours, duty window, and weekly limits automatically.",
-      "stat": "$16,000",
-      "statLabel": "avg fine avoided"
-    },
-    "weight": {
-      "title": "Smart Weight Calculator",
-      "desc": "Know your exact axle weights before hitting the scale. Save multiple truck profiles.",
-      "stat": "100%",
-      "statLabel": "scale accuracy"
-    },
-    "qr": {
-      "title": "QR Code Scanner",
-      "desc": "Scan truck stop QR codes for instant check-in. Share your referral code to earn bonus points.",
-      "stat": "500+",
-      "statLabel": "bonus points"
-    },
-    "realtime": {
-      "title": "Real-Time Availability",
-      "desc": "See live parking updates from fellow drivers. Know exactly how full each lot is right now.",
-      "stat": "30sec",
-      "statLabel": "update frequency"
-    }
-  },
-  "cta": {
-    "title": "Join 10,000+ Drivers Saving Money & Time",
-    "subtitle": "Start finding safe parking, earning more per mile, and traveling safer today. No credit card required.",
-    "button": "Start Free Now"
-  },
-  "testimonials": {
-    "title": "What Drivers",
-    "titleHighlight": "Are Saying",
-    "reviews": [
-      {
-        "name": "Mike Johnson",
-        "location": "Texas, USA",
-        "text": "This app saved my career! I haven't gotten a single HOS violation since I started using it. The real-time parking updates are a game changer.",
-        "rating": 5
-      },
-      {
-        "name": "Robert Williams",
-        "location": "California, USA",
-        "text": "The weight calculator is perfect. Saved me thousands in overweight fines. Best trucking app I've ever used.",
-        "rating": 5
-      },
-      {
-        "name": "James Davis",
-        "location": "Florida, USA",
-        "text": "Finally an app made BY truckers FOR truckers. The convoy finder helped me make friends on the road. 5 stars!",
-        "rating": 5
-      }
-    ]
-  },
   "nav": {
     "login": "Login",
     "signup": "Sign Up Free",
@@ -183,91 +125,17 @@
     "hos": "HOS",
     "qr": "QR Code",
     "smartLoads": "Smart Loads",
-    "brokerScore": "Broker Score"
-  },
-  "parking": {
-    "availableNow": "Available Now",
-    "freeParking": "Free Parking",
-    "highSecurity": "High Security",
-    "locations": "Parking Locations",
-    "clickToView": "Click on any spot to view details and book",
-    "spaces": "Spaces",
-    "price": "Price",
-    "perNight": "/night",
-    "free": "FREE",
-    "available": "Available",
-    "full": "Full",
-    "filling": "Filling",
-    "likelyToFill": "Likely to fill in 2-3 hours",
-    "reportWhatYouSee": "Report What You See",
-    "noRecentReport": "No recent report"
-  },
-  "live": {
-    "title": "Real-Time Driver Reports",
-    "liveUpdates": "Live Updates",
-    "howItWorks": "How Live Availability Works",
-    "liveAvailability": "Live Availability",
-    "spotsAvailable": "Spots Available",
-    "timeStamped": "Time-Stamped Accuracy",
-    "lastConfirmed": "Last confirmed",
-    "minutesAgo": "minutes ago",
-    "trustScore": "Driver Trust Score",
-    "smartAlerts": "Smart Alerts",
-    "topContributors": "Top Contributors",
-    "reports": "reports",
-    "reportedSpaces": "Reported Spaces",
-    "officialCapacity": "Official capacity",
-    "beFirst": "Be the first to report!"
-  },
-  "booking": {
-    "myBookings": "My Bookings",
-    "history": "Your parking history and upcoming reservations",
-    "noBookings": "No bookings yet",
-    "checkIn": "Check-in",
-    "checkOut": "Check-out",
-    "totalPaid": "Total Paid"
-  },
-  "shower": {
-    "title": "Your Shower Credits",
-    "description": "Track your rewards across all truck stop chains",
-    "totalShowers": "Total Showers",
-    "totalPoints": "Total Points",
-    "chainsTracked": "Chains Tracked",
-    "addCredits": "Add Shower Credits"
-  },
-  "broker": {
-    "searchTitle": "Search Broker Ratings",
-    "searchPlaceholder": "Enter broker name (e.g., TQL, CH Robinson)",
-    "checkScore": "Check Score",
-    "creditScore": "Broker Credit Score Checker",
-    "verificationTips": "Broker Verification Tips"
-  },
-  "load": {
-    "availableLoads": "Available Loads",
-    "origin": "Origin",
-    "destination": "Destination",
-    "rate": "Rate",
-    "miles": "miles",
-    "perMile": "per mile",
-    "weight": "Weight",
-    "equipment": "Equipment",
-    "pickupDate": "Pickup Date",
-    "broker": "Broker",
-    "calculateProfit": "Calculate Profit",
-    "searchLoads": "Search Loads",
-    "smartMatch": "Smart Match",
-    "laneRates": "Lane Rates",
-    "loadAlerts": "Load Alerts"
-  },
-  "emergency": {
-    "sosButton": "Emergency SOS",
-    "sendSOS": "Send SOS Alert",
-    "breakdown": "Breakdown",
-    "accident": "Accident",
-    "medical": "Medical",
-    "other": "Other",
-    "contacts": "Emergency Contacts",
-    "addContact": "Add Contact"
+    "brokerScore": "Broker Score",
+    "rateCompare": "Rate Compare",
+    "profitCalc": "Profit Calc",
+    "fmcsa": "FMCSA Verify",
+    "preTrip": "Pre-Trip",
+    "expenses": "Expenses",
+    "breakTimer": "Break Timer",
+    "fuelTracker": "Fuel Tracker",
+    "forums": "Forums",
+    "hazards": "Hazards",
+    "earnings": "Earnings"
   },
   "common": {
     "loading": "Loading...",
@@ -281,7 +149,148 @@
     "back": "Back",
     "next": "Next",
     "info": "Info",
-    "set": "Set"
+    "set": "Set",
+    "add": "Add",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "reset": "Reset",
+    "export": "Export",
+    "refresh": "Refresh",
+    "report": "Report",
+    "view": "View",
+    "filter": "Filter",
+    "all": "All",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "thisYear": "This Year",
+    "allTime": "All Time"
+  },
+  "preTrip": {
+    "title": "Pre-Trip Inspection Checklist",
+    "description": "DOT-compliant vehicle inspection. Complete all critical items before driving.",
+    "progress": "Inspection Progress",
+    "critical": "Critical",
+    "criticalRemaining": "critical items remaining",
+    "exterior": "Exterior",
+    "interior": "Interior",
+    "trailer": "Trailer",
+    "fluids": "Fluids",
+    "checkAll": "Check All",
+    "complete": "Complete Inspection",
+    "notesDefects": "Notes & Defects",
+    "recentInspections": "Recent Inspections",
+    "odometer": "Odometer Reading"
+  },
+  "expenses": {
+    "title": "Expense Tracker",
+    "description": "Track all expenses by category. Export for tax deductions.",
+    "addExpense": "Add Expense",
+    "totalExpenses": "Total Expenses",
+    "transactions": "transactions",
+    "topCategory": "Top Category",
+    "breakdown": "Breakdown by Category",
+    "recentExpenses": "Recent Expenses",
+    "categories": {
+      "fuel": "Fuel",
+      "food": "Food & Meals",
+      "repairs": "Repairs & Maintenance",
+      "tolls": "Tolls",
+      "parking": "Parking",
+      "lodging": "Lodging",
+      "supplies": "Supplies & Equipment",
+      "other": "Other"
+    },
+    "taxTip": "Tax Deduction Tip"
+  },
+  "breakTimer": {
+    "title": "HOS Break Timer",
+    "description": "Stay compliant with Hours of Service regulations.",
+    "thirtyMin": "30-Min Break",
+    "tenHour": "10-Hour Rest",
+    "thirtyFourHour": "34-Hour Restart",
+    "custom": "Custom Timer",
+    "pause": "Pause",
+    "resume": "Resume",
+    "reset": "Reset",
+    "recentBreaks": "Recent Breaks",
+    "hosRules": "HOS Rules Quick Reference"
+  },
+  "fuelTracker": {
+    "title": "Fuel Efficiency Tracker",
+    "description": "Track your MPG over time. Identify trends and optimize fuel costs.",
+    "logFuelStop": "Log Fuel Stop",
+    "avgMpg": "Avg MPG",
+    "costPerMile": "Cost/Mile",
+    "totalSpent": "Total Spent",
+    "avgPrice": "Avg $/Gallon",
+    "totalGallons": "Total Gallons",
+    "milesTracked": "Miles Tracked",
+    "fuelStops": "Fuel Stops",
+    "fuelHistory": "Fuel History",
+    "efficiencyTips": "Fuel Efficiency Tips"
+  },
+  "forums": {
+    "title": "Driver Forums",
+    "description": "Connect with fellow drivers. Share tips, ask questions.",
+    "newPost": "New Post",
+    "searchDiscussions": "Search discussions...",
+    "allTopics": "All Topics",
+    "createPost": "Create New Post",
+    "postDiscussion": "Post Discussion",
+    "addComment": "Add a comment...",
+    "noComments": "No comments yet. Be the first!",
+    "categories": {
+      "general": "General Discussion",
+      "routes": "Routes & Tips",
+      "equipment": "Equipment & Gear",
+      "regulations": "Regulations & DOT",
+      "jobs": "Jobs & Opportunities",
+      "lifestyle": "Trucker Lifestyle"
+    }
+  },
+  "hazards": {
+    "title": "Road Hazard Alerts",
+    "description": "Real-time hazard reports from fellow drivers. Stay safe on the road.",
+    "active": "Active",
+    "reportHazard": "Report Hazard",
+    "submitReport": "Submit Report",
+    "confirm": "Confirm",
+    "markCleared": "Mark Cleared",
+    "severity": {
+      "minor": "Minor",
+      "moderate": "Moderate",
+      "severe": "Severe"
+    },
+    "types": {
+      "accident": "Accident",
+      "construction": "Construction",
+      "weather": "Weather Hazard",
+      "roadClosure": "Road Closure",
+      "debris": "Debris/Obstacle",
+      "traffic": "Heavy Traffic",
+      "police": "Police Activity",
+      "other": "Other Hazard"
+    },
+    "safetyReminder": "Safety Reminder"
+  },
+  "earnings": {
+    "title": "Earnings Dashboard",
+    "description": "Track your income, analyze trends, and maximize your earnings.",
+    "logEarning": "Log Earning",
+    "totalEarnings": "Total Earnings",
+    "milesDriven": "Miles Driven",
+    "avgPerMile": "Avg $/Mile",
+    "loadsCompleted": "Loads Completed",
+    "dailyEarnings": "Daily Earnings",
+    "recentEarnings": "Recent Earnings",
+    "types": {
+      "load": "Load Payment",
+      "detention": "Detention Pay",
+      "bonus": "Bonus",
+      "other": "Other"
+    },
+    "tips": "Earnings Tips"
   },
   "language": "Language"
 }
