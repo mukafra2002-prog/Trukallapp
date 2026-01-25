@@ -45,6 +45,10 @@ import DriverForums from "@/components/DriverForums";
 import HazardAlerts from "@/components/HazardAlerts";
 import EarningsDashboard from "@/components/EarningsDashboard";
 import LanguageSelector from "@/components/LanguageSelector";
+import BookingsTab from "@/components/BookingsTab";
+import ShowerCreditsTab from "@/components/ShowerCreditsTab";
+import RetailParkingTab from "@/components/RetailParkingTab";
+import LoadBoardTab from "@/components/LoadBoardTab";
 
 
 const mapContainerStyle = {
