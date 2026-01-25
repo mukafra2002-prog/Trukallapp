@@ -1558,19 +1558,19 @@ export default function DriverDashboard() {
               <Card className="bg-blue-50 border-blue-200" data-testid="stat-available">
                 <CardHeader>
                   <CardTitle className="text-2xl mono text-blue-600">{spots.filter(s => s.available_spaces > 0).length}</CardTitle>
-                  <CardDescription className="text-slate-600">Available Now</CardDescription>
+                  <CardDescription className="text-slate-600">{t('map.availableNow')}</CardDescription>
                 </CardHeader>
               </Card>
               <Card className="bg-green-50 border-green-200" data-testid="stat-free">
                 <CardHeader>
                   <CardTitle className="text-2xl mono text-green-600">{spots.filter(s => s.is_free).length}</CardTitle>
-                  <CardDescription className="text-slate-600">Free Parking</CardDescription>
+                  <CardDescription className="text-slate-600">{t('map.freeParking')}</CardDescription>
                 </CardHeader>
               </Card>
               <Card className="bg-purple-50 border-purple-200" data-testid="stat-secure">
                 <CardHeader>
                   <CardTitle className="text-2xl mono text-purple-600">{spots.filter(s => s.security_level === 'high').length}</CardTitle>
-                  <CardDescription className="text-slate-600">High Security</CardDescription>
+                  <CardDescription className="text-slate-600">{t('map.highSecurity')}</CardDescription>
                 </CardHeader>
               </Card>
             </div>
@@ -1578,8 +1578,8 @@ export default function DriverDashboard() {
             {/* Map */}
             <Card className="mb-6 bg-white border-slate-200">
               <CardHeader>
-                <CardTitle className="text-slate-900">Parking Locations</CardTitle>
-                <CardDescription className="text-slate-600">Click on any spot to view details and book</CardDescription>
+                <CardTitle className="text-slate-900">{t('map.parkingLocations')}</CardTitle>
+                <CardDescription className="text-slate-600">{t('map.clickToBook')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="map-container rounded-lg overflow-hidden" data-testid="map-container">
@@ -1605,7 +1605,7 @@ export default function DriverDashboard() {
                     </GoogleMap>
                   ) : (
                     <div className="bg-slate-800 flex items-center justify-center" style={mapContainerStyle}>
-                      <p className="text-slate-400">Loading map...</p>
+                      <p className="text-slate-400">{t('map.loadingMap')}</p>
                     </div>
                   )}
                 </div>
@@ -1615,9 +1615,9 @@ export default function DriverDashboard() {
             {/* Spots List */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {loading ? (
-                <p className="col-span-full text-center text-muted-foreground">Loading parking spots...</p>
+                <p className="col-span-full text-center text-muted-foreground">{t('map.loadingSpots')}</p>
               ) : spots.length === 0 ? (
-                <p className="col-span-full text-center text-muted-foreground">No parking spots found</p>
+                <p className="col-span-full text-center text-muted-foreground">{t('map.noSpotsFound')}</p>
               ) : (
                 spots.map((spot) => (
                   <Card key={spot.id} className="card-hover cursor-pointer" onClick={() => navigate(`/spot/${spot.id}`)} data-testid={`spot-card-${spot.id}`}>
@@ -1629,15 +1629,15 @@ export default function DriverDashboard() {
                         </div>
                         <div className="flex flex-col gap-1">
                           {spot.available_spaces > 0 ? (
-                            <Badge className="status-available">Available</Badge>
+                            <Badge className="status-available">{t('map.available')}</Badge>
                           ) : (
-                            <Badge className="status-full">Full</Badge>
+                            <Badge className="status-full">{t('map.full')}</Badge>
                           )}
                           {/* Predictive Badge */}
                           {spot.available_spaces > 0 && spot.available_spaces <= spot.total_spaces * 0.5 && (
                             <Badge className="bg-secondary/20 text-secondary text-xs" data-testid="trend-filling">
                               <TrendingUp className="w-3 h-3 mr-1" />
-                              Filling
+                              {t('map.filling')}
                             </Badge>
                           )}
                         </div>
@@ -1646,13 +1646,13 @@ export default function DriverDashboard() {
                     <CardContent>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Spaces</span>
+                          <span className="text-sm text-muted-foreground">{t('map.spaces')}</span>
                           <span className="font-bold mono">{spot.available_spaces}/{spot.total_spaces}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Price</span>
+                          <span className="text-sm text-muted-foreground">{t('map.price')}</span>
                           <span className="font-bold mono text-primary">
-                            {spot.is_free ? "FREE" : `$${spot.price_per_night}/night`}
+                            {spot.is_free ? t('map.free') : `$${spot.price_per_night}${t('map.perNight')}`}
                           </span>
                         </div>
                         {/* Predicted availability for next few hours */}
@@ -1660,7 +1660,7 @@ export default function DriverDashboard() {
                           <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-md p-2">
                             <p className="text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
                               <AlertTriangle className="w-3 h-3" />
-                              <span>Likely to fill in 2-3 hours</span>
+                              <span>{t('map.likelyToFill')}</span>
                             </p>
                           </div>
                         )}
@@ -1673,7 +1673,7 @@ export default function DriverDashboard() {
                         </div>
                         {spot.fuel_price_diesel && (
                           <div className="text-sm text-muted-foreground">
-                            Diesel: <span className="fuel-price text-primary">${spot.fuel_price_diesel}</span>
+                            {t('map.diesel')}: <span className="fuel-price text-primary">${spot.fuel_price_diesel}</span>
                           </div>
                         )}
                       </div>
