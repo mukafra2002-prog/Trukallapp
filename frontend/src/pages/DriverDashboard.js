@@ -1093,6 +1093,42 @@ export default function DriverDashboard() {
             <FileText className="w-4 h-4 mr-2" />
             FMCSA Verify
           </Button>
+          <Button
+            variant={activeTab === "pretrip" ? "default" : "outline"}
+            onClick={() => setActiveTab("pretrip")}
+            className={`touch-target ${activeTab === "pretrip" ? "bg-green-600 hover:bg-green-700" : "border-green-300 text-green-700"}`}
+            data-testid="tab-pretrip"
+          >
+            <ClipboardCheck className="w-4 h-4 mr-2" />
+            Pre-Trip
+          </Button>
+          <Button
+            variant={activeTab === "expenses" ? "default" : "outline"}
+            onClick={() => setActiveTab("expenses")}
+            className={`touch-target ${activeTab === "expenses" ? "bg-teal-600 hover:bg-teal-700" : "border-teal-300 text-teal-700"}`}
+            data-testid="tab-expenses"
+          >
+            <DollarSign className="w-4 h-4 mr-2" />
+            Expenses
+          </Button>
+          <Button
+            variant={activeTab === "breaktimer" ? "default" : "outline"}
+            onClick={() => setActiveTab("breaktimer")}
+            className={`touch-target ${activeTab === "breaktimer" ? "bg-purple-600 hover:bg-purple-700" : "border-purple-300 text-purple-700"}`}
+            data-testid="tab-breaktimer"
+          >
+            <Timer className="w-4 h-4 mr-2" />
+            Break Timer
+          </Button>
+          <Button
+            variant={activeTab === "fueltrack" ? "default" : "outline"}
+            onClick={() => setActiveTab("fueltrack")}
+            className={`touch-target ${activeTab === "fueltrack" ? "bg-yellow-600 hover:bg-yellow-700" : "border-yellow-300 text-yellow-700"}`}
+            data-testid="tab-fueltrack"
+          >
+            <Fuel className="w-4 h-4 mr-2" />
+            Fuel Tracker
+          </Button>
         </div>
 
         {/* Onboarding Tutorial */}
