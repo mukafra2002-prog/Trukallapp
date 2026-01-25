@@ -166,6 +166,25 @@
     "thisYear": "This Year",
     "allTime": "All Time"
   },
+  "map": {
+    "availableNow": "Available Now",
+    "freeParking": "Free Parking",
+    "highSecurity": "High Security",
+    "parkingLocations": "Parking Locations",
+    "clickToBook": "Click on any spot to view details and book",
+    "loadingMap": "Loading map...",
+    "loadingSpots": "Loading parking spots...",
+    "noSpotsFound": "No parking spots found",
+    "available": "Available",
+    "full": "Full",
+    "filling": "Filling",
+    "likelyToFill": "Likely to fill in 2-3 hours",
+    "spaces": "Spaces",
+    "price": "Price",
+    "free": "FREE",
+    "perNight": "/night",
+    "diesel": "Diesel"
+  },
   "preTrip": {
     "title": "Pre-Trip Inspection Checklist",
     "description": "DOT-compliant vehicle inspection. Complete all critical items before driving.",
