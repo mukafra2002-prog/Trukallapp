@@ -240,7 +240,10 @@ TrukAll is a comprehensive Progressive Web App (PWA) for truck drivers that solv
 - **Email Service** - Password reset shows code in UI toast (no real email)
 - **Push Notifications** - Backend ready, frontend pending
 - **Microsoft Clarity** - Script added with placeholder ID
-- **FMCSA/EIA APIs** - Backend endpoints use demo data, need real API keys
+- **FMCSA API** - Backend endpoint uses demo data, needs WebKey from user
+
+## Real API Integrations (Working)
+- **EIA Fuel Prices** - ✅ Real national diesel & gas prices from U.S. Energy Information Administration
 
 ## Completed Tasks (Jan 25, 2026)
 - [x] ~~Complete i18n for remaining dashboard tabs and content~~ - DONE
