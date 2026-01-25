@@ -1,145 +1,125 @@
 {
   "hero": {
-    "badge": "Über 10.000 LKW-Fahrer vertrauen uns",
-    "title": "Fahre nie wieder zu einem",
+    "badge": "Vertraut von über 10.000 LKW-Fahrern",
+    "title": "Fahren Sie nie wieder zu einem",
     "titleHighlight": "Vollen Parkplatz",
     "titleEnd": "",
-    "subtitle": "Finde sicheres Parken in Sekunden, verdiene Geld mit Frachtbörse, verfolge Ausgaben und schließe dich Konvois an.",
-    "cta": "Heute Kostenlos Starten",
-    "secondary": "Siehe Wie Es Funktioniert",
+    "subtitle": "Finden Sie sicheres Parken in Sekunden, verdienen Sie Geld mit der Ladeliste.",
+    "cta": "Jetzt Kostenlos Starten",
     "trust1": "100% Für Immer Kostenlos",
     "trust2": "Keine Kreditkarte Erforderlich",
-    "trust3": "Funktioniert auf iPhone & Android"
+    "trust3": "Funktioniert auf iPhone und Android"
   },
-  "stats": {
-    "drivers": "Aktive Fahrer",
-    "saved": "Pro Jahr Gespart",
-    "updates": "Echtzeit-Updates",
-    "rating": "Fahrerbewertung"
-  },
-  "features": {
-    "title": "Wir Lösen",
-    "titleHighlight": "Jedes Problem",
-    "subtitle": "Hör auf Geld, Zeit und Schlaf zu verlieren. TrukAll löst die 10 größten Probleme der LKW-Fahrer.",
-    "parking": {
-      "title": "Parkplatz 24h Vorher Reservieren",
-      "desc": "Fahre nie wieder zu einem vollen Parkplatz. Reserviere deinen Platz vor der Abfahrt.",
-      "benefit": "Spare $4.600/Jahr"
-    },
-    "loadBoard": {
-      "title": "Frachtbörse + Rechner",
-      "desc": "Finde zahlende Frachten und wisse ob sie profitabel sind bevor du akzeptierst.",
-      "benefit": "Verdiene mehr pro Meile"
-    },
-    "convoy": {
-      "title": "Konvoi-Finder + Chat",
-      "desc": "Finde Fahrer auf deiner Route. Fahrt zusammen für Sicherheit und Gesellschaft.",
-      "benefit": "Sicherere Langstrecken"
-    },
-    "emergency": {
-      "title": "Notfall-SOS + GPS",
-      "desc": "Ein-Tipp-Notfallknopf sendet deinen Standort für sofortige Hilfe.",
-      "benefit": "Lebensrettende Funktion"
-    },
-    "reviews": {
-      "title": "Verifizierte Fahrer-Bewertungen",
-      "desc": "Echte Bewertungen von echten Fahrern. Wisse was gut ist bevor du fährst.",
-      "benefit": "Community-gestütztes Vertrauen"
-    },
-    "rewards": {
-      "title": "Belohnungs- & Punktesystem",
-      "desc": "Verdiene Punkte für Buchungen, Bewertungen und sicheres Fahren.",
-      "benefit": "Werde fürs Nutzen bezahlt"
-    }
-  },
-  "killerFeatures": {
-    "title": "Sieh Unsere",
-    "titleHighlight": "Killer-Funktionen",
-    "subtitle": "Diese Funktionen heben TrukAll von jeder anderen LKW-App ab",
-    "hos": {
-      "title": "Lenkzeit-Tracker",
-      "desc": "Nie wieder DOT-Verstöße. Verfolge Fahrzeit, Dienstfenster und Wochenlimits.",
-      "stat": "$16.000",
-      "statLabel": "durchschn. Strafe vermieden"
-    },
-    "weight": {
-      "title": "Intelligenter Gewichts-Rechner",
-      "desc": "Kenne dein genaues Achsgewicht vor der Waage. Speichere mehrere LKW-Profile.",
-      "stat": "100%",
-      "statLabel": "Waagen-Genauigkeit"
-    },
-    "qr": {
-      "title": "QR-Code Scanner",
-      "desc": "Scanne QR-Codes an Raststätten für sofortiges Check-in. Teile deinen Empfehlungscode.",
-      "stat": "500+",
-      "statLabel": "Bonuspunkte"
-    },
-    "realtime": {
-      "title": "Echtzeit-Verfügbarkeit",
-      "desc": "Sieh Live-Updates von anderen Fahrern. Wisse wie voll jeder Parkplatz ist.",
-      "stat": "30Sek",
-      "statLabel": "Update-Frequenz"
-    }
-  },
-  "testimonials": {
-    "title": "Was Fahrer",
-    "titleHighlight": "Sagen",
-    "reviews": [
-      {
-        "name": "Hans Müller",
-        "location": "Berlin, Deutschland",
-        "text": "Diese App hat meine Karriere gerettet! Seit ich sie nutze, habe ich keine Lenkzeitstrafe mehr bekommen.",
-        "rating": 5
-      },
-      {
-        "name": "Klaus Schmidt",
-        "location": "München",
-        "text": "Der Gewichtsrechner ist perfekt. Ich habe Tausende an Überladungsstrafen gespart.",
-        "rating": 5
-      }
-    ]
-  },
-  "cta": {
-    "title": "Schließe dich 10.000+ Fahrern an",
-    "subtitle": "Beginne heute sicheres Parken zu finden und mehr zu verdienen.",
-    "button": "Jetzt Kostenlos Starten"
-  },
-  "nav": {
-    "login": "Anmelden",
-    "signup": "Kostenlos Registrieren",
-    "logout": "Abmelden"
-  },
+  "nav": { "login": "Anmelden", "signup": "Registrieren", "logout": "Abmelden" },
   "auth": {
     "welcome": "Willkommen Zurück",
-    "createAccount": "Kostenloses Konto Erstellen",
-    "loginDesc": "Melde dich bei deinem TrukAll-Konto an",
-    "signupDesc": "Schließe dich 10.000+ Fahrern an",
     "email": "E-Mail",
     "password": "Passwort",
     "name": "Vollständiger Name",
-    "role": "Ich bin",
     "driver": "LKW-Fahrer",
-    "partner": "Parkplatz-Besitzer",
-    "forgotPassword": "Passwort vergessen?",
+    "partner": "Parkplatzbesitzer",
     "loginBtn": "ANMELDEN",
-    "signupBtn": "Kostenloses Konto Erstellen",
-    "demoBtn": "Demo Testen",
-    "noAccount": "Kein Konto?",
-    "hasAccount": "Bereits ein Konto?",
-    "signupFree": "Kostenlos registrieren",
-    "agreeTerms": "Ich stimme den",
-    "terms": "Nutzungsbedingungen",
-    "privacy": "Datenschutzrichtlinie",
-    "and": "und"
+    "demoBtn": "Demo-Konto Testen"
   },
   "dashboard": {
-    "points": "Deine Punkte",
+    "points": "Ihre Punkte",
     "howToEarn": "Wie verdienen?",
-    "fatigue": "Müdigkeitsstatus",
+    "fatigue": "Ermüdungsstatus",
     "allGood": "ALLES GUT",
-    "takeBreak": "MACH PAUSE!",
-    "wakeUp": "Weck-Alarm",
-    "notSet": "Nicht eingestellt"
+    "takeBreak": "PAUSE MACHEN!",
+    "takeBreakSoon": "BALD PAUSE",
+    "wakeUp": "Weckalarm",
+    "notSet": "Nicht eingestellt",
+    "truckDriver": "LKW-Fahrer",
+    "searchPlaceholder": "Nach Stadt suchen"
+  },
+  "tabs": {
+    "live": "LIVE",
+    "map": "Parken Finden",
+    "bookings": "Meine Buchungen",
+    "showers": "Dusch-Guthaben",
+    "brokers": "Makler-Bewertungen",
+    "convoy": "Konvoi",
+    "loads": "Ladungstafel",
+    "calculator": "Rechner",
+    "compliance": "DOT-Konformität",
+    "emergency": "SOS",
+    "documents": "Dokumente",
+    "fuel": "Kraftstoffpreise",
+    "weather": "Wetterwarnungen",
+    "analytics": "Analytik",
+    "route": "Routenplaner",
+    "forums": "Foren",
+    "hazards": "Gefahren",
+    "earnings": "Einnahmen",
+    "preTrip": "Vor-Fahrt",
+    "expenses": "Ausgaben",
+    "breakTimer": "Pausentimer",
+    "fuelTracker": "Kraftstoff-Tracker",
+    "smartLoads": "Intelligente Ladungen",
+    "brokerScore": "Makler-Score",
+    "rateCompare": "Tarife Vergleichen",
+    "profitCalc": "Gewinn-Rechner",
+    "fmcsa": "FMCSA-Prüfung"
+  },
+  "common": {
+    "loading": "Laden...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "search": "Suchen",
+    "submit": "Absenden",
+    "close": "Schließen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "info": "Info",
+    "set": "Einstellen",
+    "add": "Hinzufügen",
+    "refresh": "Aktualisieren",
+    "report": "Melden",
+    "all": "Alle",
+    "thisWeek": "Diese Woche",
+    "thisMonth": "Dieser Monat"
+  },
+  "preTrip": {
+    "title": "Vor-Fahrt-Checkliste",
+    "description": "DOT-konforme Fahrzeuginspektion.",
+    "progress": "Inspektionsfortschritt",
+    "critical": "Kritisch",
+    "exterior": "Außen",
+    "interior": "Innen",
+    "trailer": "Anhänger",
+    "fluids": "Flüssigkeiten",
+    "complete": "Inspektion Abschließen"
+  },
+  "expenses": {
+    "title": "Ausgaben-Tracker",
+    "addExpense": "Ausgabe Hinzufügen",
+    "totalExpenses": "Gesamtausgaben",
+    "categories": {
+      "fuel": "Kraftstoff",
+      "food": "Essen",
+      "repairs": "Reparaturen",
+      "tolls": "Maut",
+      "parking": "Parken",
+      "other": "Sonstiges"
+    }
+  },
+  "hazards": {
+    "title": "Straßengefahren-Warnungen",
+    "reportHazard": "Gefahr Melden",
+    "types": {
+      "accident": "Unfall",
+      "construction": "Baustelle",
+      "weather": "Wettergefahr",
+      "traffic": "Starker Verkehr"
+    }
+  },
+  "earnings": {
+    "title": "Einnahmen-Dashboard",
+    "logEarning": "Einnahme Hinzufügen",
+    "totalEarnings": "Gesamteinnahmen",
+    "milesDriven": "Gefahrene Meilen"
   },
   "language": "Sprache"
 }

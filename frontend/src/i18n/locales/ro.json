@@ -1,145 +1,125 @@
 {
   "hero": {
-    "badge": "Încredere de peste 10.000 de șoferi de camion",
-    "title": "Nu mai conduce niciodată la o",
+    "badge": "De încredere pentru peste 10.000 de șoferi de camion",
+    "title": "Nu mai conduce niciodată către o",
     "titleHighlight": "Parcare Plină",
     "titleEnd": "",
-    "subtitle": "Găsește parcare sigură în secunde, câștigă bani cu tabla de încărcături, urmărește cheltuielile și alătură-te convoaielor.",
+    "subtitle": "Găsește parcare sigură în câteva secunde, câștigă bani cu panoul de încărcături.",
     "cta": "Începe Gratuit Azi",
-    "secondary": "Vezi Cum Funcționează",
     "trust1": "100% Gratuit Pentru Totdeauna",
     "trust2": "Fără Card de Credit",
     "trust3": "Funcționează pe iPhone și Android"
   },
-  "stats": {
-    "drivers": "Șoferi Activi",
-    "saved": "Economisit Pe An",
-    "updates": "Actualizări în Timp Real",
-    "rating": "Evaluare Șoferi"
-  },
-  "features": {
-    "title": "Rezolvăm",
-    "titleHighlight": "Fiecare Problemă",
-    "subtitle": "Nu mai pierde bani, timp și somn. TrukAll rezolvă cele 10 probleme majore ale șoferilor.",
-    "parking": {
-      "title": "Rezervă Parcare cu 24h Înainte",
-      "desc": "Nu mai conduce la o parcare plină. Rezervă-ți locul înainte de plecare.",
-      "benefit": "Economisește $4.600/an"
-    },
-    "loadBoard": {
-      "title": "Tablă Încărcături + Calculator",
-      "desc": "Găsește încărcături plătite și află dacă sunt profitabile înainte să accepți.",
-      "benefit": "Câștigă mai mult pe milă"
-    },
-    "convoy": {
-      "title": "Găsitor Convoi + Chat",
-      "desc": "Găsește șoferi pe ruta ta. Călătoriți împreună pentru siguranță.",
-      "benefit": "Curse mai sigure"
-    },
-    "emergency": {
-      "title": "SOS de Urgență + GPS",
-      "desc": "Buton de urgență cu o atingere trimite locația ta pentru ajutor instant.",
-      "benefit": "Funcție salvatoare de vieți"
-    },
-    "reviews": {
-      "title": "Recenzii Verificate",
-      "desc": "Recenzii reale de la șoferi reali. Află ce e bun înainte să mergi.",
-      "benefit": "Încredere din comunitate"
-    },
-    "rewards": {
-      "title": "Sistem de Recompense",
-      "desc": "Câștigă puncte pentru rezervări, recenzii și condus sigur.",
-      "benefit": "Ești plătit să folosești"
-    }
-  },
-  "killerFeatures": {
-    "title": "Vezi",
-    "titleHighlight": "Funcțiile Killer",
-    "subtitle": "Aceste funcții fac TrukAll diferit de orice altă aplicație pentru camioane",
-    "hos": {
-      "title": "Tracker Ore de Serviciu",
-      "desc": "Nu mai primi niciodată o încălcare DOT. Urmărește orele de condus și limitele săptămânale.",
-      "stat": "$16.000",
-      "statLabel": "amendă medie evitată"
-    },
-    "weight": {
-      "title": "Calculator Greutate Inteligent",
-      "desc": "Află greutatea exactă a osiilor înainte de cântar. Salvează mai multe profile.",
-      "stat": "100%",
-      "statLabel": "acuratețe cântar"
-    },
-    "qr": {
-      "title": "Scanner Cod QR",
-      "desc": "Scanează coduri QR la opriri pentru check-in instant. Împărtășește codul de recomandare.",
-      "stat": "500+",
-      "statLabel": "puncte bonus"
-    },
-    "realtime": {
-      "title": "Disponibilitate în Timp Real",
-      "desc": "Vezi actualizări live de la alți șoferi. Află cât de plin e fiecare loc.",
-      "stat": "30sec",
-      "statLabel": "frecvență actualizare"
-    }
-  },
-  "testimonials": {
-    "title": "Ce Spun",
-    "titleHighlight": "Șoferii",
-    "reviews": [
-      {
-        "name": "Ion Popescu",
-        "location": "București, România",
-        "text": "Această aplicație mi-a salvat cariera! Nu am mai primit nicio amendă HOS de când o folosesc.",
-        "rating": 5
-      },
-      {
-        "name": "Andrei Ionescu",
-        "location": "Cluj-Napoca",
-        "text": "Calculatorul de greutate e perfect. Am economisit mii în amenzi de supraîncărcare.",
-        "rating": 5
-      }
-    ]
-  },
-  "cta": {
-    "title": "Alătură-te la 10.000+ Șoferi",
-    "subtitle": "Începe să găsești parcare sigură și să câștigi mai mult azi.",
-    "button": "Începe Gratuit Acum"
-  },
-  "nav": {
-    "login": "Autentificare",
-    "signup": "Înregistrare Gratuită",
-    "logout": "Deconectare"
-  },
+  "nav": { "login": "Autentificare", "signup": "Înregistrare", "logout": "Deconectare" },
   "auth": {
     "welcome": "Bine ai Revenit",
-    "createAccount": "Creează Cont Gratuit",
-    "loginDesc": "Conectează-te la contul TrukAll",
-    "signupDesc": "Alătură-te la 10.000+ șoferi",
     "email": "Email",
     "password": "Parolă",
     "name": "Nume Complet",
-    "role": "Sunt",
     "driver": "Șofer de Camion",
     "partner": "Proprietar Parcare",
-    "forgotPassword": "Ai uitat parola?",
     "loginBtn": "AUTENTIFICARE",
-    "signupBtn": "Creează Cont Gratuit",
-    "demoBtn": "Încearcă Demo",
-    "noAccount": "Nu ai cont?",
-    "hasAccount": "Ai deja cont?",
-    "signupFree": "Înregistrează-te gratuit",
-    "agreeTerms": "Sunt de acord cu",
-    "terms": "Termenii de Serviciu",
-    "privacy": "Politica de Confidențialitate",
-    "and": "și"
+    "demoBtn": "Încearcă Cont Demo"
   },
   "dashboard": {
     "points": "Punctele Tale",
     "howToEarn": "Cum câștigi?",
-    "fatigue": "Status Oboseală",
+    "fatigue": "Stare de Oboseală",
     "allGood": "TOTUL BINE",
-    "takeBreak": "IA O PAUZĂ!",
+    "takeBreak": "FA O PAUZĂ!",
+    "takeBreakSoon": "PAUZĂ ÎN CURÂND",
     "wakeUp": "Alarmă de Trezire",
-    "notSet": "Nesetat"
+    "notSet": "Nesetat",
+    "truckDriver": "Șofer de Camion",
+    "searchPlaceholder": "Caută după oraș"
+  },
+  "tabs": {
+    "live": "ÎN DIRECT",
+    "map": "Găsește Parcare",
+    "bookings": "Rezervările Mele",
+    "showers": "Credite Duș",
+    "brokers": "Evaluări Brokeri",
+    "convoy": "Convoi",
+    "loads": "Panou Încărcături",
+    "calculator": "Calculator",
+    "compliance": "Conformitate DOT",
+    "emergency": "SOS",
+    "documents": "Documente",
+    "fuel": "Prețuri Combustibil",
+    "weather": "Alerte Meteo",
+    "analytics": "Analize",
+    "route": "Planificator Rută",
+    "forums": "Forumuri",
+    "hazards": "Pericole",
+    "earnings": "Câștiguri",
+    "preTrip": "Pre-Călătorie",
+    "expenses": "Cheltuieli",
+    "breakTimer": "Cronometru",
+    "fuelTracker": "Urmărire Combustibil",
+    "smartLoads": "Încărcături Inteligente",
+    "brokerScore": "Scor Broker",
+    "rateCompare": "Compară Tarife",
+    "profitCalc": "Calc. Profit",
+    "fmcsa": "Verificare FMCSA"
+  },
+  "common": {
+    "loading": "Se încarcă...",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "delete": "Șterge",
+    "search": "Caută",
+    "submit": "Trimite",
+    "close": "Închide",
+    "back": "Înapoi",
+    "next": "Următorul",
+    "info": "Info",
+    "set": "Setează",
+    "add": "Adaugă",
+    "refresh": "Actualizează",
+    "report": "Raportează",
+    "all": "Toate",
+    "thisWeek": "Săptămâna Aceasta",
+    "thisMonth": "Luna Aceasta"
+  },
+  "preTrip": {
+    "title": "Lista de Verificare Pre-Călătorie",
+    "description": "Inspecție vehicul conform DOT.",
+    "progress": "Progres Inspecție",
+    "critical": "Critic",
+    "exterior": "Exterior",
+    "interior": "Interior",
+    "trailer": "Remorcă",
+    "fluids": "Fluide",
+    "complete": "Finalizează Inspecția"
+  },
+  "expenses": {
+    "title": "Urmărire Cheltuieli",
+    "addExpense": "Adaugă Cheltuială",
+    "totalExpenses": "Cheltuieli Totale",
+    "categories": {
+      "fuel": "Combustibil",
+      "food": "Mâncare",
+      "repairs": "Reparații",
+      "tolls": "Taxe Drum",
+      "parking": "Parcare",
+      "other": "Altele"
+    }
+  },
+  "hazards": {
+    "title": "Alerte Pericole Rutiere",
+    "reportHazard": "Raportează Pericol",
+    "types": {
+      "accident": "Accident",
+      "construction": "Construcție",
+      "weather": "Pericol Meteo",
+      "traffic": "Trafic Intens"
+    }
+  },
+  "earnings": {
+    "title": "Panou Câștiguri",
+    "logEarning": "Adaugă Câștig",
+    "totalEarnings": "Câștiguri Totale",
+    "milesDriven": "Mile Parcurse"
   },
   "language": "Limbă"
 }

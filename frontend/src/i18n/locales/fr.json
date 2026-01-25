@@ -1,136 +1,25 @@
 {
   "hero": {
-    "badge": "Plus de 10 000 camionneurs nous font confiance",
+    "badge": "Confié par plus de 10 000 camionneurs",
     "title": "Ne conduisez plus jamais vers un",
     "titleHighlight": "Parking Plein",
     "titleEnd": "",
-    "subtitle": "Trouvez un stationnement sûr en quelques secondes, gagnez de l'argent avec le tableau des charges, suivez vos dépenses et rejoignez des convois.",
-    "cta": "Commencez Gratuitement",
-    "secondary": "Voir Comment Ça Marche",
+    "subtitle": "Trouvez un stationnement sécurisé en quelques secondes, gagnez de l'argent avec le tableau de charges.",
+    "cta": "Commencer Gratuitement",
     "trust1": "100% Gratuit Pour Toujours",
-    "trust2": "Pas de Carte de Crédit",
+    "trust2": "Sans Carte de Crédit",
     "trust3": "Fonctionne sur iPhone et Android"
   },
-  "stats": {
-    "drivers": "Chauffeurs Actifs",
-    "saved": "Économisé Par An",
-    "updates": "Mises à Jour en Temps Réel",
-    "rating": "Note des Chauffeurs"
-  },
-  "features": {
-    "title": "Nous Résolvons",
-    "titleHighlight": "Chaque Problème",
-    "subtitle": "Arrêtez de perdre de l'argent, du temps et du sommeil. TrukAll résout les 10 problèmes majeurs des camionneurs.",
-    "parking": {
-      "title": "Réservez un Parking 24h à l'Avance",
-      "desc": "Ne conduisez plus jamais vers un parking plein. Réservez votre place avant de partir.",
-      "benefit": "Économisez 4 600$/an"
-    },
-    "loadBoard": {
-      "title": "Tableau des Charges + Calculateur",
-      "desc": "Trouvez des charges payantes et sachez si elles sont rentables avant d'accepter.",
-      "benefit": "Gagnez plus par mile"
-    },
-    "convoy": {
-      "title": "Recherche de Convoi + Chat",
-      "desc": "Trouvez des chauffeurs sur votre route. Voyagez ensemble pour la sécurité.",
-      "benefit": "Trajets plus sûrs"
-    },
-    "emergency": {
-      "title": "SOS d'Urgence + GPS",
-      "desc": "Bouton d'urgence en un clic envoie votre position pour une aide instantanée.",
-      "benefit": "Fonction qui sauve des vies"
-    },
-    "reviews": {
-      "title": "Avis Vérifiés des Chauffeurs",
-      "desc": "De vrais avis de vrais chauffeurs. Sachez ce qui est bien avant d'y aller.",
-      "benefit": "Confiance de la communauté"
-    },
-    "rewards": {
-      "title": "Système de Récompenses",
-      "desc": "Gagnez des points pour les réservations, avis et conduite sûre.",
-      "benefit": "Soyez payé pour l'utiliser"
-    }
-  },
-  "killerFeatures": {
-    "title": "Découvrez Nos",
-    "titleHighlight": "Fonctions Exceptionnelles",
-    "subtitle": "Ces fonctionnalités distinguent TrukAll de toutes les autres applications de camionnage",
-    "hos": {
-      "title": "Suivi des Heures de Service",
-      "desc": "Plus jamais de violation DOT. Suivez les heures de conduite et les limites hebdomadaires.",
-      "stat": "16 000$",
-      "statLabel": "amende moyenne évitée"
-    },
-    "weight": {
-      "title": "Calculateur de Poids Intelligent",
-      "desc": "Connaissez le poids exact de vos essieux avant la balance. Enregistrez plusieurs profils.",
-      "stat": "100%",
-      "statLabel": "précision de la balance"
-    },
-    "qr": {
-      "title": "Scanner de Code QR",
-      "desc": "Scannez les codes QR aux arrêts pour un check-in instantané. Partagez votre code de parrainage.",
-      "stat": "500+",
-      "statLabel": "points bonus"
-    },
-    "realtime": {
-      "title": "Disponibilité en Temps Réel",
-      "desc": "Voyez les mises à jour en direct des autres chauffeurs. Sachez à quel point chaque parking est plein.",
-      "stat": "30sec",
-      "statLabel": "fréquence de mise à jour"
-    }
-  },
-  "testimonials": {
-    "title": "Ce Que Disent",
-    "titleHighlight": "Les Chauffeurs",
-    "reviews": [
-      {
-        "name": "Pierre Dubois",
-        "location": "Montréal, Canada",
-        "text": "Cette appli a sauvé ma carrière! Je n'ai plus eu d'amende HOS depuis que je l'utilise.",
-        "rating": 5
-      },
-      {
-        "name": "Jean Martin",
-        "location": "Paris, France",
-        "text": "Le calculateur de poids est parfait. J'ai économisé des milliers en amendes de surcharge.",
-        "rating": 5
-      }
-    ]
-  },
-  "cta": {
-    "title": "Rejoignez 10 000+ Chauffeurs",
-    "subtitle": "Commencez à trouver un parking sûr et à gagner plus aujourd'hui.",
-    "button": "Commencer Gratuitement"
-  },
-  "nav": {
-    "login": "Connexion",
-    "signup": "Inscription Gratuite",
-    "logout": "Déconnexion"
-  },
+  "nav": { "login": "Connexion", "signup": "Inscription", "logout": "Déconnexion" },
   "auth": {
     "welcome": "Bon Retour",
-    "createAccount": "Créer un Compte Gratuit",
-    "loginDesc": "Connectez-vous à votre compte TrukAll",
-    "signupDesc": "Rejoignez 10 000+ chauffeurs",
     "email": "Email",
     "password": "Mot de passe",
     "name": "Nom Complet",
-    "role": "Je suis",
-    "driver": "Camionneur",
+    "driver": "Chauffeur Routier",
     "partner": "Propriétaire de Parking",
-    "forgotPassword": "Mot de passe oublié?",
     "loginBtn": "CONNEXION",
-    "signupBtn": "Créer un Compte Gratuit",
-    "demoBtn": "Essayer la Démo",
-    "noAccount": "Pas de compte?",
-    "hasAccount": "Déjà un compte?",
-    "signupFree": "Inscrivez-vous gratuitement",
-    "agreeTerms": "J'accepte les",
-    "terms": "Conditions d'Utilisation",
-    "privacy": "Politique de Confidentialité",
-    "and": "et"
+    "demoBtn": "Essayer le Compte Démo"
   },
   "dashboard": {
     "points": "Vos Points",
@@ -138,8 +27,99 @@
     "fatigue": "État de Fatigue",
     "allGood": "TOUT VA BIEN",
     "takeBreak": "FAITES UNE PAUSE!",
+    "takeBreakSoon": "PAUSE BIENTÔT",
     "wakeUp": "Alarme de Réveil",
-    "notSet": "Non défini"
+    "notSet": "Non défini",
+    "truckDriver": "Chauffeur Routier",
+    "searchPlaceholder": "Rechercher par ville"
+  },
+  "tabs": {
+    "live": "EN DIRECT",
+    "map": "Trouver Parking",
+    "bookings": "Mes Réservations",
+    "showers": "Crédits Douche",
+    "brokers": "Notes Courtiers",
+    "convoy": "Convoi",
+    "loads": "Tableau de Charges",
+    "calculator": "Calculateur",
+    "compliance": "Conformité DOT",
+    "emergency": "SOS",
+    "documents": "Documents",
+    "fuel": "Prix Carburant",
+    "weather": "Alertes Météo",
+    "analytics": "Analytique",
+    "route": "Planificateur",
+    "forums": "Forums",
+    "hazards": "Dangers",
+    "earnings": "Revenus",
+    "preTrip": "Pré-Voyage",
+    "expenses": "Dépenses",
+    "breakTimer": "Minuteur",
+    "fuelTracker": "Suivi Carburant",
+    "smartLoads": "Charges Intelligentes",
+    "brokerScore": "Score Courtier",
+    "rateCompare": "Comparer Tarifs",
+    "profitCalc": "Calc. Profit",
+    "fmcsa": "Vérification FMCSA"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "search": "Rechercher",
+    "submit": "Soumettre",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "info": "Info",
+    "set": "Définir",
+    "add": "Ajouter",
+    "refresh": "Actualiser",
+    "report": "Signaler",
+    "all": "Tout",
+    "thisWeek": "Cette Semaine",
+    "thisMonth": "Ce Mois"
+  },
+  "preTrip": {
+    "title": "Liste de Contrôle Pré-Voyage",
+    "description": "Inspection de véhicule conforme DOT.",
+    "progress": "Progression de l'Inspection",
+    "critical": "Critique",
+    "exterior": "Extérieur",
+    "interior": "Intérieur",
+    "trailer": "Remorque",
+    "fluids": "Fluides",
+    "complete": "Terminer l'Inspection"
+  },
+  "expenses": {
+    "title": "Suivi des Dépenses",
+    "addExpense": "Ajouter Dépense",
+    "totalExpenses": "Dépenses Totales",
+    "categories": {
+      "fuel": "Carburant",
+      "food": "Nourriture",
+      "repairs": "Réparations",
+      "tolls": "Péages",
+      "parking": "Parking",
+      "other": "Autre"
+    }
+  },
+  "hazards": {
+    "title": "Alertes Dangers Routiers",
+    "reportHazard": "Signaler un Danger",
+    "types": {
+      "accident": "Accident",
+      "construction": "Construction",
+      "weather": "Danger Météo",
+      "traffic": "Trafic Dense"
+    }
+  },
+  "earnings": {
+    "title": "Tableau de Bord des Revenus",
+    "logEarning": "Ajouter Revenu",
+    "totalEarnings": "Revenus Totaux",
+    "milesDriven": "Miles Parcourus"
   },
   "language": "Langue"
 }
