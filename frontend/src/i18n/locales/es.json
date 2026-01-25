@@ -121,6 +121,25 @@
     "thisYear": "Este Año",
     "allTime": "Todo el Tiempo"
   },
+  "map": {
+    "availableNow": "Disponible Ahora",
+    "freeParking": "Estacionamiento Gratis",
+    "highSecurity": "Alta Seguridad",
+    "parkingLocations": "Ubicaciones de Estacionamiento",
+    "clickToBook": "Haga clic en cualquier lugar para ver detalles y reservar",
+    "loadingMap": "Cargando mapa...",
+    "loadingSpots": "Cargando lugares de estacionamiento...",
+    "noSpotsFound": "No se encontraron lugares de estacionamiento",
+    "available": "Disponible",
+    "full": "Lleno",
+    "filling": "Llenándose",
+    "likelyToFill": "Probablemente se llenará en 2-3 horas",
+    "spaces": "Espacios",
+    "price": "Precio",
+    "free": "GRATIS",
+    "perNight": "/noche",
+    "diesel": "Diésel"
+  },
   "preTrip": {
     "title": "Lista de Inspección Pre-Viaje",
     "description": "Inspección de vehículo conforme al DOT.",
