@@ -1280,6 +1280,26 @@ export default function DriverDashboard() {
           <CarrierVerification />
         )}
 
+        {/* Pre-Trip Inspection Checklist Tab */}
+        {activeTab === "pretrip" && (
+          <PreTripChecklist />
+        )}
+
+        {/* Expense Tracker Tab */}
+        {activeTab === "expenses" && (
+          <ExpenseTracker />
+        )}
+
+        {/* Break Timer Tab */}
+        {activeTab === "breaktimer" && (
+          <BreakTimer />
+        )}
+
+        {/* Fuel Efficiency Tracker Tab */}
+        {activeTab === "fueltrack" && (
+          <FuelEfficiencyTracker />
+        )}
+
         {/* LIVE Updates Tab */}
         {activeTab === "live" && (
           <div className="space-y-6">
