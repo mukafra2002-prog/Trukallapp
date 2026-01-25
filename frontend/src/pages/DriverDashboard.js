@@ -120,6 +120,24 @@ export default function DriverDashboard() {
   // Onboarding state
   const [showOnboarding, setShowOnboarding] = useState(false);
   
+  // Dark mode state
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('trukall_dark_mode');
+    return saved === 'true';
+  });
+  
+  // Apply dark mode class to document
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark', 'bg-slate-900');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark', 'bg-slate-900');
+    }
+    localStorage.setItem('trukall_dark_mode', darkMode);
+  }, [darkMode]);
+  
   // Check if user needs onboarding on first load
   useEffect(() => {
     const onboardingComplete = localStorage.getItem('trukall_onboarding_complete');
