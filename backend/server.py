@@ -1845,29 +1845,57 @@ async def get_national_fuel_prices():
     
     try:
         async with httpx.AsyncClient(timeout=30) as client:
-            # EIA API for diesel prices
-            diesel_url = f"https://api.eia.gov/v2/petroleum/pri/gnd/data/?api_key={EIA_API_KEY}&frequency=weekly&data[0]=value&facets[product][]=EPD2D&facets[series][]=EMD_EPD2D_PTE_NUS_DPG&sort[0][column]=period&sort[0][direction]=desc&length=1"
+            # EIA API for national diesel prices
+            diesel_url = f"https://api.eia.gov/v2/petroleum/pri/gnd/data/?api_key={EIA_API_KEY}&frequency=weekly&data[0]=value&facets[product][]=EPD2D&facets[series][]=EMD_EPD2D_PTE_NUS_DPG&sort[0][column]=period&sort[0][direction]=desc&length=2"
             
-            response = await client.get(diesel_url)
+            # EIA API for national regular gas prices
+            gas_url = f"https://api.eia.gov/v2/petroleum/pri/gnd/data/?api_key={EIA_API_KEY}&frequency=weekly&data[0]=value&facets[product][]=EPM0R&facets[series][]=EMM_EPM0R_PTE_NUS_DPG&sort[0][column]=period&sort[0][direction]=desc&length=2"
             
-            if response.status_code == 200:
-                data = response.json()
+            # Fetch both in parallel
+            diesel_response, gas_response = await asyncio.gather(
+                client.get(diesel_url),
+                client.get(gas_url),
+                return_exceptions=True
+            )
+            
+            result = {
+                "source": "U.S. Energy Information Administration (EIA)",
+                "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                "prices": {},
+                "verified": True
+            }
+            
+            # Process diesel data
+            if not isinstance(diesel_response, Exception) and diesel_response.status_code == 200:
+                data = diesel_response.json()
                 diesel_data = data.get("response", {}).get("data", [])
-                diesel_price = diesel_data[0].get("value") if diesel_data else 3.75
+                if diesel_data:
+                    current_price = float(diesel_data[0].get("value", 0))
+                    prev_price = float(diesel_data[1].get("value", current_price)) if len(diesel_data) > 1 else current_price
+                    result["date"] = diesel_data[0].get("period", result["date"])
+                    result["prices"]["diesel"] = {
+                        "national_avg": current_price,
+                        "week_change": round(current_price - prev_price, 3),
+                        "unit": "$/gallon"
+                    }
+            
+            # Process gas data  
+            if not isinstance(gas_response, Exception) and gas_response.status_code == 200:
+                data = gas_response.json()
+                gas_data = data.get("response", {}).get("data", [])
+                if gas_data:
+                    current_price = float(gas_data[0].get("value", 0))
+                    prev_price = float(gas_data[1].get("value", current_price)) if len(gas_data) > 1 else current_price
+                    result["prices"]["regular_gas"] = {
+                        "national_avg": current_price,
+                        "week_change": round(current_price - prev_price, 3),
+                        "unit": "$/gallon"
+                    }
+            
+            if not result["prices"]:
+                return {"verified": False, "error": "No data returned from EIA API"}
                 
-                return {
-                    "source": "U.S. Energy Information Administration (EIA)",
-                    "date": diesel_data[0].get("period") if diesel_data else datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                    "prices": {
-                        "diesel": {
-                            "national_avg": float(diesel_price),
-                            "unit": "$/gallon"
-                        }
-                    },
-                    "verified": True
-                }
-            else:
-                return {"verified": False, "error": f"EIA API error: {response.status_code}"}
+            return result
                 
     except Exception as e:
         logger.error(f"EIA API error: {str(e)}")
