@@ -824,7 +824,7 @@ export default function DriverDashboard() {
             data-testid="tab-retail"
           >
             <Store className="w-4 h-4 mr-2" />
-            Retail Parking
+            {t('tabs.retail')}
           </Button>
           <Button
             variant={activeTab === "convoy" ? "default" : "outline"}
@@ -833,7 +833,7 @@ export default function DriverDashboard() {
             data-testid="tab-convoy"
           >
             <Users className="w-4 h-4 mr-2" />
-            Convoy
+            {t('tabs.convoy')}
           </Button>
           <Button
             variant={activeTab === "loads" ? "default" : "outline"}
@@ -842,7 +842,7 @@ export default function DriverDashboard() {
             data-testid="tab-loads"
           >
             <Truck className="w-4 h-4 mr-2" />
-            Load Board
+            {t('tabs.loads')}
           </Button>
           <Button
             variant={activeTab === "calculator" ? "default" : "outline"}
@@ -851,7 +851,7 @@ export default function DriverDashboard() {
             data-testid="tab-calculator"
           >
             <Calculator className="w-4 h-4 mr-2" />
-            Trip Calculator
+            {t('tabs.calculator')}
           </Button>
           <Button
             variant={activeTab === "compliance" ? "default" : "outline"}
@@ -860,7 +860,7 @@ export default function DriverDashboard() {
             data-testid="tab-compliance"
           >
             <FileText className="w-4 h-4 mr-2" />
-            DOT Compliance
+            {t('tabs.compliance')}
           </Button>
           <Button
             variant={activeTab === "subscription" ? "default" : "outline"}
@@ -869,7 +869,7 @@ export default function DriverDashboard() {
             data-testid="tab-subscription"
           >
             <Crown className="w-4 h-4 mr-2" />
-            Plans
+            {t('tabs.subscription')}
           </Button>
           <Button
             variant={activeTab === "emergency" ? "default" : "outline"}
@@ -878,7 +878,7 @@ export default function DriverDashboard() {
             data-testid="tab-emergency"
           >
             <Phone className="w-4 h-4 mr-2" />
-            SOS
+            {t('tabs.emergency')}
           </Button>
           <Button
             variant={activeTab === "documents" ? "default" : "outline"}
@@ -887,7 +887,7 @@ export default function DriverDashboard() {
             data-testid="tab-documents"
           >
             <Camera className="w-4 h-4 mr-2" />
-            Documents
+            {t('tabs.documents')}
           </Button>
           <Button
             variant={activeTab === "fuel" ? "default" : "outline"}
@@ -896,7 +896,7 @@ export default function DriverDashboard() {
             data-testid="tab-fuel"
           >
             <Fuel className="w-4 h-4 mr-2" />
-            Fuel Prices
+            {t('tabs.fuel')}
           </Button>
           <Button
             variant={activeTab === "weather" ? "default" : "outline"}
@@ -905,7 +905,7 @@ export default function DriverDashboard() {
             data-testid="tab-weather"
           >
             <CloudRain className="w-4 h-4 mr-2" />
-            Weather Alerts
+            {t('tabs.weather')}
           </Button>
           <Button
             variant={activeTab === "analytics" ? "default" : "outline"}
@@ -914,7 +914,7 @@ export default function DriverDashboard() {
             data-testid="tab-analytics"
           >
             <BarChart3 className="w-4 h-4 mr-2" />
-            Analytics
+            {t('tabs.analytics')}
           </Button>
           <Button
             variant={activeTab === "route" ? "default" : "outline"}
@@ -923,7 +923,7 @@ export default function DriverDashboard() {
             data-testid="tab-route"
           >
             <Route className="w-4 h-4 mr-2" />
-            Route Planner
+            {t('tabs.route')}
           </Button>
           <Button
             variant={activeTab === "voice" ? "default" : "outline"}
@@ -932,7 +932,7 @@ export default function DriverDashboard() {
             data-testid="tab-voice"
           >
             <Mic className="w-4 h-4 mr-2" />
-            Voice
+            {t('tabs.voice')}
           </Button>
           <Button
             variant={activeTab === "photos" ? "default" : "outline"}
@@ -941,7 +941,7 @@ export default function DriverDashboard() {
             data-testid="tab-photos"
           >
             <Image className="w-4 h-4 mr-2" />
-            Photo Reviews
+            {t('tabs.photos')}
           </Button>
           <Button
             variant={activeTab === "messages" ? "default" : "outline"}
@@ -950,7 +950,7 @@ export default function DriverDashboard() {
             data-testid="tab-messages"
           >
             <MessageCircle className="w-4 h-4 mr-2" />
-            Messages
+            {t('tabs.messages')}
           </Button>
           <Button
             variant={activeTab === "community" ? "default" : "outline"}
@@ -959,7 +959,7 @@ export default function DriverDashboard() {
             data-testid="tab-community"
           >
             <Users className="w-4 h-4 mr-2" />
-            Community
+            {t('tabs.community')}
           </Button>
           <Button
             variant={activeTab === "referral" ? "default" : "outline"}
@@ -968,7 +968,7 @@ export default function DriverDashboard() {
             data-testid="tab-referral"
           >
             <Gift className="w-4 h-4 mr-2" />
-            Refer & Earn
+            {t('tabs.referral')}
           </Button>
           <Button
             variant={activeTab === "feedback" ? "default" : "outline"}
@@ -977,7 +977,7 @@ export default function DriverDashboard() {
             data-testid="tab-feedback"
           >
             <MessageSquare className="w-4 h-4 mr-2" />
-            Feedback
+            {t('tabs.feedback')}
           </Button>
           <Button
             variant={activeTab === "connect" ? "default" : "outline"}
@@ -986,7 +986,7 @@ export default function DriverDashboard() {
             data-testid="tab-connect"
           >
             <Globe className="w-4 h-4 mr-2" />
-            Connect
+            {t('tabs.connect')}
           </Button>
           <Button
             variant={activeTab === "achievements" ? "default" : "outline"}
@@ -995,7 +995,7 @@ export default function DriverDashboard() {
             data-testid="tab-achievements"
           >
             <Trophy className="w-4 h-4 mr-2" />
-            Achievements
+            {t('tabs.achievements')}
           </Button>
           <Button
             variant={activeTab === "rewards" ? "default" : "outline"}
@@ -1004,7 +1004,7 @@ export default function DriverDashboard() {
             data-testid="tab-rewards"
           >
             <ShoppingBag className="w-4 h-4 mr-2" />
-            Rewards
+            {t('tabs.rewards')}
           </Button>
           <Button
             variant={activeTab === "maintenance" ? "default" : "outline"}
@@ -1013,7 +1013,7 @@ export default function DriverDashboard() {
             data-testid="tab-maintenance"
           >
             <Wrench className="w-4 h-4 mr-2" />
-            Maintenance
+            {t('tabs.maintenance')}
           </Button>
           <Button
             variant={activeTab === "mentors" ? "default" : "outline"}
@@ -1022,7 +1022,7 @@ export default function DriverDashboard() {
             data-testid="tab-mentors"
           >
             <GraduationCap className="w-4 h-4 mr-2" />
-            Mentors
+            {t('tabs.mentors')}
           </Button>
           <Button
             variant={activeTab === "weight" ? "default" : "outline"}
@@ -1031,7 +1031,7 @@ export default function DriverDashboard() {
             data-testid="tab-weight"
           >
             <Scale className="w-4 h-4 mr-2" />
-            Weight
+            {t('tabs.weight')}
           </Button>
           <Button
             variant={activeTab === "hos" ? "default" : "outline"}
@@ -1040,7 +1040,7 @@ export default function DriverDashboard() {
             data-testid="tab-hos"
           >
             <Clock className="w-4 h-4 mr-2" />
-            HOS
+            {t('tabs.hos')}
           </Button>
           <Button
             variant={activeTab === "qr" ? "default" : "outline"}
@@ -1049,7 +1049,7 @@ export default function DriverDashboard() {
             data-testid="tab-qr"
           >
             <QrCode className="w-4 h-4 mr-2" />
-            QR Code
+            {t('tabs.qr')}
           </Button>
           <Button
             variant={activeTab === "smartloads" ? "default" : "outline"}
@@ -1058,7 +1058,7 @@ export default function DriverDashboard() {
             data-testid="tab-smartloads"
           >
             <Target className="w-4 h-4 mr-2" />
-            Smart Loads
+            {t('tabs.smartLoads')}
           </Button>
           <Button
             variant={activeTab === "brokerscore" ? "default" : "outline"}
@@ -1067,7 +1067,7 @@ export default function DriverDashboard() {
             data-testid="tab-brokerscore"
           >
             <Shield className="w-4 h-4 mr-2" />
-            Broker Score
+            {t('tabs.brokerScore')}
           </Button>
           <Button
             variant={activeTab === "ratecompare" ? "default" : "outline"}
@@ -1076,7 +1076,7 @@ export default function DriverDashboard() {
             data-testid="tab-ratecompare"
           >
             <BarChart3 className="w-4 h-4 mr-2" />
-            Rate Compare
+            {t('tabs.rateCompare')}
           </Button>
           <Button
             variant={activeTab === "profitcalc" ? "default" : "outline"}
@@ -1085,7 +1085,7 @@ export default function DriverDashboard() {
             data-testid="tab-profitcalc"
           >
             <Calculator className="w-4 h-4 mr-2" />
-            Profit Calc
+            {t('tabs.profitCalc')}
           </Button>
           <Button
             variant={activeTab === "fmcsa" ? "default" : "outline"}
@@ -1094,7 +1094,7 @@ export default function DriverDashboard() {
             data-testid="tab-fmcsa"
           >
             <FileText className="w-4 h-4 mr-2" />
-            FMCSA Verify
+            {t('tabs.fmcsa')}
           </Button>
           <Button
             variant={activeTab === "pretrip" ? "default" : "outline"}
@@ -1103,7 +1103,7 @@ export default function DriverDashboard() {
             data-testid="tab-pretrip"
           >
             <ClipboardCheck className="w-4 h-4 mr-2" />
-            Pre-Trip
+            {t('tabs.preTrip')}
           </Button>
           <Button
             variant={activeTab === "expenses" ? "default" : "outline"}
@@ -1112,7 +1112,7 @@ export default function DriverDashboard() {
             data-testid="tab-expenses"
           >
             <DollarSign className="w-4 h-4 mr-2" />
-            Expenses
+            {t('tabs.expenses')}
           </Button>
           <Button
             variant={activeTab === "breaktimer" ? "default" : "outline"}
@@ -1121,7 +1121,7 @@ export default function DriverDashboard() {
             data-testid="tab-breaktimer"
           >
             <Timer className="w-4 h-4 mr-2" />
-            Break Timer
+            {t('tabs.breakTimer')}
           </Button>
           <Button
             variant={activeTab === "fueltrack" ? "default" : "outline"}
@@ -1130,7 +1130,7 @@ export default function DriverDashboard() {
             data-testid="tab-fueltrack"
           >
             <Fuel className="w-4 h-4 mr-2" />
-            Fuel Tracker
+            {t('tabs.fuelTracker')}
           </Button>
           <Button
             variant={activeTab === "forums" ? "default" : "outline"}
@@ -1139,7 +1139,7 @@ export default function DriverDashboard() {
             data-testid="tab-forums"
           >
             <MessageSquare className="w-4 h-4 mr-2" />
-            Forums
+            {t('tabs.forums')}
           </Button>
           <Button
             variant={activeTab === "hazards" ? "default" : "outline"}
@@ -1148,7 +1148,7 @@ export default function DriverDashboard() {
             data-testid="tab-hazards"
           >
             <AlertTriangle className="w-4 h-4 mr-2" />
-            Hazards
+            {t('tabs.hazards')}
           </Button>
           <Button
             variant={activeTab === "earnings" ? "default" : "outline"}
@@ -1157,7 +1157,7 @@ export default function DriverDashboard() {
             data-testid="tab-earnings"
           >
             <TrendingUp className="w-4 h-4 mr-2" />
-            Earnings
+            {t('tabs.earnings')}
           </Button>
         </div>
 
