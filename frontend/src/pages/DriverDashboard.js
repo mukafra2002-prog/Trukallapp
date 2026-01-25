@@ -44,6 +44,7 @@ import FuelEfficiencyTracker from "@/components/FuelEfficiencyTracker";
 import DriverForums from "@/components/DriverForums";
 import HazardAlerts from "@/components/HazardAlerts";
 import EarningsDashboard from "@/components/EarningsDashboard";
+import LanguageSelector from "@/components/LanguageSelector";
 
 
 const mapContainerStyle = {
