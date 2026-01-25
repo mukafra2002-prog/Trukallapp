@@ -1690,53 +1690,7 @@ export default function DriverDashboard() {
         )}
 
         {activeTab === "bookings" && (
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>My Bookings</CardTitle>
-                <CardDescription>Your parking history and upcoming reservations</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {bookings.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No bookings yet</p>
-                ) : (
-                  <div className="space-y-4">
-                    {bookings.map((booking) => (
-                      <Card key={booking.id} data-testid={`booking-${booking.id}`}>
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <CardTitle className="text-lg">{booking.spot_name}</CardTitle>
-                              <CardDescription>{booking.spot_address}</CardDescription>
-                            </div>
-                            <Badge className={booking.payment_status === 'paid' ? 'bg-secondary' : 'bg-yellow-500'}>
-                              {booking.payment_status}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <p className="text-muted-foreground">Check-in</p>
-                              <p className="font-bold mono">{new Date(booking.check_in_date).toLocaleDateString()}</p>
-                            </div>
-                            <div>
-                              <p className="text-muted-foreground">Check-out</p>
-                              <p className="font-bold mono">{new Date(booking.check_out_date).toLocaleDateString()}</p>
-                            </div>
-                            <div className="col-span-2">
-                              <p className="text-muted-foreground">Total Paid</p>
-                              <p className="font-bold mono text-primary text-2xl">${booking.total_price}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+          <BookingsTab bookings={bookings} />
         )}
 
         {/* Shower Credits Tab */}
