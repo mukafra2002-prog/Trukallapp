@@ -1837,106 +1837,15 @@ export default function DriverDashboard() {
 
         {/* Retail Parking Tab */}
         {activeTab === "retail" && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Store className="w-6 h-6" />
-                  Free Overnight Parking
-                </CardTitle>
-                <CardDescription>Find overnight parking at Walmart, Cracker Barrel, and more</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2 flex-wrap">
-                  <Button
-                    variant={selectedChain === "" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      setSelectedChain("");
-                      fetchRetailParking("");
-                    }}
-                  >
-                    All
-                  </Button>
-                  {retailChains.filter(c => c.overnight_friendly).map((chain) => (
-                    <Button
-                      key={chain.id}
-                      variant={selectedChain === chain.id ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        setSelectedChain(chain.id);
-                        fetchRetailParking(chain.id);
-                      }}
-                    >
-                      {chain.name}
-                    </Button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {retailParking.length === 0 ? (
-                <Card className="col-span-full">
-                  <CardContent className="py-8 text-center">
-                    <Store className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">No retail parking locations found</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                retailParking.map((location) => (
-                  <Card key={location.id} className="overflow-hidden" data-testid={`retail-${location.id}`}>
-                    <div className={`h-2 ${getChainColor(location.chain)}`}></div>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-lg">{location.name}</CardTitle>
-                          <CardDescription>{location.city}, {location.state}</CardDescription>
-                        </div>
-                        {location.community_verified && (
-                          <Badge className="bg-green-500/20 text-green-600 text-xs">Verified</Badge>
-                        )}
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-3">{location.address}</p>
-                      
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                          <span className="font-bold">{location.average_rating.toFixed(1)}</span>
-                          <span className="text-xs text-muted-foreground">({location.total_reviews} reviews)</span>
-                        </div>
-                        {location.truck_parking_spaces && (
-                          <Badge variant="outline">{location.truck_parking_spaces} spots</Badge>
-                        )}
-                      </div>
-
-                      {location.restrictions.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {location.restrictions.map((restriction, i) => (
-                            <Badge key={i} variant="outline" className="text-xs bg-yellow-500/10 text-yellow-600">
-                              {restriction.replace(/_/g, ' ')}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-
-                      {location.amenities.length > 0 && (
-                        <div className="flex gap-2">
-                          {location.amenities.map((amenity, i) => (
-                            <span key={i} className="text-xs text-muted-foreground">
-                              {getAmenityIcon(amenity)} {amenity}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
+          <RetailParkingTab 
+            retailParking={retailParking}
+            retailChains={retailChains}
+            selectedChain={selectedChain}
+            onChainSelect={(chain) => {
+              setSelectedChain(chain);
+              fetchRetailParking(chain);
+            }}
+          />
         )}
 
         {/* Convoy Finder Tab */}
@@ -1946,122 +1855,11 @@ export default function DriverDashboard() {
 
         {/* Load Board Tab */}
         {activeTab === "loads" && (
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Truck className="w-6 h-6 text-green-600" />
-                      Load Board
-                    </CardTitle>
-                    <CardDescription>Find and accept loads to maximize your earnings</CardDescription>
-                  </div>
-                  <Badge className="bg-green-500 text-white">{loads.length} Available Loads</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Quick Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                    <p className="text-2xl font-bold text-green-600">{loads.length}</p>
-                    <p className="text-xs text-slate-600">Available Loads</p>
-                  </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-2xl font-bold text-blue-600">
-                      ${loads.length > 0 ? Math.round(loads.reduce((a, b) => a + b.rate, 0) / loads.length).toLocaleString() : 0}
-                    </p>
-                    <p className="text-xs text-slate-600">Avg Rate</p>
-                  </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                    <p className="text-2xl font-bold text-purple-600">
-                      {loads.length > 0 ? Math.round(loads.reduce((a, b) => a + b.distance, 0) / loads.length) : 0}
-                    </p>
-                    <p className="text-xs text-slate-600">Avg Miles</p>
-                  </div>
-                  <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-200">
-                    <p className="text-2xl font-bold text-amber-600">
-                      ${loads.length > 0 ? (loads.reduce((a, b) => a + (b.rate / b.distance), 0) / loads.length).toFixed(2) : '0.00'}
-                    </p>
-                    <p className="text-xs text-slate-600">Avg $/Mile</p>
-                  </div>
-                </div>
-
-                {/* Load List */}
-                <div className="space-y-4">
-                  {loads.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Truck className="w-12 h-12 mx-auto mb-4 text-slate-300" />
-                      <p className="text-slate-500">No loads available right now. Check back soon!</p>
-                    </div>
-                  ) : (
-                    loads.map((load) => (
-                      <Card key={load.id} className="hover:shadow-md transition-shadow border-l-4 border-l-green-500" data-testid={`load-${load.id}`}>
-                        <CardContent className="p-4">
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Badge variant="outline" className="text-xs">{load.equipment_type}</Badge>
-                                <Badge className={load.status === 'available' ? 'bg-green-500' : 'bg-slate-500'}>
-                                  {load.status}
-                                </Badge>
-                              </div>
-                              <h4 className="font-bold text-lg">
-                                {load.origin_city}, {load.origin_state} 
-                                <ArrowRight className="w-4 h-4 inline mx-2" />
-                                {load.destination_city}, {load.destination_state}
-                              </h4>
-                              <div className="flex flex-wrap gap-4 mt-2 text-sm text-slate-600">
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4" />
-                                  {load.distance} miles
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="w-4 h-4" />
-                                  Pickup: {new Date(load.pickup_date).toLocaleDateString()}
-                                </span>
-                                <span>Weight: {load.weight?.toLocaleString() || 'N/A'} lbs</span>
-                              </div>
-                              <p className="text-sm text-slate-500 mt-1">
-                                Contact: {load.contact_name} • {load.contact_phone}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-3xl font-black text-green-600">${load.rate.toLocaleString()}</p>
-                              <p className="text-sm text-slate-600">${(load.rate / load.distance).toFixed(2)}/mile</p>
-                              <div className="flex gap-2 mt-3">
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  onClick={() => {
-                                    setActiveTab("calculator");
-                                    calculateTripProfit(load.id);
-                                  }}
-                                >
-                                  <Calculator className="w-4 h-4 mr-1" />
-                                  Calculate
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  className="bg-green-600 hover:bg-green-700"
-                                  onClick={() => {
-                                    toast.success(`Load accepted! Contact ${load.contact_name} at ${load.contact_phone}`);
-                                  }}
-                                  data-testid={`accept-load-${load.id}`}
-                                >
-                                  Accept Load
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <LoadBoardTab 
+            loads={loads}
+            onCalculateProfit={calculateTripProfit}
+            onSwitchToCalculator={() => setActiveTab("calculator")}
+          />
         )}
 
         {/* Trip Calculator Tab */}
