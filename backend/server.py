@@ -1784,10 +1784,11 @@ async def search_carriers_fmcsa(name: str, limit: int = 10):
                 return {"query": name, "verified": False, "error": f"API error {response.status_code}"}
             
             data = response.json()
-            carriers = data.get("content", [])
+            carriers_data = data.get("content", [])
             
             results = []
-            for carrier in carriers[:limit]:
+            for item in carriers_data[:limit]:
+                carrier = item.get("carrier", {})
                 results.append({
                     "dot_number": carrier.get("dotNumber"),
                     "legal_name": carrier.get("legalName"),
@@ -1795,13 +1796,15 @@ async def search_carriers_fmcsa(name: str, limit: int = 10):
                     "city": carrier.get("phyCity"),
                     "state": carrier.get("phyState"),
                     "allow_to_operate": carrier.get("allowedToOperate"),
-                    "out_of_service": carrier.get("oosStatus")
+                    "out_of_service": carrier.get("oosDate") is not None,
+                    "status_code": carrier.get("statusCode"),
+                    "total_power_units": carrier.get("totalPowerUnits")
                 })
             
             return {
                 "query": name,
                 "verified": True,
-                "total_found": len(carriers),
+                "total_found": len(carriers_data),
                 "results": results
             }
     except Exception as e:
