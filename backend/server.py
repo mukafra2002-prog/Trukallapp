@@ -1666,7 +1666,7 @@ async def verify_carrier_fmcsa(dot_number: str):
                 }
             
             data = response.json()
-            carrier = data.get("content", {})
+            carrier = data.get("content", {}).get("carrier", {})
             
             # Extract key information
             return {
@@ -1675,7 +1675,7 @@ async def verify_carrier_fmcsa(dot_number: str):
                 "legal_name": carrier.get("legalName"),
                 "dba_name": carrier.get("dbaName"),
                 "allow_to_operate": carrier.get("allowedToOperate"),
-                "out_of_service": carrier.get("oosStatus"),
+                "out_of_service": carrier.get("oosDate") is not None,
                 "out_of_service_date": carrier.get("oosDate"),
                 "mc_number": carrier.get("mcNumber"),
                 "physical_address": {
@@ -1691,7 +1691,8 @@ async def verify_carrier_fmcsa(dot_number: str):
                 "safety_rating_date": carrier.get("safetyRatingDate"),
                 "total_drivers": carrier.get("totalDrivers"),
                 "total_power_units": carrier.get("totalPowerUnits"),
-                "is_authorized": carrier.get("allowedToOperate") == "Y" and carrier.get("oosStatus") != "Y"
+                "status_code": carrier.get("statusCode"),
+                "is_authorized": carrier.get("allowedToOperate") == "Y" and carrier.get("statusCode") == "A"
             }
     except httpx.TimeoutException:
         return {"dot_number": dot_number, "verified": False, "error": "FMCSA API timeout"}
